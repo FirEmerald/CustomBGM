@@ -4,12 +4,12 @@ Custom Background Music (and sound loops) for Minecraft
 
 Provides a framework for custom background music to be used by both mods and map makers. Music is defined inside a "loops.xml" file inside the base assets folder (I.E. assets/minecraft/loops.xml), with the following format:
 
-\<Loops\>
-  \<\[name]\>
-    \<resource start=\[loop start sample\] end=\[loop end sample\]\>\[sound file location, as found inside the loops folder inside the base assets folder\]\</resource\>
-    \[more resource definitions - a random one will be picked by the sound engine\]
-  \</\[name]\>
-\</Loops\>
+    <Loops>
+        <[name]>
+            <resource start=[loop start sample] end=[loop end sample]>[sound file location, as found inside the loops folder inside the base assets folder]</resource>
+            [more resource definitions - a random one will be picked by the sound engine]
+        </[name]>
+    </Loops>
 
 The BGM block can be used to set the BGM for a specific volume
 The Boss Spawner block is a helper block that can be used to spawn an enemy and play a specific BGM while the entity is alive.
