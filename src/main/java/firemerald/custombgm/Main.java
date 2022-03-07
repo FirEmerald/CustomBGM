@@ -66,8 +66,8 @@ public class Main extends CoreModMainClass<CommonProxy> implements LoadingCallba
 	@Override
 	public void onPreInitialization(FMLPreInitializationEvent event)
 	{
-		ForgeChunkManager.setForcedChunkLoadingCallback(this, this);
 		super.onPreInitialization(event);
+		ForgeChunkManager.setForcedChunkLoadingCallback(this, this);
 	}
 
 	@Override

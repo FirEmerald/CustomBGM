@@ -1,5 +1,6 @@
 itemGroup.custombgm=CustomBGM
 tile.entity_tester.name=Entity Tester
+tile.bgm.name=BGM Block
 tile.boss_spawner.name=Boss Spawner
 item.shape_tool.name=Shape Tool (%s)
 lore.custombgm.bgm=Sets background music for players.
