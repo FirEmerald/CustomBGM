@@ -23,7 +23,7 @@ public class Core extends DummyModContainer
     	METADATA.credits = "FirEmerald";
     	METADATA.description = "Framework for mods to add in sounds with custom loop points";
     	METADATA.modId = Plugin.MOD_ID;
-    	METADATA.name = "Looped Sounds";
+    	METADATA.name = "CustomBGM";
     	METADATA.version = Plugin.MOD_VERSION;
     	METADATA.logoFile = "assets/custombgm/textures/logo.png";
 	}
