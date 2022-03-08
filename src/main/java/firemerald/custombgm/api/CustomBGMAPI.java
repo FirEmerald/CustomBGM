@@ -12,6 +12,7 @@ import net.minecraft.util.SoundCategory;
 public abstract class CustomBGMAPI
 {
 	public static final String MOD_ID = "custombgm";
+    public static final String API_VERSION = "1.0.0";
 
 	/**
 	 * API implementation instance. null if the mod is not installed, so use null checks if the mod is not strictly required.
