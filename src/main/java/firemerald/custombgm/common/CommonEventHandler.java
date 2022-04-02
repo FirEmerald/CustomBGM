@@ -79,7 +79,7 @@ public class CommonEventHandler
 				Biome biome = player.world.getBiomeForCoordsBody(player.getPosition());
 				if (biome instanceof ICustomMusic)
 				{
-					ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getMusicOverride());
+					ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getLastMusicOverride());
 					if (mus != null) lsPlayer.addMusicOverride(mus, 0);
 				}
 				if (entity instanceof EntityPlayerMP && !Objects.equals(lsPlayer.getMusicOverride(), lsPlayer.getLastMusicOverride()))
