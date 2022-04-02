@@ -5,6 +5,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -21,7 +22,7 @@ public interface ICustomMusic
 	 * @param currentMusic the currently playing BGM. null if none or vanilla.
 	 * @return the music to play
 	 */
-	public ResourceLocation getMusic(@Nullable ResourceLocation currentMusic);
+	public ResourceLocation getMusic(EntityPlayer player, @Nullable ResourceLocation currentMusic);
 
 	/**
 	 * Helper method to pick a music from a random list, or return the current music if it is already in the list.

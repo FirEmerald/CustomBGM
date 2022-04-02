@@ -17,7 +17,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -182,36 +181,28 @@ public class ClientState
 			currentBGMName = null;
 			menuMus = -1;
 		}
-		boolean inGame;
-		if (mc.world != null && mc.player != null) inGame = true;
-		else inGame = false;
-		ResourceLocation loopSound = ClientState.clientPlayer != null ? ClientState.clientPlayer.getMusicOverride() : null;
-		if (loopSound == null)
+		ResourceLocation loopSound;
+		if (mc.currentScreen instanceof ICustomMusic)
 		{
-			boolean isMenu;
-			if (type == MusicType.MENU) isMenu = true;
-			else
+			loopSound = ((ICustomMusic) mc.currentScreen).getMusic(mc.player, currentBGMName);
+		}
+		else
+		{
+			loopSound = ClientState.clientPlayer != null ? ClientState.clientPlayer.getMusicOverride() : null;
+			if (loopSound == null)
 			{
-				isMenu = false;
-				menuMus = -1;
-			}
-			if (mc.currentScreen instanceof ICustomMusic) loopSound = ((ICustomMusic) mc.currentScreen).getMusic(currentBGMName);
-			else
-			{
+				boolean isMenu;
+				if (type == MusicType.MENU) isMenu = true;
+				else
+				{
+					isMenu = false;
+					menuMus = -1;
+				}
 				ConfigClientOptions config = ConfigClientOptions.INSTANCE;
 				if (isMenu && config.titleMusic.val.length > 0)
 				{
 					if (menuMus == -1) menuMus = (int) (Math.random() * config.titleMusic.val.length);
 					loopSound = config.titleMusic.val[menuMus];
-				}
-				else if (inGame)
-				{
-					Biome biome = mc.world.getBiomeForCoordsBody(mc.player.getPosition());
-					if (biome instanceof ICustomMusic)
-					{
-						ResourceLocation mus = ((ICustomMusic) biome).getMusic(currentBGMName);
-						if (mus != null) loopSound = mus;
-					}
 				}
 			}
 		}

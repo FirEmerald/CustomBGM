@@ -22,7 +22,7 @@ public class Plugin implements IFMLLoadingPlugin, IFMLCallHook
 {
 	public static final String MOD_ID = CustomBGMAPI.MOD_ID;
     public static final String MC_VERSION = "[1.12.2]";
-    public static final String MOD_VERSION = "[1.0.0]";
+    public static final String MOD_VERSION = "[1.1.0]";
 
     private File location;
 

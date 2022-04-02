@@ -2,6 +2,7 @@ package firemerald.custombgm.common;
 
 import firemerald.custombgm.Main;
 import firemerald.custombgm.api.Capabilities;
+import firemerald.custombgm.api.ICustomMusic;
 import firemerald.custombgm.api.IPlayer;
 import firemerald.custombgm.capability.PlayerBase;
 import firemerald.custombgm.capability.PlayerServer;
@@ -15,7 +16,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -71,6 +74,12 @@ public class CommonEventHandler
 			IPlayer lsPlayer = player.getCapability(Capabilities.player, null);
 			if (lsPlayer != null)
 			{
+				Biome biome = player.world.getBiomeForCoordsBody(player.getPosition());
+				if (biome instanceof ICustomMusic)
+				{
+					ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getMusicOverride());
+					if (mus != null) lsPlayer.addMusicOverride(mus, 0);
+				}
 				if (entity instanceof EntityPlayerMP) Main.network().sendTo(new SelfDataSyncPacket(lsPlayer), (EntityPlayerMP) entity);
 				lsPlayer.clearMusicOverride();
 			}

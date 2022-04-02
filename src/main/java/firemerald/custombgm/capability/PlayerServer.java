@@ -9,7 +9,7 @@ public class PlayerServer extends PlayerBase
 	@Override
 	public void addMusicOverride(ResourceLocation music, int priority)
 	{
-		if (priority >= this.musicOverridePriority)
+		if (priority > this.musicOverridePriority)
 		{
 			super.addMusicOverride(music, priority);
 			this.musicOverridePriority = priority;
