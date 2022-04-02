@@ -12,6 +12,7 @@ import firemerald.custombgm.init.LSBlocks;
 import firemerald.custombgm.init.LSItems;
 import firemerald.custombgm.init.LSSounds;
 import firemerald.custombgm.networking.client.SelfDataSyncPacket;
+import firemerald.custombgm.networking.server.InitializedPacket;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -70,24 +71,34 @@ public class CommonEventHandler
 	public void onLivingUpdatePostAlways(LivingUpdateEvent event)
 	{
 		EntityLivingBase entity = event.getEntityLiving();
-		if (!entity.world.isRemote && entity instanceof EntityPlayer)
+		if (entity instanceof EntityPlayer)
 		{
 			EntityPlayer player = (EntityPlayer) entity;
 			IPlayer lsPlayer = player.getCapability(Capabilities.player, null);
 			if (lsPlayer != null)
 			{
-				Biome biome = player.world.getBiomeForCoordsBody(player.getPosition());
-				if (biome instanceof ICustomMusic)
+				if (player.world.isRemote)
 				{
-					ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getLastMusicOverride());
-					if (mus != null) lsPlayer.addMusicOverride(mus, 0);
+					if (!lsPlayer.getInit())
+					{
+						Main.network().sendToServer(new InitializedPacket());
+					}
 				}
-				if (entity instanceof EntityPlayerMP && !Objects.equals(lsPlayer.getMusicOverride(), lsPlayer.getLastMusicOverride()))
+				else if (lsPlayer.getInit())
 				{
-					lsPlayer.setLastMusicOverride(lsPlayer.getMusicOverride());
-					Main.network().sendTo(new SelfDataSyncPacket(lsPlayer), (EntityPlayerMP) entity);
+					Biome biome = player.world.getBiomeForCoordsBody(player.getPosition());
+					if (biome instanceof ICustomMusic)
+					{
+						ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getLastMusicOverride());
+						if (mus != null) lsPlayer.addMusicOverride(mus, 0);
+					}
+					if (entity instanceof EntityPlayerMP && !Objects.equals(lsPlayer.getMusicOverride(), lsPlayer.getLastMusicOverride()))
+					{
+						lsPlayer.setLastMusicOverride(lsPlayer.getMusicOverride());
+						Main.network().sendTo(new SelfDataSyncPacket(lsPlayer), (EntityPlayerMP) entity);
+					}
+					lsPlayer.clearMusicOverride();
 				}
-				lsPlayer.clearMusicOverride();
 			}
 		}
 	}

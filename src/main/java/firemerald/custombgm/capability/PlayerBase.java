@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 public class PlayerBase implements IPlayer
 {
 	public ResourceLocation musicOverride = null;
+	private boolean isInit = false;
 
 	@Override
 	public void addMusicOverride(ResourceLocation music, int priority)
@@ -33,4 +34,16 @@ public class PlayerBase implements IPlayer
 
 	@Override
 	public void setLastMusicOverride(ResourceLocation music) {}
+
+	@Override
+	public boolean getInit()
+	{
+		return isInit;
+	}
+
+	@Override
+	public void setInit(boolean isInit)
+	{
+		this.isInit = isInit;
+	}
 }

@@ -64,4 +64,8 @@ public interface IPlayer extends ICapabilityProvider
 	 * @return the music
 	 */
 	public void setLastMusicOverride(ResourceLocation music);
+	
+	public boolean getInit();
+	
+	public void setInit(boolean isInit);
 }

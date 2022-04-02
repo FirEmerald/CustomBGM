@@ -9,6 +9,7 @@ import firemerald.custombgm.init.LSTabs;
 import firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import firemerald.custombgm.networking.client.TileGUIPacket;
 import firemerald.custombgm.networking.server.ShapeToolSetPacket;
+import firemerald.custombgm.networking.server.InitializedPacket;
 import firemerald.custombgm.networking.server.TileGUIClosedPacket;
 import firemerald.custombgm.plugin.Plugin;
 import firemerald.custombgm.tileentity.TileEntityBGM;
@@ -41,6 +42,7 @@ public class CommonProxy implements IProxy
 
 		network.registerMessage(TileGUIClosedPacket.Handler.class, TileGUIClosedPacket.class, p++, Side.SERVER);
 		network.registerMessage(ShapeToolSetPacket.Handler.class, ShapeToolSetPacket.class, p++, Side.SERVER);
+		network.registerMessage(InitializedPacket.Handler.class, InitializedPacket.class, p++, Side.SERVER);
 
     	MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
     }
