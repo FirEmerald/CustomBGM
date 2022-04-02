@@ -82,6 +82,7 @@ public class CommonEventHandler
 					if (!lsPlayer.getInit())
 					{
 						Main.network().sendToServer(new InitializedPacket());
+						lsPlayer.setInit(true);
 					}
 				}
 				else if (lsPlayer.getInit())
