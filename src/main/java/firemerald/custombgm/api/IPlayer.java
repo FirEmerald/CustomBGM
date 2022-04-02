@@ -50,4 +50,18 @@ public interface IPlayer extends ICapabilityProvider
 	 * @return the music
 	 */
 	public ResourceLocation getMusicOverride();
+
+	/**
+	 * Gets the current synchronized music override.
+	 *
+	 * @return the music
+	 */
+	public ResourceLocation getLastMusicOverride();
+
+	/**
+	 * Sets the current synchronized music override.
+	 *
+	 * @return the music
+	 */
+	public void setLastMusicOverride(ResourceLocation music);
 }

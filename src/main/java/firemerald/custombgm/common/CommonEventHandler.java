@@ -1,5 +1,7 @@
 package firemerald.custombgm.common;
 
+import java.util.Objects;
+
 import firemerald.custombgm.Main;
 import firemerald.custombgm.api.Capabilities;
 import firemerald.custombgm.api.ICustomMusic;
@@ -80,7 +82,11 @@ public class CommonEventHandler
 					ResourceLocation mus = ((ICustomMusic) biome).getMusic(player, lsPlayer.getMusicOverride());
 					if (mus != null) lsPlayer.addMusicOverride(mus, 0);
 				}
-				if (entity instanceof EntityPlayerMP) Main.network().sendTo(new SelfDataSyncPacket(lsPlayer), (EntityPlayerMP) entity);
+				if (entity instanceof EntityPlayerMP && !Objects.equals(lsPlayer.getMusicOverride(), lsPlayer.getLastMusicOverride()))
+				{
+					lsPlayer.setLastMusicOverride(lsPlayer.getMusicOverride());
+					Main.network().sendTo(new SelfDataSyncPacket(lsPlayer), (EntityPlayerMP) entity);
+				}
 				lsPlayer.clearMusicOverride();
 			}
 		}

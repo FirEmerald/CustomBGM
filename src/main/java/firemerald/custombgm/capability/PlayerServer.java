@@ -4,7 +4,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class PlayerServer extends PlayerBase
 {
-	public int musicOverridePriority = Integer.MIN_VALUE;
+	private int musicOverridePriority = Integer.MIN_VALUE;
+	private ResourceLocation synchronizedMusic = null;
 
 	@Override
 	public void addMusicOverride(ResourceLocation music, int priority)
@@ -21,6 +22,18 @@ public class PlayerServer extends PlayerBase
 	{
 		super.clearMusicOverride();
 		this.musicOverridePriority = Integer.MIN_VALUE;
+	}
+
+	@Override
+	public ResourceLocation getLastMusicOverride()
+	{
+		return synchronizedMusic;
+	}
+
+	@Override
+	public void setLastMusicOverride(ResourceLocation music)
+	{
+		this.synchronizedMusic = music;
 	}
 
 }

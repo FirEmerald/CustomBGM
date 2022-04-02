@@ -24,4 +24,13 @@ public class PlayerBase implements IPlayer
 	{
 		return musicOverride;
 	}
+
+	@Override
+	public ResourceLocation getLastMusicOverride()
+	{
+		return musicOverride;
+	}
+
+	@Override
+	public void setLastMusicOverride(ResourceLocation music) {}
 }
