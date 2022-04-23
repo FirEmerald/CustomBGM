@@ -1,7 +1,7 @@
 package firemerald.custombgm.tileentity;
 
-import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import firemerald.api.betterscreens.TileEntityGUI;
 import firemerald.api.selectionshapes.BoundingShape;
@@ -44,18 +44,18 @@ public abstract class TileEntityEntityOperator<T extends Entity> extends TileEnt
 
     public abstract boolean operate(T entity);
 
-    public abstract List<? extends T> allEntities();
+    public abstract Stream<? extends T> allEntities();
 
 	@Override
 	public void update()
 	{
 		if (isActive())
 		{
-			List<? extends T> matchingEntities;
+			Stream<? extends T> matchingEntities;
 			if (selector == null) matchingEntities = allEntities();
 			else try
 			{
-				matchingEntities = EntitySelector.matchEntities(this, selector, clazz);
+				matchingEntities = EntitySelector.matchEntities(this, selector, clazz).stream();
 			}
 			catch (CommandException e)
 			{
@@ -63,7 +63,7 @@ public abstract class TileEntityEntityOperator<T extends Entity> extends TileEnt
 			}
 			Predicate<T> tester = entity -> shape.isWithin(entity, entity.posX, entity.posY, entity.posZ, pos.getX(), pos.getY(), pos.getZ());
 			if (!selectorNBT.hasNoTags()) tester = tester.and(entity -> NBTUtil.areNBTEquals(selectorNBT, CommandBase.entityToNBT(entity), true));
-			successCount = (int) matchingEntities.stream().filter(tester.and(this::operate)).count();
+			successCount = (int) matchingEntities.filter(tester.and(this::operate)).count();
 			this.setCommandStat(Type.AFFECTED_ENTITIES, successCount);
 			this.setCommandStat(Type.SUCCESS_COUNT, successCount);
 		}

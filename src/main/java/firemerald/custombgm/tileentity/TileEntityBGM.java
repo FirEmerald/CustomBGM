@@ -1,6 +1,6 @@
 package firemerald.custombgm.tileentity;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import firemerald.api.betterscreens.GuiTileEntityGui;
 import firemerald.custombgm.api.Capabilities;
@@ -52,9 +52,9 @@ public class TileEntityBGM extends TileEntityEntityOperator<EntityPlayer>
 	}
 
 	@Override
-	public List<? extends EntityPlayer> allEntities()
+	public Stream<? extends EntityPlayer> allEntities()
 	{
-		return world.playerEntities;
+		return world.playerEntities.stream();
 	}
 
 	@Override

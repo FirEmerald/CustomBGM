@@ -1,9 +1,9 @@
 package firemerald.custombgm.tileentity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import firemerald.api.betterscreens.GuiTileEntityGui;
 import firemerald.api.core.IChunkLoader;
@@ -199,9 +199,9 @@ public class TileEntityBossSpawner extends TileEntityEntityOperator<EntityPlayer
 	}
 
 	@Override
-	public List<? extends EntityPlayer> allEntities()
+	public Stream<? extends EntityPlayer> allEntities()
 	{
-		return world.playerEntities;
+		return world.playerEntities.stream();
 	}
 
 	@Override

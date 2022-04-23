@@ -2,6 +2,7 @@ package firemerald.custombgm.tileentity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import firemerald.api.betterscreens.GuiTileEntityGui;
 import firemerald.custombgm.client.gui.GuiEntityTester;
@@ -53,9 +54,9 @@ public class TileEntityEntityTester extends TileEntityEntityOperator<Entity>
 	}
 
 	@Override
-	public List<? extends Entity> allEntities()
+	public Stream<? extends Entity> allEntities()
 	{
-		return world.loadedEntityList;
+		return world.loadedEntityList.stream();
 	}
 
 	public static ResourceLocation getId(Entity entity)
