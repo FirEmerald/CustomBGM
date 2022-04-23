@@ -60,7 +60,7 @@ public class ConfigValueStringList extends ConfigValueBase
 		else
 		{
 			val = new ArrayList<>(list.tagCount());
-			for (int i = 0; i < val.size(); i++) val.set(i, list.getStringTagAt(i));
+			for (int i = 0; i < list.tagCount(); i++) val.add(list.getStringTagAt(i));
 		}
 	}
 
