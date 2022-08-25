@@ -9,20 +9,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Interface to be implemented on custom biomes or GUI screens that changes the background music to a custom loop.
+ * Interface to be implemented on GUI screens that changes the background music to a custom loop.
  *
  * @author FirEmerald
  *
  */
-public interface ICustomMusic
+public interface ICustomMusic<T>
 {
 	/**
 	 * Get the music to play
 	 *
+	 * @param player the player entity
 	 * @param currentMusic the currently playing BGM. null if none or vanilla.
+	 * @param ths the Screen or Holder of Biome this is referring to
 	 * @return the music to play
 	 */
-	public ResourceLocation getMusic(Player player, @Nullable ResourceLocation currentMusic);
+	public ResourceLocation getMusic(Player player, @Nullable ResourceLocation currentMusic, T ths);
 
 	/**
 	 * Helper method to pick a music from a random list, or return the current music if it is already in the list.

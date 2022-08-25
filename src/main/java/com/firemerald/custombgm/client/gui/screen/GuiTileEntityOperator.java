@@ -1,13 +1,16 @@
-package com.firemerald.custombgm.client.gui;
+package com.firemerald.custombgm.client.gui.screen;
 
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import com.firemerald.custombgm.blockentity.BlockEntityEntityOperator;
-import com.firemerald.fecore.betterscreens.BlockEntityGUIScreen;
-import com.firemerald.fecore.betterscreens.components.text.BetterTextField;
-import com.firemerald.fecore.selectionshapes.*;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
+import com.firemerald.fecore.boundingshapes.BoundingShapeSphere;
+import com.firemerald.fecore.client.gui.components.ButtonConfigureShape;
+import com.firemerald.fecore.client.gui.components.text.BetterTextField;
+import com.firemerald.fecore.client.gui.screen.BlockEntityGUIScreen;
+import com.firemerald.fecore.client.gui.screen.ShapesScreen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

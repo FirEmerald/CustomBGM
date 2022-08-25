@@ -13,6 +13,4 @@ public class CustomBGMTabs
 			return new ItemStack(CustomBGMItems.BGM);
 		}
 	};
-
-	public static void init() {}
 }

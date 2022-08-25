@@ -1,4 +1,4 @@
-package com.firemerald.custombgm.client.gui;
+package com.firemerald.custombgm.client.gui.screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,18 +7,20 @@ import java.util.function.DoubleConsumer;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
-import com.firemerald.fecore.betterscreens.components.Button;
-import com.firemerald.fecore.betterscreens.components.ToggleButton;
-import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
-import com.firemerald.fecore.betterscreens.components.scrolling.VerticalScrollBar;
-import com.firemerald.fecore.betterscreens.components.scrolling.VerticalScrollableComponentPane;
-import com.firemerald.fecore.betterscreens.components.text.BetterTextField;
-import com.firemerald.fecore.betterscreens.components.text.CompoundTagField;
-import com.firemerald.fecore.betterscreens.components.text.DoubleField;
-import com.firemerald.fecore.betterscreens.components.text.LabeledBetterTextField;
-import com.firemerald.fecore.networking.FECoreNetwork;
+import com.firemerald.custombgm.client.gui.EnumSearchMode;
+import com.firemerald.custombgm.client.gui.MusicTabCompleter;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.client.Translator;
+import com.firemerald.fecore.client.gui.components.Button;
+import com.firemerald.fecore.client.gui.components.ToggleButton;
+import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
+import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
+import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollableComponentPane;
+import com.firemerald.fecore.client.gui.components.text.BetterTextField;
+import com.firemerald.fecore.client.gui.components.text.CompoundTagField;
+import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -158,7 +160,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 		entityButtonsScroll = new VerticalScrollBar(400, 40, 420, 220, entityButtons);
 
 		okay = new Button(0, 220, 200, 20, new TranslatableComponent("fecore.gui.confirm"), () -> {
-			FECoreNetwork.INSTANCE.sendToServer(new BlockEntityGUIClosedPacket(this));
+			FECoreMod.NETWORK.sendToServer(new BlockEntityGUIClosedPacket(this));
 			this.onClose();
 		});
 		cancel = new Button(200, 220, 400, 20, new TranslatableComponent("fecore.gui.cancel"), () -> {

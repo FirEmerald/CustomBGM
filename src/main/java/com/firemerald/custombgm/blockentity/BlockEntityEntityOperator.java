@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import com.firemerald.fecore.betterscreens.BlockEntityGUI;
-import com.firemerald.fecore.selectionshapes.BoundingShape;
-import com.firemerald.fecore.selectionshapes.BoundingShapeSphere;
+import com.firemerald.fecore.blockentity.BlockEntityGUI;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
+import com.firemerald.fecore.boundingshapes.BoundingShapeSphere;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -93,6 +93,7 @@ public abstract class BlockEntityEntityOperator<T extends Entity> extends BlockE
 	{
 		if (isActive())
 		{
+			int prevFound = found;
 			Stream<? extends T> matchingEntities;
 			if (selector == null) matchingEntities = allEntities();
 			else try
@@ -107,7 +108,7 @@ public abstract class BlockEntityEntityOperator<T extends Entity> extends BlockE
 			Predicate<T> tester = entity -> shape.isWithin(entity, entity.position().x, entity.position().y, entity.position().z, blockPos.getX(), blockPos.getY(), blockPos.getZ());
 			//if (!selectorNBT.isEmpty()) tester = tester.and(entity -> NbtUtils.areNBTEquals(selectorNBT, CommandBase.entityToNBT(entity), true));
 			found = (int) matchingEntities.filter(tester.and(this::operate)).count();
-			this.setChanged();
+			if (prevFound != found) this.setChanged();
 		}
 	}
 

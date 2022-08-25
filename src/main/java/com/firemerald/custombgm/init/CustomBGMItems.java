@@ -12,19 +12,19 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(CustomBGMAPI.MOD_ID)
 public class CustomBGMItems
 {
-	@ObjectHolder("bgm")
+	@ObjectHolder(RegistryNames.BLOCK_ENTITY_BGM)
 	public static final BlockItem BGM = null;
-	@ObjectHolder("entity_tester")
+	@ObjectHolder(RegistryNames.BLOCK_ENTITY_ENTITY_TESTER)
 	public static final BlockItem ENTITY_TESTER = null;
-	@ObjectHolder("boss_spawner")
+	@ObjectHolder(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER)
 	public static final BlockItem BOSS_SPAWNER = null;
 	
 	public static void registerItems(IEventBus eventBus)
 	{
 		DeferredRegister<Item> items = DeferredRegister.create(ForgeRegistries.ITEMS, CustomBGMAPI.MOD_ID);
-		items.register("bgm", () -> new BlockItem(CustomBGMBlocks.BGM, new Item.Properties().tab(CustomBGMTabs.TAB)));
-		items.register("entity_tester", () -> new BlockItem(CustomBGMBlocks.ENTITY_TESTER, new Item.Properties().tab(CustomBGMTabs.TAB)));
-		items.register("boss_spawner", () -> new BlockItem(CustomBGMBlocks.BOSS_SPAWNER, new Item.Properties().tab(CustomBGMTabs.TAB)));
+		items.register(RegistryNames.BLOCK_ENTITY_BGM, () -> new BlockItem(CustomBGMBlocks.BGM, new Item.Properties().tab(CustomBGMTabs.TAB)));
+		items.register(RegistryNames.BLOCK_ENTITY_ENTITY_TESTER, () -> new BlockItem(CustomBGMBlocks.ENTITY_TESTER, new Item.Properties().tab(CustomBGMTabs.TAB)));
+		items.register(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER, () -> new BlockItem(CustomBGMBlocks.BOSS_SPAWNER, new Item.Properties().tab(CustomBGMTabs.TAB)));
 		items.register(eventBus);
 	}
 }

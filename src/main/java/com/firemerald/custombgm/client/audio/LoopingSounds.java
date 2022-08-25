@@ -1,8 +1,6 @@
 package com.firemerald.custombgm.client.audio;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -166,10 +164,7 @@ public class LoopingSounds
 						else format = FileFormat.getFormat(extension);
 						ResourceLocation res = new ResourceLocation(domain, "loops/" + loc);
 						if (format.canAddSound(res)) infos.add(new LoopingSoundInfo(res, loopStart, loopEnd, format));
-						else
-						{
-							//TODO
-						}
+						else CustomBGMMod.LOGGER.warn("Sound format " + format + " is unable to load resource " + res + ", it will not be registered");
 					}
 					catch (Exception e3)
 					{
@@ -226,17 +221,15 @@ public class LoopingSounds
 			@Override
 			public boolean canAddSound(ResourceLocation sound)
 			{
-				String filename = OggSound.getOutputDir(sound);
-				File file = new File(filename);
-				file.getParentFile().mkdirs();
-				try (InputStream in = ResourceLoader.getResource(sound))
+				if (!CustomBGMMod.cacheAll()) return true;
+				else try
 				{
-					Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					OggSound.saveResource(sound);
 					return true;
 				}
 				catch (IOException e)
 				{
-					//TODO
+					CustomBGMMod.LOGGER.error("Unable to cache " + sound + ", this loop is unavailable", e);
 					return false;
 				}
 			}

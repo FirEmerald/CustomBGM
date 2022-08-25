@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.firemerald.custombgm.client.gui.GuiEntityTester;
+import com.firemerald.custombgm.client.gui.screen.GuiEntityTester;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
-import com.firemerald.fecore.betterscreens.BlockEntityGUIScreen;
+import com.firemerald.fecore.client.gui.screen.BlockEntityGUIScreen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -30,10 +30,10 @@ public class BlockEntityEntityTester extends BlockEntityEntityOperator<Entity>
 	public short min = 1, max = Short.MAX_VALUE;
 	public int count = 0;
 
-    public BlockEntityEntityTester(BlockPos pos, BlockState state)
-    {
-    	this(CustomBGMBlockEntities.ENTITY_TESTER, pos, state);
-    }
+	public BlockEntityEntityTester(BlockPos pos, BlockState state)
+	{
+		this(CustomBGMBlockEntities.ENTITY_TESTER, pos, state);
+	}
 
     public BlockEntityEntityTester(BlockEntityType<? extends BlockEntityEntityTester> type, BlockPos pos, BlockState state)
     {
@@ -89,7 +89,7 @@ public class BlockEntityEntityTester extends BlockEntityEntityOperator<Entity>
 		int count = this.getSuccessCount();
 		if (count < min || count > max) this.count = 0;
 		else this.count = count + 1 - min;
-		if (this.count != prevCount) level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
+		if (this.count != prevCount && level != null) level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
 	}
 
 	@Override

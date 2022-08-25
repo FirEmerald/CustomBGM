@@ -1,11 +1,12 @@
 {
 	"custombgm.config.titlemusic": "Title Music",
+	"custombgm.config.cacheall": "Cache all music",
 	"custombgm.gui.entities.search": "Search",
 	"custombgm.gui.entities.search.narrate": "Entity name search box",
 	"custombgm.gui.entities.type.entity": "Entities",
 	"custombgm.gui.entities.type.living": "Living",
 	"custombgm.gui.entities.type.mob": "Mobs",
-	"custombgm.gui.entities.type.projectile": "Projectiles"
+	"custombgm.gui.entities.type.projectile": "Projectiles",
 	"custombgm.gui.operator.selector": "Entity Selector (optional)",
 	"custombgm.gui.operator.relative": "Relative",
 	"custombgm.gui.operator.absolute": "Absolute",
@@ -26,6 +27,8 @@
 	"custombgm.gui.bossspawner.nbt": "Entity NBT (optional)",
 	"custombgm.gui.bossspawner.nbt.narrate": "Entity NBT, optional",
 	"custombgm.gui.bgm": "Background Music configuration GUI",
+	"custombgm.gui.bgm.priority": "Music priority",
+	"custombgm.gui.bgm.priority.narrate": "Background music priority",
 	"custombgm.gui.bgm.music": "Music track",
 	"custombgm.gui.bgm.music.narrate": "Music track ID",
 	"custombgm.bgm.priority": "Music priority",
@@ -33,5 +36,5 @@
 	"custombgm.tooltip.bgm": "Sets background music for players. Outputs a comparator signal based on the number of detected players.",
 	"custombgm.tooltip.entity_tester": "Detects entities. Outputs a comparator signal based on the number of detected entities over the minumum number.",
 	"custombgm.tooltip.boss_spawner": "Spawns bosses. Outputs a comparator signal of %d when boss is spawned and %d when boss is killed. Can be reset by powering off and back on.",
-	"custombgm.tooltip.redstone_activated": "Activate with a redstone signal.",
+	"custombgm.tooltip.redstone_activated": "Activate with a redstone signal."
 }

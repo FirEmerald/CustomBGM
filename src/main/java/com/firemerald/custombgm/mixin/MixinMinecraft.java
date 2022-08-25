@@ -13,10 +13,10 @@ import net.minecraft.sounds.Music;
 @Mixin(Minecraft.class)
 public class MixinMinecraft
 {
-	@Inject(method = "getSituationalMusic", at = @At("RETURN"))
-	public void getSituationalMusic(Minecraft mc, CallbackInfoReturnable<Music> ci)
+	@Inject(method = "getSituationalMusic", at = @At("RETURN"), cancellable = true)
+	public void getSituationalMusic(CallbackInfoReturnable<Music> ci)
 	{
-		ci.setReturnValue(ClientState.getCustomMusic(ci.getReturnValue(), mc));
+		ci.setReturnValue(ClientState.getCustomMusic(ci.getReturnValue(), (Minecraft) (Object) this));
 		//ci.cancel();
 	}
 }

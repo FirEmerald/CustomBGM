@@ -37,7 +37,7 @@ public class BlockBGM extends BlockEntityGUIBlock
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
-		return new BlockEntityBGM(null, blockPos, blockState);
+		return new BlockEntityBGM(blockPos, blockState);
 	}
 	
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)

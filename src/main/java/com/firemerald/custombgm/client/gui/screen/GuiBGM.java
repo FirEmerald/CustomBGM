@@ -1,16 +1,17 @@
-package com.firemerald.custombgm.client.gui;
+package com.firemerald.custombgm.client.gui.screen;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
-import com.firemerald.fecore.betterscreens.EnumTextAlignment;
-import com.firemerald.fecore.betterscreens.components.Button;
-import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
-import com.firemerald.fecore.betterscreens.components.text.BetterTextField;
-import com.firemerald.fecore.betterscreens.components.text.IntegerField;
-import com.firemerald.fecore.networking.FECoreNetwork;
+import com.firemerald.custombgm.client.gui.MusicTabCompleter;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.client.Translator;
+import com.firemerald.fecore.client.gui.EnumTextAlignment;
+import com.firemerald.fecore.client.gui.components.Button;
+import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
+import com.firemerald.fecore.client.gui.components.text.BetterTextField;
+import com.firemerald.fecore.client.gui.components.text.IntegerField;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -37,15 +38,15 @@ public class GuiBGM extends GuiTileEntityOperator
 		super(new TranslatableComponent("custombgm.gui.bgm"), pos);
 		this.font = Minecraft.getInstance().font;
 		setupShapeField(0, 0, 200, 20);
-		selStr = new FloatingText(0, 20, 200, 40, font, Translator.format("gui.custombgm.operator.selector"), EnumTextAlignment.CENTER);
+		selStr = new FloatingText(0, 20, 200, 40, font, Translator.format("custombgm.gui.operator.selector"), EnumTextAlignment.CENTER);
 		setupSelectorTextField(0, 0, 41, 198, 18);
-		musStr = new FloatingText(200, 20, 400, 40, font, Translator.format("gui.custombgm.bgm.music"), EnumTextAlignment.CENTER);
+		musStr = new FloatingText(200, 20, 400, 40, font, Translator.format("custombgm.gui.bgm.music"), EnumTextAlignment.CENTER);
 		musicTxt = new BetterTextField(font, 201, 41, 198, 18, new TranslatableComponent("custombgm.gui.bgm.music.narrate"), (Consumer<String>) (str -> music = str));
 		musicTxt.setMaxLength(Short.MAX_VALUE);
-		piorStr = new FloatingText(200, 20, 400, 60, font, Translator.format("gui.custombgm.bgm.priority"), EnumTextAlignment.CENTER);
+		piorStr = new FloatingText(200, 20, 400, 60, font, Translator.format("custombgm.gui.bgm.priority"), EnumTextAlignment.CENTER);
 		priorTxt = new IntegerField(font, 201, 81, 198, 18, priority, new TranslatableComponent("custombgm.gui.bgm.priority.narrate"), (IntConsumer) (v -> priority = v));
 		okay = new Button(0, 100, 200, 120, new TranslatableComponent("fecore.gui.confirm"), () -> {
-			FECoreNetwork.INSTANCE.sendToServer(new BlockEntityGUIClosedPacket(this));
+			FECoreMod.NETWORK.sendToServer(new BlockEntityGUIClosedPacket(this));
 			this.onClose();
 		});
 		cancel = new Button(200, 100, 400, 120, new TranslatableComponent("fecore.gui.cancel"), () -> {

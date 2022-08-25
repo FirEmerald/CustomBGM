@@ -1,6 +1,6 @@
 package com.firemerald.custombgm.networking.client;
 
-import com.firemerald.custombgm.api.IPlayer;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.ClientState;
 import com.firemerald.fecore.networking.client.ClientPacket;
 

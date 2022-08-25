@@ -38,12 +38,12 @@ public class BlockBossSpawner extends BlockEntityGUIBlock
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
-		return new BlockEntityBossSpawner(null, blockPos, blockState);
+		return new BlockEntityBossSpawner(blockPos, blockState);
 	}
 	
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
-		return (type == CustomBGMBlockEntities.BGM && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityBossSpawner) blockEntity).serverTick(level2, blockPos, blockState) : null;
+		return (type == CustomBGMBlockEntities.BOSS_SPAWNER && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityBossSpawner) blockEntity).serverTick(level2, blockPos, blockState) : null;
 	}
 
 	public RenderShape getRenderShape(BlockState blockState)
@@ -60,7 +60,7 @@ public class BlockBossSpawner extends BlockEntityGUIBlock
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos)
     {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
-        return tileentity instanceof BlockEntityBossSpawner ? ((BlockEntityBossSpawner) tileentity).getSuccessCount() : 0;
+        return tileentity instanceof BlockEntityBossSpawner ? ((BlockEntityBossSpawner) tileentity).getComparatorLevel() : 0;
     }
 
     @Override

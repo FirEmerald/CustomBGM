@@ -1,7 +1,6 @@
 package com.firemerald.custombgm.capability;
 
-import com.firemerald.custombgm.api.CustomBGMCapabilities;
-import com.firemerald.custombgm.api.IPlayer;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
 
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -56,6 +55,6 @@ public class PlayerBase implements IPlayer
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
 	{
-        return CustomBGMCapabilities.MUSIC_PLAYER.orEmpty(cap, holder);
+        return CAP.orEmpty(cap, holder);
 	}
 }

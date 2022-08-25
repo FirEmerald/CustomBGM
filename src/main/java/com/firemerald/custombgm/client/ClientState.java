@@ -4,14 +4,14 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.firemerald.custombgm.ConfigClient;
 import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.ICustomMusic;
-import com.firemerald.custombgm.api.IPlayer;
 import com.firemerald.custombgm.api.ISoundLoop;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -169,9 +169,10 @@ public class ClientState
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "resource" })
 	public static Music getCustomMusic(Music type, Minecraft mc)
 	{
-		//if (!SoundSystem.initialized()) return type; TODO
+		if (!Minecraft.getInstance().getSoundManager().soundEngine.loaded) return type;
 		if (currentBGM != null && currentBGM.isStopped())
 		{
 			currentBGM = null;
@@ -181,7 +182,7 @@ public class ClientState
 		ResourceLocation loopSound;
 		if (mc.screen instanceof ICustomMusic)
 		{
-			loopSound = ((ICustomMusic) mc.screen).getMusic(mc.player, currentBGMName);
+			loopSound = ((ICustomMusic<Screen>) mc.screen).getMusic(mc.player, currentBGMName, mc.screen);
 		}
 		else if (type == Musics.CREDITS)
 		{

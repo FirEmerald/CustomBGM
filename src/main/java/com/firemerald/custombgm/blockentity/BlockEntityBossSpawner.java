@@ -3,11 +3,11 @@ package com.firemerald.custombgm.blockentity;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.firemerald.custombgm.api.CustomBGMCapabilities;
-import com.firemerald.custombgm.api.IPlayer;
-import com.firemerald.custombgm.client.gui.GuiBossSpawner;
+import com.firemerald.custombgm.api.capabilities.IBossTracker;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.client.gui.screen.GuiBossSpawner;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
-import com.firemerald.fecore.betterscreens.BlockEntityGUIScreen;
+import com.firemerald.fecore.client.gui.screen.BlockEntityGUIScreen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 {
@@ -37,10 +36,10 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 	public boolean killed = false;
 	public int levelOnActive = 7, levelOnKilled = 15;
 
-    public BlockEntityBossSpawner(BlockPos pos, BlockState state)
-    {
-    	this(CustomBGMBlockEntities.BOSS_SPAWNER, pos, state);
-    }
+	public BlockEntityBossSpawner(BlockPos pos, BlockState state)
+	{
+		this(CustomBGMBlockEntities.BOSS_SPAWNER, pos, state);
+	}
 
 	public BlockEntityBossSpawner(BlockEntityType<? extends BlockEntityBossSpawner> type, BlockPos pos, BlockState state)
 	{
@@ -67,47 +66,58 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 	@Override
 	public void serverTick(Level level, BlockPos blockPos, BlockState blockState)
 	{
-		if (!level.isClientSide && level.hasNeighborSignal(worldPosition)) setKilled(false);
+		//if (!level.isClientSide && !isActive()) setKilled(false);
 		super.serverTick(level, blockPos, blockState);
 		if (!level.isClientSide)
 		{
 			int count = this.getSuccessCount();
-			if (boss == null) //boss does not exist
-			{
-				if (isActive() && count > 0 && toSpawn != null) //spawn boss
-				{
-					@SuppressWarnings("deprecation")
-					EntityType<?> type = Registry.ENTITY_TYPE.get(toSpawn);
-					Entity entity = type.create(level);
-					double x, y, z;
-					if (isRelative)
-					{
-						x = spawnX + worldPosition.getX();
-						y = spawnY + worldPosition.getY();
-						z = spawnZ + worldPosition.getZ();
-					}
-					else
-					{
-						x = spawnX;
-						y = spawnY;
-						z = spawnZ;
-					}
-					if (spawnTag != null)
-					{
-		                CompoundTag nbttagcompound = entity.saveWithoutId(new CompoundTag());
-		                UUID uuid = entity.getUUID();
-		                nbttagcompound.merge(spawnTag);
-		                entity.load(nbttagcompound);
-		                entity.setUUID(uuid);
-					}
-					entity.setPos(x, y, z);
-					setBoss(entity);
-					((ServerLevel) level).addFreshEntityWithPassengers(entity);
-				}
-			}
-			else if ((!isActive() || count <= 0) && boss != null) //no players in area, despawn boss
+			if (!isActive())
 			{
 				despawn();
+				setKilled(false);
+			}
+			else if (!killed)
+			{
+				if (boss == null) //boss does not exist
+				{
+					if (count > 0) //spawn boss
+					{
+						@SuppressWarnings("deprecation")
+						EntityType<?> type = Registry.ENTITY_TYPE.get(toSpawn);
+						Entity entity = type.create(level);
+						double x, y, z;
+						if (isRelative)
+						{
+							x = spawnX + worldPosition.getX();
+							y = spawnY + worldPosition.getY();
+							z = spawnZ + worldPosition.getZ();
+						}
+						else
+						{
+							x = spawnX;
+							y = spawnY;
+							z = spawnZ;
+						}
+						if (spawnTag != null)
+						{
+			                CompoundTag nbttagcompound = entity.saveWithoutId(new CompoundTag());
+			                UUID uuid = entity.getUUID();
+			                nbttagcompound.merge(spawnTag);
+			                entity.load(nbttagcompound);
+			                entity.setUUID(uuid);
+						}
+						entity.setPos(x, y, z);
+						IBossTracker.get(entity).ifPresent(tracker -> {
+							tracker.setBossBlock(BlockEntityBossSpawner.this.getLevel(), BlockEntityBossSpawner.this.getBlockPos());
+							BlockEntityBossSpawner.this.setBoss(entity);
+							((ServerLevel) level).addFreshEntityWithPassengers(entity);
+						});
+					}
+				}
+				else if (count <= 0) //no players in area, despawn boss
+				{
+					despawn();
+				}
 			}
 		}
 	}
@@ -134,17 +144,13 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 	@Override
 	public boolean isActive()
 	{
-		return !level.isClientSide && !killed && toSpawn != null && level.hasNeighborSignal(worldPosition);
+		return toSpawn != null && level.hasNeighborSignal(worldPosition);
 	}
 
 	@Override
 	public boolean operate(Player player)
 	{
-		if (boss != null && !disableMusic)
-		{
-			LazyOptional<IPlayer> iPlayer = player.getCapability(CustomBGMCapabilities.MUSIC_PLAYER, null);
-			if (iPlayer.isPresent()) iPlayer.resolve().get().addMusicOverride(music, priority);
-		}
+		if (boss != null && !disableMusic) IPlayer.get(player).ifPresent(iPlayer -> iPlayer.addMusicOverride(music, priority));
 		return true;
 	}
 

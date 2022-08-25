@@ -1,37 +1,32 @@
 package com.firemerald.custombgm.client;
 
-import firemerald.api.betterscreens.ScissorUtil;
-import com.firemerald.custombgm.api.CustomBGMCapabilities;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler
 {
 	@SubscribeEvent
-	public void onClientTick(ClientTickEvent event)
+	public static void onClientTick(ClientTickEvent event)
 	{
 		if (event.phase == Phase.START)
 		{
 			LoopingSounds.update();
-			EntityPlayer player = Minecraft.getMinecraft().player;
-			ClientState.clientPlayer = (player != null) ? player.getCapability(CustomBGMCapabilities.player, null) : null;
+			@SuppressWarnings("resource")
+			Player player = Minecraft.getInstance().player;
+			if (player == null) ClientState.clientPlayer = null;
+			else ClientState.clientPlayer = IPlayer.getOrNull(player);
 		}
-		else
+		else if (ClientState.currentBGM != null)
 		{
-			if (ClientState.currentBGM != null) ClientState.currentBGM.tick(true);
-			if (Minecraft.getMinecraft().world != null) while (!ClientState.QUEUED_ACTIONS.isEmpty()) ClientState.QUEUED_ACTIONS.poll().run();
-			else ClientState.QUEUED_ACTIONS.clear();
+			ClientState.currentBGM.tick(true);
 		}
-	}
-
-	@SubscribeEvent
-	public void onRenderTick(RenderTickEvent event)
-	{
-		if (event.phase == Phase.START) ScissorUtil.clearScissor();
 	}
 }

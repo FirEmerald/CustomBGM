@@ -1,4 +1,4 @@
-package com.firemerald.custombgm.client.gui;
+package com.firemerald.custombgm.client.gui.screen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,15 +10,16 @@ import java.util.function.IntConsumer;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.firemerald.custombgm.CustomBGMMod;
-import com.firemerald.fecore.betterscreens.components.Button;
-import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
-import com.firemerald.fecore.betterscreens.components.scrolling.VerticalScrollBar;
-import com.firemerald.fecore.betterscreens.components.scrolling.VerticalScrollableComponentPane;
-import com.firemerald.fecore.betterscreens.components.text.IntegerField;
-import com.firemerald.fecore.betterscreens.components.text.LabeledBetterTextField;
-import com.firemerald.fecore.networking.FECoreNetwork;
+import com.firemerald.custombgm.client.gui.EnumSearchMode;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.client.Translator;
+import com.firemerald.fecore.client.gui.components.Button;
+import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
+import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
+import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollableComponentPane;
+import com.firemerald.fecore.client.gui.components.text.IntegerField;
+import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
@@ -121,7 +122,7 @@ public class GuiEntityTester extends GuiTileEntityOperator
 		entityButtonsScroll = new VerticalScrollBar(400, 60, 420, 180, entityButtons);
 
 		okay = new Button(0, 180, 200, 20, new TranslatableComponent("fecore.gui.confirm"), () -> {
-			FECoreNetwork.INSTANCE.sendToServer(new BlockEntityGUIClosedPacket(this));
+			FECoreMod.NETWORK.sendToServer(new BlockEntityGUIClosedPacket(this));
 			GuiEntityTester.this.onClose();
 		});
 		cancel = new Button(200, 180, 200, 20, new TranslatableComponent("fecore.gui.cancel"), () -> {

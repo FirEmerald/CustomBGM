@@ -37,12 +37,12 @@ public class BlockEntityTester extends BlockEntityGUIBlock
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
-		return new BlockEntityEntityTester(null, blockPos, blockState);
+		return new BlockEntityEntityTester(blockPos, blockState);
 	}
 	
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
-		return (type == CustomBGMBlockEntities.BGM && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityEntityTester) blockEntity).serverTick(level2, blockPos, blockState) : null;
+		return (type == CustomBGMBlockEntities.ENTITY_TESTER && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityEntityTester) blockEntity).serverTick(level2, blockPos, blockState) : null;
 	}
 
 	public RenderShape getRenderShape(BlockState blockState)

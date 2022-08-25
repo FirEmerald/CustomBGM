@@ -1,12 +1,10 @@
 package com.firemerald.custombgm.networking.server;
 
-import com.firemerald.custombgm.api.CustomBGMCapabilities;
-import com.firemerald.custombgm.api.IPlayer;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.fecore.networking.server.ServerPacket;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkEvent.Context;
 
 public class InitializedPacket extends ServerPacket
@@ -23,8 +21,7 @@ public class InitializedPacket extends ServerPacket
 	{
 		final Player player = context.getSender();
 		context.enqueueWork(() -> {
-			LazyOptional<IPlayer> lsPlayer = player.getCapability(CustomBGMCapabilities.MUSIC_PLAYER, null);
-			if (lsPlayer.isPresent()) lsPlayer.resolve().get().setInit(true);
+			IPlayer.get(player).ifPresent(iPlayer -> iPlayer.setInit(true));
 		});
 	}
 }

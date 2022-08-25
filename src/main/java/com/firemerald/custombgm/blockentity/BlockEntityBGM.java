@@ -2,11 +2,10 @@ package com.firemerald.custombgm.blockentity;
 
 import java.util.stream.Stream;
 
-import com.firemerald.custombgm.api.CustomBGMCapabilities;
-import com.firemerald.custombgm.api.IPlayer;
-import com.firemerald.custombgm.client.gui.GuiBGM;
+import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.client.gui.screen.GuiBGM;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
-import com.firemerald.fecore.betterscreens.BlockEntityGUIScreen;
+import com.firemerald.fecore.client.gui.screen.BlockEntityGUIScreen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -26,10 +25,10 @@ public class BlockEntityBGM extends BlockEntityEntityOperator<Player>
 	public int priority;
 	public int count = 0;
 
-    public BlockEntityBGM(BlockPos pos, BlockState state)
-    {
-    	this(CustomBGMBlockEntities.BGM, pos, state);
-    }
+	public BlockEntityBGM(BlockPos pos, BlockState state)
+	{
+		this(CustomBGMBlockEntities.BGM, pos, state);
+	}
 
     public BlockEntityBGM(BlockEntityType<? extends BlockEntityBGM> type, BlockPos pos, BlockState state)
     {
@@ -54,7 +53,7 @@ public class BlockEntityBGM extends BlockEntityEntityOperator<Player>
 	@Override
 	public boolean operate(Player player)
 	{
-		LazyOptional<IPlayer> iPlayer = player.getCapability(CustomBGMCapabilities.MUSIC_PLAYER, null);
+		LazyOptional<IPlayer> iPlayer = IPlayer.get(player);
 		if (iPlayer.isPresent())
 		{
 			iPlayer.resolve().get().addMusicOverride(music, priority);
@@ -78,7 +77,7 @@ public class BlockEntityBGM extends BlockEntityEntityOperator<Player>
 		String music = tag.getString("music");
 		this.music = music.isEmpty() ? null : new ResourceLocation(music);
 		priority = tag.getInt("priority");
-		if (this.count != prevCount) level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
+		if (this.count != prevCount && level != null) level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
 	}
 
 	@Override
