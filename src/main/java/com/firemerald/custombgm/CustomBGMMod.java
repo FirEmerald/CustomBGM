@@ -41,6 +41,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(CustomBGMAPI.MOD_ID)
 public class CustomBGMMod {
@@ -59,7 +60,7 @@ public class CustomBGMMod {
     {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
-        eventBus.addListener(this::clientSetup);
+        if (FMLEnvironment.dist.isClient()) eventBus.addListener(this::clientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
         CustomBGMItems.registerItems(eventBus);
         CustomBGMBlocks.registerBlocks(eventBus);
