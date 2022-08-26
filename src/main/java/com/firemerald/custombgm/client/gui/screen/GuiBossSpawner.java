@@ -8,7 +8,7 @@ import java.util.function.DoubleConsumer;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.firemerald.custombgm.client.gui.EnumSearchMode;
-import com.firemerald.custombgm.client.gui.MusicTabCompleter;
+import com.firemerald.custombgm.client.gui.MusicSuggestions;
 import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.components.Button;
@@ -21,7 +21,6 @@ import com.firemerald.fecore.client.gui.components.text.CompoundTagField;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
 import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
@@ -73,7 +72,6 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 	public final List<EntityButton> entities = new ArrayList<>();
 	public EntityButton activeEntity;
 	public int sup = 0;
-    private MusicTabCompleter tabCompleter;
 
     public final FloatingText labelSelector, labelSpawn, labelSpawnNBT, labelMusic;
     public final Button spawnRelative, okay, cancel;
@@ -84,6 +82,8 @@ public class GuiBossSpawner extends GuiTileEntityOperator
     public final LabeledBetterTextField fieldSearch;
     public final VerticalScrollableComponentPane entityButtons;
     public final VerticalScrollBar entityButtonsScroll;
+
+	public MusicSuggestions suggestions;
 
 	public String music = "";
 	public int priority;
@@ -140,6 +140,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 			}
 		});
 		fieldMusic = new BetterTextField(font, 0, 200, 200, 20, music, new TranslatableComponent("custombgm.gui.bgm.music.nmarrate"), (Consumer<String>) (val -> this.music = val));
+		fieldMusic.setResponder(this::onEdited);
 
 		fieldSearch = new LabeledBetterTextField(font, 200, 0, 220, 20, Translator.translate("custombgm.gui.entities.search"), new TranslatableComponent("custombgm.gui.entities.search.narrate"), (Consumer<String>) this::updateSearch);
 		entityButtons = new VerticalScrollableComponentPane(200, 40, 400, 220);
@@ -153,7 +154,6 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 			this.onClose();
 		});
 		entityButtons.setScrollBar(entityButtonsScroll);
-        this.tabCompleter = new MusicTabCompleter(this.fieldMusic);
 	}
 
 	@Override
@@ -231,6 +231,9 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 
 		addRenderableWidget(okay);
 		addRenderableWidget(cancel);
+		suggestions = new MusicSuggestions(this.minecraft, this, this.fieldMusic, this.font, 0, 7, Integer.MIN_VALUE);
+		suggestions.setAllowSuggestions(true);
+		suggestions.updateCommandInfo();
 	}
 
 	public void updateSearch()
@@ -261,14 +264,25 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 	@Override
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
-        this.tabCompleter.resetRequested();
-        if (key == InputConstants.KEY_TAB && !hasControlDown())
-        {
-        	this.tabCompleter.complete();
-        	return true;
-        }
-        else this.tabCompleter.resetDidComplete();
-        return super.keyPressed(key, scancode, mods);
+		if (this.suggestions.keyPressed(key, scancode, mods)) return true;
+		else return super.keyPressed(key, scancode, mods);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mX, double mY, double scrollY)
+	{
+		return this.suggestions.mouseScrolled(scrollY) ? true : super.mouseScrolled(mX, mY, scrollY);
+	}
+
+	@Override
+	public boolean mouseClicked(double mX, double mY, int button)
+	{
+		return this.suggestions.mouseClicked(mX, mY, button) ? true : super.mouseClicked(mX, mY, button);
+	}
+	
+	private void onEdited(String p_97689_)
+	{
+		if (suggestions != null) this.suggestions.updateCommandInfo();
 	}
 
 	@Override
@@ -276,6 +290,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 	{
 		this.renderBackground(pose);
 		super.render(pose, mx, my, partialTicks, canHover);
+		this.suggestions.render(pose, mx, my);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package com.firemerald.custombgm.client.gui.screen;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
-import com.firemerald.custombgm.client.gui.MusicTabCompleter;
+import com.firemerald.custombgm.client.gui.MusicSuggestions;
 import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
@@ -12,7 +12,6 @@ import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.BetterTextField;
 import com.firemerald.fecore.client.gui.components.text.IntegerField;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
@@ -24,12 +23,12 @@ public class GuiBGM extends GuiTileEntityOperator
 {
 	public String music = "";
 	public int priority;
-    private MusicTabCompleter tabCompleter;
 
     public final Button okay, cancel;
     public final FloatingText musStr, piorStr, selStr;
     public final BetterTextField musicTxt;
 	public final IntegerField priorTxt;
+	public MusicSuggestions suggestions;
 
 	@SuppressWarnings("resource")
 	public GuiBGM(BlockPos pos)
@@ -42,6 +41,7 @@ public class GuiBGM extends GuiTileEntityOperator
 		musStr = new FloatingText(200, 20, 400, 40, font, Translator.format("custombgm.gui.bgm.music"), EnumTextAlignment.CENTER);
 		musicTxt = new BetterTextField(font, 201, 41, 198, 18, new TranslatableComponent("custombgm.gui.bgm.music.narrate"), (Consumer<String>) (str -> music = str));
 		musicTxt.setMaxLength(Short.MAX_VALUE);
+		musicTxt.setResponder(this::onEdited);
 		piorStr = new FloatingText(200, 20, 400, 60, font, Translator.format("custombgm.gui.bgm.priority"), EnumTextAlignment.CENTER);
 		priorTxt = new IntegerField(font, 201, 81, 198, 18, priority, new TranslatableComponent("custombgm.gui.bgm.priority.narrate"), (IntConsumer) (v -> priority = v));
 		okay = new Button(0, 100, 200, 120, new TranslatableComponent("fecore.gui.confirm"), () -> {
@@ -51,7 +51,6 @@ public class GuiBGM extends GuiTileEntityOperator
 		cancel = new Button(200, 100, 400, 120, new TranslatableComponent("fecore.gui.cancel"), () -> {
 			this.onClose();
 		});
-        this.tabCompleter = new MusicTabCompleter(this.musicTxt);
 	}
 
 	@Override
@@ -94,19 +93,33 @@ public class GuiBGM extends GuiTileEntityOperator
 
 		addRenderableWidget(okay);
 		addRenderableWidget(cancel);
+		suggestions = new MusicSuggestions(this.minecraft, this, this.musicTxt, this.font, 0, 7, Integer.MIN_VALUE);
+		suggestions.setAllowSuggestions(true);
+		suggestions.updateCommandInfo();
 	}
 
 	@Override
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
-        this.tabCompleter.resetRequested();
-        if (key == InputConstants.KEY_TAB && !hasControlDown())
-        {
-        	this.tabCompleter.complete();
-        	return true;
-        }
-        else this.tabCompleter.resetDidComplete();
-        return super.keyPressed(key, scancode, mods);
+		if (this.suggestions.keyPressed(key, scancode, mods)) return true;
+		else return super.keyPressed(key, scancode, mods);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mX, double mY, double scrollY)
+	{
+		return this.suggestions.mouseScrolled(scrollY) ? true : super.mouseScrolled(mX, mY, scrollY);
+	}
+
+	@Override
+	public boolean mouseClicked(double mX, double mY, int button)
+	{
+		return this.suggestions.mouseClicked(mX, mY, button) ? true : super.mouseClicked(mX, mY, button);
+	}
+	
+	private void onEdited(String p_97689_)
+	{
+		if (suggestions != null) this.suggestions.updateCommandInfo();
 	}
 
 	@Override
@@ -114,6 +127,7 @@ public class GuiBGM extends GuiTileEntityOperator
 	{
 		this.renderBackground(pose);
 		super.render(pose, mx, my, partialTicks, canHover);
+		this.suggestions.render(pose, mx, my);
 	}
 
 	@Override
