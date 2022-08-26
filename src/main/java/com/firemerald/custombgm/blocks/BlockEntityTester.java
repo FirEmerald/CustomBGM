@@ -39,18 +39,21 @@ public class BlockEntityTester extends BlockEntityGUIBlock
 	{
 		return new BlockEntityEntityTester(blockPos, blockState);
 	}
-	
+
+	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
 		return (type == CustomBGMBlockEntities.ENTITY_TESTER && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityEntityTester) blockEntity).serverTick(level2, blockPos, blockState) : null;
 	}
 
+	@Override
 	public RenderShape getRenderShape(BlockState blockState)
 	{
 		return RenderShape.MODEL;
 	}
 
-    public boolean hasAnalogOutputSignal(BlockState state)
+    @Override
+	public boolean hasAnalogOutputSignal(BlockState state)
     {
        return true;
     }

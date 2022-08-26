@@ -51,11 +51,11 @@ public abstract class CustomBGMAPI
 	public abstract void registerBiomeMusic(ResourceLocation biomeName, ICustomMusic<Holder<Biome>> music);
 
 	public abstract void registerBiomeMusic(TagKey<Biome> biomeTag, ICustomMusic<Holder<Biome>> music);
-	
+
 	protected abstract ICustomMusic<Holder<Biome>> getBiomeMusic(ResourceLocation biomeName);
-	
+
 	protected abstract ICustomMusic<Holder<Biome>> getBiomeMusic(TagKey<Biome> biomeTag);
-	
+
 	public ICustomMusic<Holder<Biome>> getBiomeMusic(Holder<Biome> biome)
 	{
 		ICustomMusic<Holder<Biome>> music = getBiomeMusic(biome.value().getRegistryName());

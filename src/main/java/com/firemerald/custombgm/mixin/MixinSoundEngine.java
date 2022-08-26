@@ -17,13 +17,13 @@ public class MixinSoundEngine
 	{
 		LoopingSounds.stopAll();
 	}
-	
+
 	@Inject(method = "pause", at = @At("HEAD"))
 	public void pause(CallbackInfo ci)
 	{
 		LoopingSounds.pauseAll();
 	}
-	
+
 	@Inject(method = "resume", at = @At("HEAD"))
 	public void resume(CallbackInfo ci)
 	{

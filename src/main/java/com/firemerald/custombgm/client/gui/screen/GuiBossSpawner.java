@@ -168,7 +168,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 		int farX = offX + width;
 		int listX = farX - 10;
 		int buttonWidth = listX - midX;
-		
+
 		/*
 		 * <        shape        ><search>
 		 * <      sel label      >< list >
@@ -270,7 +270,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
         else this.tabCompleter.resetDidComplete();
         return super.keyPressed(key, scancode, mods);
 	}
-	   
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
 	{

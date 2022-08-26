@@ -249,14 +249,14 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 	{
 		return new GuiBossSpawner(this.worldPosition);
 	}
-	
+
 	@Override
 	public void setRemoved()
 	{
 		super.setRemoved();
 		despawn();
 	}
-	
+
 	@Override
 	public void onChunkUnloaded()
 	{

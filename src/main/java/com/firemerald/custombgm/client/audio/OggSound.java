@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.stb.STBVorbis;
@@ -19,38 +20,54 @@ import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.fecore.data.ResourceLoader;
 import com.firemerald.fecore.util.FECoreUtil;
 
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 
 public class OggSound extends SoundBase
 {
 	private static final Set<ResourceLocation> CACHED = new HashSet<>();
+	private static final Set<ResourceLocation> ERRORED = new HashSet<>();
 	private static final String CACHE_DIR = "custombgmcache/";
-	
+	private static final File CACHE_FOLDER = new File(CACHE_DIR);
+
 	static
 	{
-		File file = new File(CACHE_DIR);
-		file.mkdirs();
-		file.deleteOnExit();
+		CACHE_FOLDER.mkdirs();
+		CACHE_FOLDER.deleteOnExit();
 	}
-	
+
 	public static void clearCached()
 	{
 		CACHED.clear();
+		ERRORED.clear();
 	}
-	
+
 	private static String getOutputDir(ResourceLocation name)
 	{
 		return CACHE_DIR + name.getNamespace() + "/" + name.getPath();
 	}
-	
+
+	private static void markDirForDeletion(File file)
+	{
+		Stack<File> stack = new Stack<>();
+		File parent = file.getParentFile();
+		while (!parent.equals(CACHE_FOLDER))
+		{
+			stack.add(parent);
+			parent = parent.getParentFile();
+		}
+		while (!stack.isEmpty()) stack.pop().deleteOnExit();
+	}
+
 	public static void saveResource(ResourceLocation name) throws IOException
 	{
 		if (CACHED.contains(name)) return;
-		CACHED.add(name);
 		String filename = OggSound.getOutputDir(name);
 		File file = new File(filename);
 		file.getParentFile().mkdirs();
+		markDirForDeletion(file);
+		file.deleteOnExit();
 		try (InputStream in = ResourceLoader.getResource(name))
 		{
 			Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -59,8 +76,26 @@ public class OggSound extends SoundBase
 		{
 			throw e;
 		}
+		CACHED.add(name);
 	}
-	
+
+	public static OggSound make(Sound sound, SoundSource category, boolean disablePan)
+	{
+		if (ERRORED.contains(sound.getLocation())) return null;
+		int loopStart = ((IExtendedSound) sound).getLoopStart();
+		int loopEnd = ((IExtendedSound) sound).getLoopEnd();
+		try
+		{
+			return new OggSound(new ResourceLocation(sound.getLocation().getNamespace(), "sounds/" + sound.getLocation().getPath() + ".ogg"), category, loopStart, loopEnd, disablePan);
+		}
+		catch (Throwable t)
+		{
+			ERRORED.add(sound.getLocation());
+			CustomBGMMod.LOGGER.error("Error grabbing sound loop", t);
+			return null;
+		}
+	}
+
 	public long decoder;
 	public STBVorbisInfo info;
 	public int loopStart = 0;
@@ -68,16 +103,16 @@ public class OggSound extends SoundBase
 	private int position;
 	public final boolean disablePan;
 
-	public OggSound(ResourceLocation resource, SoundSource category, int loopStart, int loopEnd, boolean disablePan)
+	private OggSound(ResourceLocation resource, SoundSource category, int loopStart, int loopEnd, boolean disablePan)
 	{
 		super(FECoreUtil.getURLForResource(resource), category, "looping streamed OGG");
-		if (!CustomBGMMod.cacheAll()) try
+		try
 		{
 			saveResource(resource);
 		}
 		catch (IOException e)
 		{
-			throw new IllegalStateException("Unable to cache " + resource);
+			throw new IllegalStateException("Unable to cache " + resource, e);
 		}
 		IntBuffer err = IntBuffer.allocate(1);
 		info = STBVorbisInfo.malloc();
@@ -87,10 +122,10 @@ public class OggSound extends SoundBase
         this.loopEnd = loopEnd;
         this.disablePan = disablePan;
 	}
-	
+
 	public void loadData(int channels, int rate, ShortBuffer buffer)
 	{
-		buffer.limit(Math.max((((position + rate) > loopEnd) ? (loopEnd - position) : rate), 0) * channels);
+		buffer.limit(Math.max((loopEnd > 0 && ((position + rate) > loopEnd) ? (loopEnd - position) : rate), 0) * channels);
 		int loaded = STBVorbis.stb_vorbis_get_samples_short_interleaved(decoder, channels, buffer);
 		buffer.limit(loaded * channels);
 		position += loaded;

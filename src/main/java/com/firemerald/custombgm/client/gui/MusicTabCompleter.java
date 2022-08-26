@@ -7,11 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import com.firemerald.custombgm.client.audio.LoopingSounds;
 
 @OnlyIn(Dist.CLIENT)
 public class MusicTabCompleter
@@ -58,7 +58,7 @@ public class MusicTabCompleter
     private void requestCompletions(String prefix)
     {
         this.requestedCompletions = true;
-        this.setCompletions(LoopingSounds.allSoundNames.stream().filter(str -> str.startsWith(prefix)).collect(Collectors.toList()));
+        this.setCompletions(Minecraft.getInstance().getSoundManager().getAvailableSounds().stream().map(ResourceLocation::toString).filter(str -> str.startsWith(prefix)).collect(Collectors.toList()));
     }
 
     /**

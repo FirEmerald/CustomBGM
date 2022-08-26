@@ -10,6 +10,7 @@ import com.firemerald.custombgm.api.ISoundLoop;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.init.CustomBGMSounds;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;

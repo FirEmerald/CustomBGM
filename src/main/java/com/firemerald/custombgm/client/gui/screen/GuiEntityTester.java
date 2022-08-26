@@ -146,7 +146,7 @@ public class GuiEntityTester extends GuiTileEntityOperator
 		int farX = offX + width;
 		int listX = farX - 10;
 		int buttonWidth = listX - midX;
-		
+
 		/*
 		 * <  shape  ><sel all><sel none>
 		 * <sel label><     search      >
@@ -157,7 +157,7 @@ public class GuiEntityTester extends GuiTileEntityOperator
 		 * <   max   ><      list       >
 		 * < confirm ><     cancel      >
 		 */
-		
+
 		int y = 0;
 		configureShape.setSize(offX, y, midX, y + 20);
 		selectAll.setSize(midX, y, selectMidX, y + 20);
@@ -177,9 +177,9 @@ public class GuiEntityTester extends GuiTileEntityOperator
 		labelMax.setSize(offX, y, midX, y + 20);
 		y += 20;
 		fieldMax.setSize(offX, y, midX, y + 20);
-		
-		
-		
+
+
+
 		okay.setSize(offX, height - 20, offX + 200, height);
 		cancel.setSize(farX - 200, height - 20, farX, height);
 		allEntities.forEach(button -> button.setSize(0, button.getY1(), buttonWidth, button.getY2()));

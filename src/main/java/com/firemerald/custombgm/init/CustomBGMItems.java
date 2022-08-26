@@ -18,7 +18,7 @@ public class CustomBGMItems
 	public static final BlockItem ENTITY_TESTER = null;
 	@ObjectHolder(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER)
 	public static final BlockItem BOSS_SPAWNER = null;
-	
+
 	public static void registerItems(IEventBus eventBus)
 	{
 		DeferredRegister<Item> items = DeferredRegister.create(ForgeRegistries.ITEMS, CustomBGMAPI.MOD_ID);

@@ -46,17 +46,17 @@ public abstract class BlockEntityEntityOperator<T extends Entity> extends BlockE
     	super(type, pos, state);
     	this.clazz = clazz;
     }
-    
+
     public String getSelectorString()
     {
     	return selectorString;
     }
-    
+
     public EntitySelector getSelector()
     {
     	return selector;
     }
-    
+
     public void setSelectorString(String selectorString)
     {
     	this.selectorString = selectorString;
@@ -163,7 +163,7 @@ public abstract class BlockEntityEntityOperator<T extends Entity> extends BlockE
 	public Component getName() {
 		return this.customName;
 	}
-	
+
 	public void setName(@Nullable Component customName)
 	{
 		if (customName != null) this.customName = customName;
@@ -187,7 +187,7 @@ public abstract class BlockEntityEntityOperator<T extends Entity> extends BlockE
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void sendMessage(Component p_45426_, UUID p_45427_) {}
 }

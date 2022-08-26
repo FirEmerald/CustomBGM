@@ -3,7 +3,8 @@ package com.firemerald.custombgm.common;
 import java.util.Objects;
 
 import com.firemerald.custombgm.CustomBGMMod;
-import com.firemerald.custombgm.api.*;
+import com.firemerald.custombgm.api.CustomBGMAPI;
+import com.firemerald.custombgm.api.ICustomMusic;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.blockentity.BlockEntityBossSpawner;
@@ -43,7 +44,7 @@ public class CommonEventHandler
 			}
 		});
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLeaveWorld(EntityLeaveWorldEvent event) //boss despawned
 	{
@@ -57,7 +58,7 @@ public class CommonEventHandler
 			tracker.setBossBlock(null, null); //no longer tracking
 		});
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingDeath(LivingDeathEvent event) //boss killed
 	{

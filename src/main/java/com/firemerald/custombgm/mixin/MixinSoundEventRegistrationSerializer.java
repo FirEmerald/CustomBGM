@@ -19,19 +19,23 @@ public class MixinSoundEventRegistrationSerializer
 	@Inject(method = "getSound", at = @At("RETURN"))
 	public void getSound(JsonObject obj, CallbackInfoReturnable<Sound> callback)
 	{
-		int start;
-		if (obj.has("loopStart"))
+		Sound sound = callback.getReturnValue();
+		if (sound != null)
 		{
-			start = GsonHelper.getAsInt(obj, "loopStart", 0);
-			Validate.isTrue(start >= 0, "Invalid loop start");
-			((IExtendedSound) callback.getReturnValue()).setLoopStart(start);
-		}
-		else start = 0;
-		if (obj.has("loopEnd"))
-		{
-			int end = GsonHelper.getAsInt(obj, "loopEnd", 0);
-			Validate.isTrue(end == 0 || end > start, "Invalid loop end");
-			((IExtendedSound) callback.getReturnValue()).setLoopEnd(end);
+			int start;
+			if (obj.has("loopStart"))
+			{
+				start = GsonHelper.getAsInt(obj, "loopStart", 0);
+				Validate.isTrue(start >= 0, "Invalid loop start");
+				((IExtendedSound) sound).setLoopStart(start);
+			}
+			else start = 0;
+			if (obj.has("loopEnd"))
+			{
+				int end = GsonHelper.getAsInt(obj, "loopEnd", 0);
+				Validate.isTrue(end == 0 || end > start, "Invalid loop end");
+				((IExtendedSound) sound).setLoopEnd(end);
+			}
 		}
 	}
 }

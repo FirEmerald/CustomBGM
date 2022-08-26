@@ -15,7 +15,10 @@ import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.ConfigClient;
 import com.firemerald.custombgm.client.ReloadListener;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
-import com.firemerald.custombgm.init.*;
+import com.firemerald.custombgm.init.CustomBGMBlockEntities;
+import com.firemerald.custombgm.init.CustomBGMBlocks;
+import com.firemerald.custombgm.init.CustomBGMItems;
+import com.firemerald.custombgm.init.CustomBGMSounds;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
 import com.firemerald.fecore.networking.SimpleNetwork;
@@ -35,18 +38,15 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(CustomBGMAPI.MOD_ID)
 public class CustomBGMMod {
     public static final Logger LOGGER = LoggerFactory.getLogger("Custom BGM");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(CustomBGMAPI.MOD_ID, "main"), "1");
-    
+
     static final ForgeConfigSpec clientSpec;
     public static final ConfigClient CLIENT;
     static {
@@ -54,20 +54,12 @@ public class CustomBGMMod {
         clientSpec = specPair.getRight();
         CLIENT = specPair.getLeft();
     }
-    private static boolean cacheAll = false;
-    
-    public static boolean cacheAll()
-    {
-    	return cacheAll;
-    }
 
     public CustomBGMMod()
     {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
-        eventBus.addListener(this::configLoading);
-        eventBus.addListener(this::loadComplete);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
         CustomBGMItems.registerItems(eventBus);
         CustomBGMBlocks.registerBlocks(eventBus);
@@ -82,7 +74,7 @@ public class CustomBGMMod {
 		CustomBGMAPI.instance = new CustomBGMAPI() {
 			final Map<ResourceLocation, ICustomMusic<Holder<Biome>>> biomeMapping = new HashMap<>();
 			final Map<TagKey<Biome>, ICustomMusic<Holder<Biome>>> tagMapping = new HashMap<>();
-			
+
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ISoundLoop grabSound(ResourceLocation name, SoundSource category, boolean disablePan)
@@ -122,23 +114,13 @@ public class CustomBGMMod {
 			}
 		};
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event)
     {
     	((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new ReloadListener());
     }
-    
-    public void configLoading(ModConfigEvent.Loading event)
-    {
-    	if (event.getConfig().getSpec() == clientSpec) cacheAll = CLIENT.cacheAll.get();
-    }
-    
-    public void loadComplete(FMLLoadCompleteEvent event)
-    {
-    	if (FMLEnvironment.dist.isClient()) LoopingSounds.loadInfos();
-    }
-    
+
 	public void registerCaps(RegisterCapabilitiesEvent event)
 	{
 		event.register(IPlayer.class);

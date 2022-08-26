@@ -80,18 +80,18 @@ public class GuiBGM extends GuiTileEntityOperator
 		y += 20;
 		okay.setSize(offX, y, offX + 200, y + 20);
 		cancel.setSize(offX + 200, y, offX + 400, y + 20);
-		
+
 		addRenderableWidget(configureShape);
-		
+
 		addRenderableWidget(selStr);
 		addRenderableWidget(selectorTxt);
-		
+
 		addRenderableWidget(musStr);
 		addRenderableWidget(musicTxt);
-		
+
 		addRenderableWidget(piorStr);
 		addRenderableWidget(priorTxt);
-		
+
 		addRenderableWidget(okay);
 		addRenderableWidget(cancel);
 	}
@@ -108,7 +108,7 @@ public class GuiBGM extends GuiTileEntityOperator
         else this.tabCompleter.resetDidComplete();
         return super.keyPressed(key, scancode, mods);
 	}
-	   
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
 	{

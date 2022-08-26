@@ -56,7 +56,7 @@ public abstract class GuiTileEntityOperator extends BlockEntityGUIScreen
 		if (customName != null) this.customName = customName;
 		else this.customName = BlockEntityEntityOperator.DEFAULT_NAME;
 	}
-	
+
 	@Override
 	public void read(FriendlyByteBuf buf)
 	{

@@ -22,12 +22,12 @@ public interface IPlayer extends ICapabilityProvider
 {
 	public static final ResourceLocation NAME = new ResourceLocation(CustomBGMAPI.MOD_ID, "player");
 	public static final Capability<IPlayer> CAP = CapabilityManager.get(new CapabilityToken<>(){});
-	
+
 	public static LazyOptional<IPlayer> get(ICapabilityProvider obj)
 	{
 		return obj.getCapability(CAP);
 	}
-	
+
 	public static LazyOptional<IPlayer> get(ICapabilityProvider obj, @Nullable Direction side)
 	{
 		return obj.getCapability(CAP, side);
@@ -37,7 +37,7 @@ public interface IPlayer extends ICapabilityProvider
 	{
 		return get(obj).resolve().orElse(null);
 	}
-	
+
 	public static IPlayer getOrNull(ICapabilityProvider obj, @Nullable Direction side)
 	{
 		return get(obj, side).resolve().orElse(null);
@@ -76,8 +76,8 @@ public interface IPlayer extends ICapabilityProvider
 	 * @return the music
 	 */
 	public void setLastMusicOverride(ResourceLocation music);
-	
+
 	public boolean getInit();
-	
+
 	public void setInit(boolean isInit);
 }

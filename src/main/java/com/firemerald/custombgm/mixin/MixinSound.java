@@ -10,7 +10,7 @@ import net.minecraft.client.resources.sounds.Sound;
 public class MixinSound implements IExtendedSound
 {
 	public int loopStart = 0, loopEnd = 0;
-	
+
 	@Override
 	public int getLoopStart()
 	{
