@@ -2,19 +2,12 @@
 # CustomBGM
 Custom Background Music (and sound loops) for Minecraft
 
-Provides a framework for custom background music to be used by both mods and map makers. Music is defined inside a "loops.xml" file inside the base assets folder (I.E. assets/minecraft/loops.xml), with the following format:
+Provides a framework for custom background music to be used by both mods and map makers. Custom loop points, used in the BGM block, Boss Spawner, optionally configured custom title screen music, and any situatons where mods use the custom loops sound engine the mod provides, can be specified in your sounds.json using "loopStart" and "loopEnd" integers, such as "mp1.boss.flaaghra": {"sounds":[{"loopStart":387124,"loopEnd":3671832,"name":"mc4:mp1/boss/rui_flaaghra","stream":true}]}. the loop points are in samples.
 
-    <Loops>
-        <[name]>
-            <resource start=[loop start sample] end=[loop end sample]>[sound file location, as found inside the loops folder inside the base assets folder]</resource>
-            [more resource definitions - a random one will be picked by the sound engine]
-        </[name]>
-    </Loops>
-
-The BGM block can be used to set the BGM for a specific volume
+The BGM block can be used to set the BGM for a specific bounding area
 The Boss Spawner block is a helper block that can be used to spawn an enemy and play a specific BGM while the entity is alive.
- - the entity will be despawned and the block reset if a player leaves the activation volume
+ - the entity will be despawned and the block reset if a player leaves the activation area
  - the block is only active while powered by redstone
  - the block will output a comparator strength of 7 when the boss is spawned and 15 when it is killed
  - turning the redstone signal off resets the block so it can be used again
-The Entity Tester block is a helper block to test for entities inside a volume
+The Entity Tester block is a helper block to test for entities inside a bounding area
