@@ -22,7 +22,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 public class GuiBGM extends GuiTileEntityOperator
 {
-	int offX, offY;
 	public String music = "";
 	public int priority;
     private MusicTabCompleter tabCompleter;
@@ -58,24 +57,41 @@ public class GuiBGM extends GuiTileEntityOperator
 	@Override
 	public void init()
 	{
-		offX = (width - 400) >> 1;
-		offY = (height - 120) >> 1;
-		configureShape.setSize(offX, offY, offX + 200, offY + 20);
-		selStr.setSize(offX, offY + 20, offX + 200, offY + 40);
-		selectorTxt.setSize(offX, offY + 40, offX + 200, offY + 60);
-		musStr.setSize(offX + 200, offY + 20, offX + 400, offY + 40);
-		musicTxt.setSize(offX + 200, offY + 40, offX + 400, offY + 60);
-		piorStr.setSize(offX + 200, offY + 60, offX + 400, offY + 80);
-		priorTxt.setSize(offX + 200, offY + 80, offX + 400, offY + 100);
-		okay.setSize(offX, offY + 100, offX + 200, offY + 120);
-		cancel.setSize(offX + 200, offY + 100, offX + 400, offY + 120);
+		/*
+		 * <    shape     >< music label  >
+		 * <--------------><    music     >
+		 * <selector label><priority label>
+		 * <   selector   ><   priority   >
+		 * <   confirm    ><    cancel    >
+		 */
+		int offX = (width - 400) >> 1;
+		int offY = (height - 100) >> 1;
+		int y = offY;
+		configureShape.setSize(offX, y, offX + 200, y + 20);
+		musStr.setSize(offX + 200, y, offX + 400, y + 20);
+		y += 20;
+		musicTxt.setSize(offX + 200, y, offX + 400, y + 20);
+		y += 20;
+		selStr.setSize(offX, y, offX + 200, y + 20);
+		piorStr.setSize(offX + 200, y, offX + 400, y + 20);
+		y += 20;
+		selectorTxt.setSize(offX, y, offX + 200, y + 20);
+		priorTxt.setSize(offX + 200, y, offX + 400, y + 20);
+		y += 20;
+		okay.setSize(offX, y, offX + 200, y + 20);
+		cancel.setSize(offX + 200, y, offX + 400, y + 20);
+		
 		addRenderableWidget(configureShape);
+		
 		addRenderableWidget(selStr);
 		addRenderableWidget(selectorTxt);
+		
 		addRenderableWidget(musStr);
 		addRenderableWidget(musicTxt);
+		
 		addRenderableWidget(piorStr);
 		addRenderableWidget(priorTxt);
+		
 		addRenderableWidget(okay);
 		addRenderableWidget(cancel);
 	}

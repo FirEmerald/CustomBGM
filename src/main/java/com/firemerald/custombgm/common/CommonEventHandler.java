@@ -21,6 +21,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -30,27 +32,31 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber
 public class CommonEventHandler
 {
-	/*
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onEntityLeaveWorld(EntityLeaveWorldEvent event) //boss despawn removal
+	@SubscribeEvent(priority = EventPriority.HIGHEST) //we want to cancel the event as soon as possible
+	public static void onEntityJoinWorld(EntityJoinWorldEvent event) //do not load boss entities
 	{
-		LazyOptional<IBossTracker> cap = event.getEntity().getCapability(CustomBGMCapabilities.BOSS_TRACKER);
-		if (cap.isPresent())
-		{
-			IBossTracker tracker = cap.resolve().get();
+		if (event.loadedFromDisk()) IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
+			if (tracker.isBoss())
+			{
+				tracker.setBossBlock(null, null); //no longer tracking
+				event.setCanceled(true);
+			}
+		});
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onLeaveWorld(EntityLeaveWorldEvent event) //boss despawned
+	{
+		IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
 			BlockEntity blockEntity = tracker.getBossBlock();
-			//System.out.println(blockEntity);
 			if (blockEntity instanceof BlockEntityBossSpawner)
 			{
 				BlockEntityBossSpawner spawner = (BlockEntityBossSpawner) blockEntity;
-				//spawner.setKilled(true);
 				spawner.setBoss(null);
 			}
-			//event.getEntity().discard(); //forcibly despawn entity TODO
-			tracker.setBossBlock(null, null);
-		}
+			tracker.setBossBlock(null, null); //no longer tracking
+		});
 	}
-	*/
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingDeath(LivingDeathEvent event) //boss killed

@@ -139,28 +139,50 @@ public class GuiEntityTester extends GuiTileEntityOperator
 	@Override
 	public void init()
 	{
-		int buttonsWidth = Math.min(this.width - 200, 392) - 10;
-		int offX = (this.width - buttonsWidth - 210) >> 1;
-		int offX2 = offX + 200;
-		int offX3 = offX2 + ((buttonsWidth + 10) >> 1);
-		int offX4 = offX2 + buttonsWidth;
-		int offX5 = offX4 + 10;
-		configureShape.setSize(offX, 0, offX2, 20);
-		labelSelector.setSize(offX, 20, offX2, 40);
-		selectorTxt.setSize(offX, 40, offX2, 60);
-		labelMin.setSize(offX, 100, offX2, 120);
-		fieldMin.setSize(offX, 120, offX2, 140);
-		labelMax.setSize(offX, 140, offX2, 160);
-		fieldMax.setSize(offX, 160, offX2, 180);
-		selectAll.setSize(offX2, 0, offX3, 20);
-		selectNone.setSize(offX3, 0, offX5, 20);
-		fieldSearch.setSize(offX2, 20, offX5, 40);
-		entityButtons.setSize(offX2, 60, offX4, height - 20);
-		entityButtonsScroll.setSize(offX4, 60, offX5, height - 20);
-		okay.setSize(offX, height - 20, offX2, height);
-		cancel.setSize(offX5 - 200, height - 20, offX5, height);
-		final int w = entityButtons.x2 - entityButtons.x1; //max 392
-		allEntities.forEach(button -> button.setSize(0, button.getY1(), w, button.getY2()));
+		int width = Math.min(this.width, 200 + 392 + 10);
+		int offX = (this.width - width) >> 1;
+		int midX = offX + 200;
+		int selectMidX = midX + ((width - 200) >> 1);
+		int farX = offX + width;
+		int listX = farX - 10;
+		int buttonWidth = listX - midX;
+		
+		/*
+		 * <  shape  ><sel all><sel none>
+		 * <sel label><     search      >
+		 * <   sel   ><      list       >
+		 * <min label><      list       >
+		 * <   min   ><      list       >
+		 * <max label><      list       >
+		 * <   max   ><      list       >
+		 * < confirm ><     cancel      >
+		 */
+		
+		int y = 0;
+		configureShape.setSize(offX, y, midX, y + 20);
+		selectAll.setSize(midX, y, selectMidX, y + 20);
+		selectNone.setSize(selectMidX, y, farX, y + 20);
+		y += 20;
+		labelSelector.setSize(offX, y, midX, y + 20);
+		fieldSearch.setSize(midX, y, farX, y + 20);
+		y += 20;
+		selectorTxt.setSize(offX, y, midX, y + 20);
+		entityButtons.setSize(midX, y, listX, this.height - 20);
+		entityButtonsScroll.setSize(listX, y, farX, this.height - 20);
+		y += 20;
+		labelMin.setSize(offX, y, midX, y + 20);
+		y += 20;
+		fieldMin.setSize(offX, y, midX, y + 20);
+		y += 20;
+		labelMax.setSize(offX, y, midX, y + 20);
+		y += 20;
+		fieldMax.setSize(offX, y, midX, y + 20);
+		
+		
+		
+		okay.setSize(offX, height - 20, offX + 200, height);
+		cancel.setSize(farX - 200, height - 20, farX, height);
+		allEntities.forEach(button -> button.setSize(0, button.getY1(), buttonWidth, button.getY2()));
 
 		this.addRenderableWidget(configureShape);
 		this.addRenderableWidget(labelSelector);

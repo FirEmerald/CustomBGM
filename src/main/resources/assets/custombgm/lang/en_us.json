@@ -1,4 +1,8 @@
 {
+	"itemGroup.custombgm": "Custom BGM",
+	"block.custombgm.bgm": "BGM Block",
+	"block.custombgm.entity_tester": "Entity Tester",
+	"block.custombgm.boss_spawner": "Boss Spawner",
 	"custombgm.config.titlemusic": "Title Music",
 	"custombgm.config.cacheall": "Cache all music",
 	"custombgm.gui.entities.search": "Search",

@@ -13,12 +13,18 @@ logoFile="custombgm.png"
 credits="FirEmerald"
 authors="FirEmerald"
 description='''
-Framework for mods to add in sounds with custom loop points, as well as setting per-biome music
+Framework for mods to add in sounds with custom loop points, as well setting music for biomes or biome tags
 Also allows for changing of the title screen music via config
 '''
 [[dependencies.custombgm]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.custombgm]]
+    modId="fecore"
+    mandatory=true
+    versionRange="[1.0,)"
     ordering="NONE"
     side="BOTH"

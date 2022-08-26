@@ -25,15 +25,23 @@ import net.minecraft.sounds.SoundSource;
 public class OggSound extends SoundBase
 {
 	private static final Set<ResourceLocation> CACHED = new HashSet<>();
+	private static final String CACHE_DIR = "custombgmcache/";
+	
+	static
+	{
+		File file = new File(CACHE_DIR);
+		file.mkdirs();
+		file.deleteOnExit();
+	}
 	
 	public static void clearCached()
 	{
 		CACHED.clear();
 	}
 	
-	public static String getOutputDir(ResourceLocation name)
+	private static String getOutputDir(ResourceLocation name)
 	{
-		return "custombgm_cache/" + name.getNamespace() + "/" + name.getPath();
+		return CACHE_DIR + name.getNamespace() + "/" + name.getPath();
 	}
 	
 	public static void saveResource(ResourceLocation name) throws IOException

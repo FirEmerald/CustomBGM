@@ -103,34 +103,20 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 			if (type.canSummon()) allEntities.add(new EntityButton(0, y.getValue(), 200, y.addAndGet(20), type.getDescription(), this, reg));
 		});
 		entities.addAll(allEntities);
-		/*
-		 * <configure shape> <         search         >
-		 * Select            !!!
-		 * <  select text  >
-		 * !!!
-		 * !!!
-		 * Spawn  <relative>
-		 * < x ><  y  >< z >
-		 * spawn NBT
-		 * <   spawn nbt   >
-		 * music < enabled >
-		 * <  music name   >
-		 * <     okay      > <         cancel         >
-		 */
 		setupShapeField(0, 0, 200, 20);
 		labelSelector = new FloatingText(0, 20, 200, 40, font, Translator.format("custombgm.gui.operator.selector"));
 		this.setupSelectorTextField(0, 0, 40, 200, 20);
 		labelSpawn = new FloatingText(0, 100, 100, 120, font, Translator.format("custombgm.gui.bossspawner.position"));
-		spawnRelative = new Button(100, 100, 100, 120, new TranslatableComponent(relative ? "custombgm.gui.operator.relative" : "custombgm.gui.operator.absolute"), null).setAction(button -> () -> {
+		spawnRelative = new Button(100, 100, 100, 120, new TranslatableComponent(relative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (relative)
 			{
 				relative = false;
-				button.displayString = new TranslatableComponent("custombgm.gui.operator.absolute");
+				button.displayString = new TranslatableComponent("fecore.shapesgui.operator.absolute");
 			}
 			else
 			{
 				relative = true;
-				button.displayString = new TranslatableComponent("custombgm.gui.operator.relative");
+				button.displayString = new TranslatableComponent("fecore.shapesgui.operator.relative");
 			}
 		});
 		fieldSpawnX = new DoubleField(font, 0, 120, 67, 20, spawnX, new TranslatableComponent("custombgm.gui.bossspawner.position.x"), (DoubleConsumer) (val -> spawnX = val));
@@ -173,47 +159,57 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 	@Override
 	public void init()
 	{
-		int buttonsWidth = Math.min(this.width - 200, 392) - 10;
-		int offX = (this.width - buttonsWidth - 210) >> 1;
-		int offX2 = offX + 100;
-		int offX3 = offX2 + 100;
-		int offX4 = offX3 + buttonsWidth;
-		int offX5 = offX4 + 10;
+		int width = Math.min(this.width, 200 + 392 + 10);
+		int offX = (this.width - width) >> 1;
+		int midX = offX + 200;
+		int midMidX = offX + 100;
+		int leftMidX = offX + 67;
+		int rightMidX = midX - 67;
+		int farX = offX + width;
+		int listX = farX - 10;
+		int buttonWidth = listX - midX;
+		
 		/*
-		 * <configure shape> <         search         >
-		 * Select            !!!
-		 * <  select text  >
-		 * !!!
-		 * !!!
-		 * Spawn  <relative>
-		 * < x ><  y  >< z >
-		 * spawn NBT
-		 * <   spawn nbt   >
-		 * music < enabled >
-		 * <  music name   >
-		 * <     okay      > <         cancel         >
+		 * <        shape        ><search>
+		 * <      sel label      >< list >
+		 * <         sel         >< list >
+		 * <spawn label><rel/abs >< list >
+		 * <  x   ><  y  ><  z   >< list >
+		 * <      nbt label      >< list >
+		 * <         nbt         >< list >
+		 * <mus label><mus enable>< list >
+		 * <        music        >< list >
+		 * <       confirm       ><cancel>
 		 */
-		configureShape.setSize(offX, 0, offX3, 20);
-		labelSelector.setSize(offX, 20, offX3, 40);
-		selectorTxt.setSize(offX, 40, offX3, 60);
-		labelSpawn.setSize(offX, 100, offX2, 120);
-		spawnRelative.setSize(offX2, 100, offX3, 120);
-		fieldSpawnX.setSize(offX, 120, offX + 67, 140);
-		fieldSpawnY.setSize(offX + 67, 120, offX3 - 67, 140);
-		fieldSpawnZ.setSize(offX3 - 67, 120, offX3, 140);
-		labelSpawnNBT.setSize(offX, 140, offX3, 160);
-		fieldSpawnNBT.setSize(offX, 160, offX3, 180);
-		labelMusic.setSize(offX, 180, offX2, 200);
-		musicEnabled.setSize(offX2, 180, offX3, 200);
-		fieldMusic.setSize(offX, 200, offX3, 220);
+		int y = 0;
+		configureShape.setSize(offX, y, midX, y + 20);
+		fieldSearch.setSize(midX, y, farX, y + 20);
+		y += 20;
+		labelSelector.setSize(offX, y, midX, y + 20);
+		entityButtons.setSize(midX, y, listX, height - 20);
+		entityButtonsScroll.setSize(listX, y, farX, height - 20);
+		y += 20;
+		selectorTxt.setSize(offX, y, midX, y + 20);
+		y += 20;
+		labelSpawn.setSize(offX, y, midMidX, y + 20);
+		spawnRelative.setSize(midMidX, y, midX, y + 20);
+		y += 20;
+		fieldSpawnX.setSize(offX, y, leftMidX, y + 20);
+		fieldSpawnY.setSize(leftMidX, y, rightMidX, y + 20);
+		fieldSpawnZ.setSize(rightMidX, y, midX, y + 20);
+		y += 20;
+		labelSpawnNBT.setSize(offX, y, midX, y + 20);
+		y += 20;
+		fieldSpawnNBT.setSize(offX, y, midX, y + 20);
+		y += 20;
+		labelMusic.setSize(offX, y, midMidX, y + 20);
+		musicEnabled.setSize(midMidX, y, midX, y + 20);
+		y += 20;
+		fieldMusic.setSize(offX, y, midX, y + 20);
 
-		fieldSearch.setSize(offX3, 0, offX5, 20);
-		entityButtons.setSize(offX3, 40, offX4, height - 20);
-		entityButtonsScroll.setSize(offX4, 40, offX5, height - 20);
-		okay.setSize(offX, height - 20, offX3, height);
-		cancel.setSize(offX5 - 200, height - 20, offX5, height);
-		final int w = entityButtons.x2 - entityButtons.x1; //max 392
-		allEntities.forEach(button -> button.setSize(0, button.getY1(), w, button.getY2()));
+		okay.setSize(offX, height - 20, offX + 200, height);
+		cancel.setSize(farX - 200, height - 20, farX, height);
+		allEntities.forEach(button -> button.setSize(0, button.getY1(), buttonWidth, button.getY2()));
 
 		this.addRenderableWidget(configureShape);
 		this.addRenderableWidget(labelSelector);
@@ -312,7 +308,7 @@ public class GuiBossSpawner extends GuiTileEntityOperator
 		levelOnActive = levels & 0xF;
 		levelOnKilled = (levels >> 4) & 0xF;
 
-		spawnRelative.displayString = new TranslatableComponent(relative ? "gui.operator.relative" : "gui.operator.absolute");
+		spawnRelative.displayString = new TranslatableComponent(relative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute");
 		fieldSpawnX.setDouble(spawnX);
 		fieldSpawnY.setDouble(spawnY);
 		fieldSpawnZ.setDouble(spawnZ);

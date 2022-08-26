@@ -163,7 +163,7 @@ public class LoopingSounds
 						}
 						else format = FileFormat.getFormat(extension);
 						ResourceLocation res = new ResourceLocation(domain, "loops/" + loc);
-						if (format.canAddSound(res)) infos.add(new LoopingSoundInfo(res, loopStart, loopEnd, format));
+						if (format.canAddSound(res, child2)) infos.add(new LoopingSoundInfo(res, loopStart, loopEnd, format));
 						else CustomBGMMod.LOGGER.warn("Sound format " + format + " is unable to load resource " + res + ", it will not be registered");
 					}
 					catch (Exception e3)
@@ -219,9 +219,9 @@ public class LoopingSounds
 			}
 			
 			@Override
-			public boolean canAddSound(ResourceLocation sound)
+			public boolean canAddSound(ResourceLocation sound, AbstractElement fromElement)
 			{
-				if (!CustomBGMMod.cacheAll()) return true;
+				if (!CustomBGMMod.cacheAll() && !fromElement.getBoolean("cacheFile", false)) return true;
 				else try
 				{
 					OggSound.saveResource(sound);
@@ -242,7 +242,7 @@ public class LoopingSounds
 			this.extensions = extensions;
 		}
 		
-		public abstract boolean canAddSound(ResourceLocation sound);
+		public abstract boolean canAddSound(ResourceLocation sound, AbstractElement fromElement);
 
 		public abstract ISoundLoop getPlayer(ResourceLocation loc, int loopStart, int loopEnd, SoundSource category, boolean disablePan);
 

@@ -31,3 +31,4 @@ gradle/*
 gradlew
 gradlew.bat
 changelog.txt
+libs/*

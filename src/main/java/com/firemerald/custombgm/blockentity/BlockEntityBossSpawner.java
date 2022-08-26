@@ -184,6 +184,7 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 		else spawnTag = null;
 		levelOnActive = tag.contains("levelOnActive", 99) ? tag.getByte("levelOnActive") : 7;
 		levelOnKilled = tag.contains("levelOnKilled", 99) ? tag.getByte("levelOnKilled") : 15;
+		despawn();
 	}
 
 	@Override
@@ -223,6 +224,7 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 		byte levels = buf.readByte();
 		levelOnActive = levels & 0xF;
 		levelOnKilled = (levels >> 4) & 0xF;
+		despawn();
 	}
 
 	@Override
