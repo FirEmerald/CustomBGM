@@ -16,11 +16,10 @@ import com.firemerald.custombgm.client.ConfigClient;
 import com.firemerald.custombgm.client.ReloadListener;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
-import com.firemerald.custombgm.init.CustomBGMBlocks;
-import com.firemerald.custombgm.init.CustomBGMItems;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
+import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
 import com.firemerald.fecore.networking.SimpleNetwork;
 
 import net.minecraft.client.Minecraft;
@@ -47,6 +46,8 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class CustomBGMMod {
     public static final Logger LOGGER = LoggerFactory.getLogger("Custom BGM");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(CustomBGMAPI.MOD_ID, "main"), "1");
+    
+    public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(CustomBGMAPI.MOD_ID);
 
     static final ForgeConfigSpec clientSpec;
     public static final ConfigClient CLIENT;
@@ -62,9 +63,7 @@ public class CustomBGMMod {
         eventBus.addListener(this::setup);
         if (FMLEnvironment.dist.isClient()) eventBus.addListener(this::clientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
-        CustomBGMItems.registerItems(eventBus);
-        CustomBGMBlocks.registerBlocks(eventBus);
-        CustomBGMBlockEntities.registerBlockEntities(eventBus);
+        CustomBGMBlockEntities.init();
         CustomBGMSounds.registerSounds(eventBus);
     }
 

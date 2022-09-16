@@ -32,7 +32,7 @@ public class BlockEntityEntityTester extends BlockEntityEntityOperator<Entity>
 
 	public BlockEntityEntityTester(BlockPos pos, BlockState state)
 	{
-		this(CustomBGMBlockEntities.ENTITY_TESTER, pos, state);
+		this(CustomBGMBlockEntities.ENTITY_TESTER.getBlockEntityType(), pos, state);
 	}
 
     public BlockEntityEntityTester(BlockEntityType<? extends BlockEntityEntityTester> type, BlockPos pos, BlockState state)

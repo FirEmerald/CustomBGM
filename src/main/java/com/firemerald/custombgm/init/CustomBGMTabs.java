@@ -10,7 +10,7 @@ public class CustomBGMTabs
 		@Override
 		public ItemStack makeIcon()
 		{
-			return new ItemStack(CustomBGMItems.BGM);
+			return new ItemStack(CustomBGMBlockEntities.BGM);
 		}
 	};
 }

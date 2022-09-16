@@ -1,32 +1,24 @@
 package com.firemerald.custombgm.init;
 
-import com.firemerald.custombgm.api.CustomBGMAPI;
+import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.blockentity.BlockEntityBGM;
 import com.firemerald.custombgm.blockentity.BlockEntityBossSpawner;
 import com.firemerald.custombgm.blockentity.BlockEntityEntityTester;
+import com.firemerald.custombgm.blocks.BlockBGM;
+import com.firemerald.custombgm.blocks.BlockBossSpawner;
+import com.firemerald.custombgm.blocks.BlockEntityTester;
+import com.firemerald.fecore.init.registry.BlockEntityObject;
 
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 
-@ObjectHolder(CustomBGMAPI.MOD_ID)
 public class CustomBGMBlockEntities
 {
-	@ObjectHolder(RegistryNames.BLOCK_ENTITY_BGM)
-	public static final BlockEntityType<BlockEntityBGM> BGM = null;
-	@ObjectHolder(RegistryNames.BLOCK_ENTITY_ENTITY_TESTER)
-	public static final BlockEntityType<BlockEntityEntityTester> ENTITY_TESTER = null;
-	@ObjectHolder(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER)
-	public static final BlockEntityType<BlockEntityBossSpawner> BOSS_SPAWNER = null;
+	public static final Item.Properties ITEM_PROPERTIES = new Item.Properties().tab(CustomBGMTabs.TAB);
 
-	public static void registerBlockEntities(IEventBus eventBus)
-	{
-		DeferredRegister<BlockEntityType<?>> blockEntities = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, CustomBGMAPI.MOD_ID);
-		blockEntities.register(RegistryNames.BLOCK_ENTITY_BGM, () -> BlockEntityType.Builder.of((pos, state) -> new BlockEntityBGM(BGM, pos, state), CustomBGMBlocks.BGM).build(null));
-		blockEntities.register(RegistryNames.BLOCK_ENTITY_ENTITY_TESTER, () -> BlockEntityType.Builder.of((pos, state) -> new BlockEntityEntityTester(ENTITY_TESTER, pos, state), CustomBGMBlocks.ENTITY_TESTER).build(null));
-		blockEntities.register(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER, () -> BlockEntityType.Builder.of((pos, state) -> new BlockEntityBossSpawner(BOSS_SPAWNER, pos, state), CustomBGMBlocks.BOSS_SPAWNER).build(null));
-		blockEntities.register(eventBus);
-	}
+	public static final BlockEntityObject<BlockEntityBGM, BlockBGM, BlockItem> BGM = CustomBGMMod.REGISTRY.registerBlockEntity(RegistryNames.BLOCK_ENTITY_BGM, BlockBGM::new, block -> new BlockItem(block.get(), ITEM_PROPERTIES), BlockEntityBGM::new);
+	public static final BlockEntityObject<BlockEntityEntityTester, BlockEntityTester, BlockItem> ENTITY_TESTER = CustomBGMMod.REGISTRY.registerBlockEntity(RegistryNames.BLOCK_ENTITY_ENTITY_TESTER, BlockEntityTester::new, block -> new BlockItem(block.get(), ITEM_PROPERTIES), BlockEntityEntityTester::new);
+	public static final BlockEntityObject<BlockEntityBossSpawner, BlockBossSpawner, BlockItem> BOSS_SPAWNER = CustomBGMMod.REGISTRY.registerBlockEntity(RegistryNames.BLOCK_ENTITY_BOSS_SPAWNER, BlockBossSpawner::new, block -> new BlockItem(block.get(), ITEM_PROPERTIES), BlockEntityBossSpawner::new);
+
+	public static void init() {}
 }

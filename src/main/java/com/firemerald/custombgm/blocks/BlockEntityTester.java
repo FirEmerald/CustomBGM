@@ -43,7 +43,7 @@ public class BlockEntityTester extends BlockEntityGUIBlock
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
-		return (type == CustomBGMBlockEntities.ENTITY_TESTER && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityEntityTester) blockEntity).serverTick(level2, blockPos, blockState) : null;
+		return (CustomBGMBlockEntities.ENTITY_TESTER.isThisBlockEntity(type) && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityEntityTester) blockEntity).serverTick(level2, blockPos, blockState) : null;
 	}
 
 	@Override

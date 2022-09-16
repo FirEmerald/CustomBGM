@@ -27,7 +27,7 @@ public class BlockEntityBGM extends BlockEntityEntityOperator<Player>
 
 	public BlockEntityBGM(BlockPos pos, BlockState state)
 	{
-		this(CustomBGMBlockEntities.BGM, pos, state);
+		this(CustomBGMBlockEntities.BGM.getBlockEntityType(), pos, state);
 	}
 
     public BlockEntityBGM(BlockEntityType<? extends BlockEntityBGM> type, BlockPos pos, BlockState state)

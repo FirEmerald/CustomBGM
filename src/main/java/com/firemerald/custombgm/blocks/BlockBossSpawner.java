@@ -44,7 +44,7 @@ public class BlockBossSpawner extends BlockEntityGUIBlock
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
-		return (type == CustomBGMBlockEntities.BOSS_SPAWNER && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityBossSpawner) blockEntity).serverTick(level2, blockPos, blockState) : null;
+		return (CustomBGMBlockEntities.BOSS_SPAWNER.isThisBlockEntity(type) && !level.isClientSide) ? (level2, blockPos, blockState, blockEntity) -> ((BlockEntityBossSpawner) blockEntity).serverTick(level2, blockPos, blockState) : null;
 	}
 
 	@Override

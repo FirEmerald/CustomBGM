@@ -1,4 +1,2 @@
-call ./gradlew jar
-call del ".\build\libs\custombgm-%~1-dev.jar"
-call rename ".\build\libs\custombgm-%~1.jar" "custombgm-%~1-dev.jar"
 call ./gradlew build
+call copy ".\build\libs\custombgm-%~1.jar" "..\MC4-1.18.2\libs\custombgm.jar"

@@ -38,7 +38,7 @@ public class BlockEntityBossSpawner extends BlockEntityEntityOperator<Player>
 
 	public BlockEntityBossSpawner(BlockPos pos, BlockState state)
 	{
-		this(CustomBGMBlockEntities.BOSS_SPAWNER, pos, state);
+		this(CustomBGMBlockEntities.BOSS_SPAWNER.getBlockEntityType(), pos, state);
 	}
 
 	public BlockEntityBossSpawner(BlockEntityType<? extends BlockEntityBossSpawner> type, BlockPos pos, BlockState state)

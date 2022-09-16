@@ -17,9 +17,10 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
 
 
-version = '1.2.0'
+version = '1.2.1'
 group = 'com.firemerald.custombgm' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'custombgm'
 
@@ -166,11 +167,18 @@ dependencies {
 
     // Examples using mod jars from ./libs
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-    implementation files('libs/fecore.jar')
+    implementation fg.deobf(files('libs/fecore.jar'))
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+}
+
+eclipse.classpath.file {
+	whenMerged {
+		def lib = entries.find { it.path.contains 'fecore.jar' }
+		lib.sourcePath = fileReference(file('../FECore-1.18.2/src/main'))
+	}
 }
 
 mixin {
@@ -184,7 +192,7 @@ jar {
         attributes([
                 "Specification-Title"     : "custombgm",
                 "Specification-Vendor"    : "FirEmerald",
-                "Specification-Version"   : "1.1.1", // We are version 1 of ourselves
+                "Specification-Version"   : project.version,
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
                 "Implementation-Vendor"   : "FirEmerald",

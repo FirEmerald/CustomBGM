@@ -63,6 +63,7 @@ public class OggSound extends SoundBase
 	public static void saveResource(ResourceLocation name) throws IOException
 	{
 		if (CACHED.contains(name)) return;
+		CACHED.add(name);
 		String filename = OggSound.getOutputDir(name);
 		File file = new File(filename);
 		file.getParentFile().mkdirs();
@@ -76,7 +77,6 @@ public class OggSound extends SoundBase
 		{
 			throw e;
 		}
-		CACHED.add(name);
 	}
 
 	public static OggSound make(Sound sound, SoundSource category, boolean disablePan)
@@ -86,7 +86,7 @@ public class OggSound extends SoundBase
 		int loopEnd = ((IExtendedSound) sound).getLoopEnd();
 		try
 		{
-			return new OggSound(new ResourceLocation(sound.getLocation().getNamespace(), "sounds/" + sound.getLocation().getPath() + ".ogg"), category, loopStart, loopEnd, disablePan);
+			return new OggSound(sound.getPath(), category, loopStart, loopEnd, disablePan);
 		}
 		catch (Throwable t)
 		{
