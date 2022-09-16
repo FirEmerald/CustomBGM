@@ -176,7 +176,7 @@ dependencies {
 
 eclipse.classpath.file {
 	whenMerged {
-		def lib = entries.find { it.path.contains 'fecore.jar' }
+		def lib = entries.find { it.path.contains 'fecore-1.18.2-1.2_mapped_official_1.18.2.jar' }
 		lib.sourcePath = fileReference(file('../FECore-1.18.2/src/main'))
 	}
 }
