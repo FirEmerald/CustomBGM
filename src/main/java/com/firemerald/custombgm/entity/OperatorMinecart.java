@@ -157,6 +157,7 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	{
 		super.readAdditionalSaveData(tag);
 		operator.load(tag);
+		isActive = tag.getBoolean("isActive");
 	}
 
 	@Override
@@ -164,6 +165,7 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	{
 		super.addAdditionalSaveData(tag);
 		operator.save(tag);
+		tag.putBoolean("isActive", isActive);
 	}
 	
 	@Override
