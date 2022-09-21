@@ -3,6 +3,13 @@
 	"block.custombgm.bgm": "BGM Block",
 	"block.custombgm.entity_tester": "Entity Tester",
 	"block.custombgm.boss_spawner": "Boss Spawner",
+	"block.custombgm.activator_detector_rail": "Activator Detector Rail",
+	"item.custombgm.bgm_minecart": "Minecart with BGM Block",
+	"item.custombgm.entity_tester_minecart": "Minecart with Entity Tester",
+	"item.custombgm.boss_spawner_minecart": "Minecart with Boss Spawner",
+	"entity.custombgm.bgm_minecart": "Minecart with BGM Block",
+	"entity.custombgm.entity_tester_minecart": "Minecart with Entity Tester",
+	"entity.custombgm.boss_spawner_minecart": "Minecart with Boss Spawner",
 	"custombgm.config.titlemusic": "Title Music",
 	"custombgm.config.cacheall": "Cache all music",
 	"custombgm.gui.entities.search": "Search",
@@ -40,5 +47,7 @@
 	"custombgm.tooltip.bgm": "Sets background music for players. Outputs a comparator signal based on the number of detected players.",
 	"custombgm.tooltip.entity_tester": "Detects entities. Outputs a comparator signal based on the number of detected entities over the minumum number.",
 	"custombgm.tooltip.boss_spawner": "Spawns bosses. Outputs a comparator signal of %d when boss is spawned and %d when boss is killed. Can be reset by powering off and back on.",
-	"custombgm.tooltip.redstone_activated": "Activate with a redstone signal."
+	"custombgm.tooltip.redstone_activated": "Activate with a redstone signal.",
+	"custombgm.tooltip.activator_rail_activated": "Activate or deactivate with an activator rail.",
+	"custombgm.tooltip.activator_detector_rail": "Acts like an activator rail that outputs the comparator value of a minecart."
 }

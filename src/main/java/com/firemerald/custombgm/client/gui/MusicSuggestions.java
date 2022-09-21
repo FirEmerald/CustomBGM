@@ -1,5 +1,11 @@
 package com.firemerald.custombgm.client.gui;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+
+import javax.annotation.Nullable;
+
 import com.firemerald.fecore.client.gui.components.text.BetterTextField;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -8,10 +14,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
@@ -43,7 +46,7 @@ public class MusicSuggestions
 	MusicSuggestions.SuggestionsList suggestions;
 	private boolean allowSuggestions;
 	boolean keepSuggestions;
-	
+
 	public MusicSuggestions(Minecraft mc, Screen screen, BetterTextField input, Font font, int lineStartOffset, int suggestionLineLimit, int fillColor)
 	{
 		this.minecraft = mc;
@@ -54,13 +57,13 @@ public class MusicSuggestions
 		this.suggestionLineLimit = suggestionLineLimit;
 		this.fillColor = fillColor;
 	}
-	
+
 	public void setAllowSuggestions(boolean allowSuggestions)
 	{
 		this.allowSuggestions = allowSuggestions;
 		if (!allowSuggestions) this.suggestions = null;
 	}
-	
+
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
 		if (this.suggestions != null && this.suggestions.keyPressed(key, scancode, mods)) return true;
@@ -71,12 +74,12 @@ public class MusicSuggestions
 		}
 		else return false;
 	}
-	
+
 	public boolean mouseScrolled(double scrollX)
 	{
 		return this.suggestions != null && this.suggestions.mouseScrolled(Mth.clamp(scrollX, -1.0D, 1.0D));
 	}
-	
+
 	public boolean mouseClicked(double mX, double mY, int button)
 	{
 		if (this.suggestions != null)
@@ -95,7 +98,7 @@ public class MusicSuggestions
 		else return false;
 		//return this.suggestions != null && this.suggestions.mouseClicked((int)mX, (int)mY, button);
 	}
-	
+
 	public void showSuggestions(boolean p_93931_)
 	{
 		if (this.pendingSuggestions != null && this.pendingSuggestions.isDone())
@@ -110,7 +113,7 @@ public class MusicSuggestions
 			}
 		}
 	}
-	
+
 	private List<Suggestion> sortSuggestions(Suggestions suggestions)
 	{
 		String s = this.input.getValue().substring(0, this.input.getCursorPosition());
@@ -125,14 +128,14 @@ public class MusicSuggestions
 		list.addAll(list1);
 		return list;
 	}
-	
+
 	private CompletableFuture<Suggestions> requestCompletions(String prefix, int start)
 	{
 		SuggestionsBuilder builder = new SuggestionsBuilder(prefix, start);
 		Minecraft.getInstance().getSoundManager().getAvailableSounds().stream().map(ResourceLocation::toString).filter(str -> str.startsWith(prefix)).forEach(builder::suggest);
 		return builder.buildFuture();
 	}
-	
+
 	public void updateCommandInfo()
 	{
 		String s = this.input.getValue();
@@ -152,24 +155,24 @@ public class MusicSuggestions
 			});
 		}
 	}
-	
+
 	private void updateUsageInfo()
 	{
 		this.suggestions = null;
 		if (this.allowSuggestions && this.minecraft.options.autoSuggestions) this.showSuggestions(false);
 	}
-	
+
 	@Nullable
 	static String calculateSuggestionSuffix(String p_93928_, String p_93929_)
 	{
 		return p_93929_.startsWith(p_93928_) ? p_93929_.substring(p_93928_.length()) : null;
 	}
-	
+
 	public void render(PoseStack pose, int mX, int mY)
 	{
 		if (this.suggestions != null) this.suggestions.render(pose, mX, mY);
 	}
-	
+
 	public String getNarrationMessage()
 	{
 		return this.suggestions != null ? "\n" + this.suggestions.getNarrationMessage() : "";
@@ -186,7 +189,7 @@ public class MusicSuggestions
 		private Vec2 lastMouse = Vec2.ZERO;
 		private boolean tabCycles;
 		private int lastNarratedEntry;
-		
+
 		SuggestionsList(int x, int y, int width, List<Suggestion> suggestions, boolean p_93961_)
 		{
 			int x1 = x - 1;
@@ -197,7 +200,7 @@ public class MusicSuggestions
 			this.suggestionList = suggestions;
 			this.select(0);
 		}
-		
+
 		public void render(PoseStack pose, int mX, int mY)
 		{
 			int i = Math.min(this.suggestionList.size(), MusicSuggestions.this.suggestionLineLimit);
@@ -205,8 +208,8 @@ public class MusicSuggestions
 			boolean flag = this.offset > 0;
 			boolean flag1 = this.suggestionList.size() > this.offset + i;
 			boolean flag2 = flag || flag1;
-			boolean flag3 = this.lastMouse.x != (float)mX || this.lastMouse.y != (float)mY;
-			if (flag3) this.lastMouse = new Vec2((float)mX, (float)mY);
+			boolean flag3 = this.lastMouse.x != mX || this.lastMouse.y != mY;
+			if (flag3) this.lastMouse = new Vec2(mX, mY);
 			if (flag2)
 			{
 				GuiComponent.fill(pose, this.rect.getX(), this.rect.getY() - 1, this.rect.getX() + this.rect.getWidth(), this.rect.getY(), MusicSuggestions.this.fillColor);
@@ -221,7 +224,7 @@ public class MusicSuggestions
 						}
 					}
 				}
-				
+
 				if (flag1)
 				{
 					for(int i1 = 0; i1 < this.rect.getWidth(); ++i1)
@@ -233,9 +236,9 @@ public class MusicSuggestions
 					}
 				}
 			}
-			
+
 			boolean flag4 = false;
-			
+
 			for(int l = 0; l < i; ++l)
 			{
 				Suggestion suggestion = this.suggestionList.get(l + this.offset);
@@ -245,17 +248,17 @@ public class MusicSuggestions
 					if (flag3) this.select(l + this.offset);
 					flag4 = true;
 				}
-				MusicSuggestions.this.font.drawShadow(pose, suggestion.getText(), (float)(this.rect.getX() + 1), (float)(this.rect.getY() + 2 + 12 * l), l + this.offset == this.current ? -256 : j);
+				MusicSuggestions.this.font.drawShadow(pose, suggestion.getText(), this.rect.getX() + 1, this.rect.getY() + 2 + 12 * l, l + this.offset == this.current ? -256 : j);
 			}
-			
+
 			if (flag4)
 			{
 				Message message = this.suggestionList.get(this.current).getTooltip();
 				if (message != null) MusicSuggestions.this.screen.renderTooltip(pose, ComponentUtils.fromMessage(message), mX, mY);
 			}
-			
+
 		}
-		
+
 		public boolean mouseClicked(int mX, int mY, int button)
 		{
 			if (!this.rect.contains(mX, mY)) return false;
@@ -270,19 +273,19 @@ public class MusicSuggestions
 				return true;
 			}
 		}
-		
+
 		public boolean mouseScrolled(double scrollY)
 		{
-			int i = (int)(MusicSuggestions.this.minecraft.mouseHandler.xpos() * (double)MusicSuggestions.this.minecraft.getWindow().getGuiScaledWidth() / (double)MusicSuggestions.this.minecraft.getWindow().getScreenWidth());
-			int j = (int)(MusicSuggestions.this.minecraft.mouseHandler.ypos() * (double)MusicSuggestions.this.minecraft.getWindow().getGuiScaledHeight() / (double)MusicSuggestions.this.minecraft.getWindow().getScreenHeight());
+			int i = (int)(MusicSuggestions.this.minecraft.mouseHandler.xpos() * MusicSuggestions.this.minecraft.getWindow().getGuiScaledWidth() / MusicSuggestions.this.minecraft.getWindow().getScreenWidth());
+			int j = (int)(MusicSuggestions.this.minecraft.mouseHandler.ypos() * MusicSuggestions.this.minecraft.getWindow().getGuiScaledHeight() / MusicSuggestions.this.minecraft.getWindow().getScreenHeight());
 			if (this.rect.contains(i, j))
 			{
-				this.offset = Mth.clamp((int)((double)this.offset - scrollY), 0, Math.max(this.suggestionList.size() - MusicSuggestions.this.suggestionLineLimit, 0));
+				this.offset = Mth.clamp((int)(this.offset - scrollY), 0, Math.max(this.suggestionList.size() - MusicSuggestions.this.suggestionLineLimit, 0));
 				return true;
 			}
 			else return false;
 		}
-		
+
 		public boolean keyPressed(int key, int code, int mods)
 		{
 			if (key == 265)
@@ -310,12 +313,12 @@ public class MusicSuggestions
 			}
 			else return false;
 		}
-		
+
 		public void cycle(int amount)
 		{
 			this.select(this.current + amount);
 			int i = this.offset;
-			int j = this.offset + MusicSuggestions.this.suggestionLineLimit - 1;	
+			int j = this.offset + MusicSuggestions.this.suggestionLineLimit - 1;
 			if (this.current < i)
 			{
 				this.offset = Mth.clamp(this.current, 0, Math.max(this.suggestionList.size() - MusicSuggestions.this.suggestionLineLimit, 0));
@@ -324,9 +327,9 @@ public class MusicSuggestions
 			{
 				this.offset = Mth.clamp(this.current + MusicSuggestions.this.lineStartOffset - MusicSuggestions.this.suggestionLineLimit, 0, Math.max(this.suggestionList.size() - MusicSuggestions.this.suggestionLineLimit, 0));
 			}
-			
+
 		}
-		
+
 		public void select(int index)
 		{
 			this.current = index;
@@ -339,7 +342,7 @@ public class MusicSuggestions
 				NarratorChatListener.INSTANCE.sayNow(this.getNarrationMessage());
 			}
 		}
-		
+
 		public void useSuggestion()
 		{
 			Suggestion suggestion = this.suggestionList.get(this.current);
@@ -352,7 +355,7 @@ public class MusicSuggestions
 			MusicSuggestions.this.keepSuggestions = false;
 			this.tabCycles = true;
 		}
-		
+
 		Component getNarrationMessage()
 		{
 			this.lastNarratedEntry = this.current;
@@ -360,10 +363,10 @@ public class MusicSuggestions
 			Message message = suggestion.getTooltip();
 			return message != null ? new TranslatableComponent("narration.suggestion.tooltip", this.current + 1, this.suggestionList.size(), suggestion.getText(), message) : new TranslatableComponent("narration.suggestion", this.current + 1, this.suggestionList.size(), suggestion.getText());
 		}
-		
+
 		public void hide()
 		{
 			MusicSuggestions.this.suggestions = null;
 		}
 	}
-}	
+}

@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.*;
@@ -38,9 +39,13 @@ public interface IBossTracker extends ICapabilitySerializable<ByteTag>
 		return get(obj, side).resolve().orElse(null);
 	}
 
-	public void setBossBlock(Level level, BlockPos pos);
+	public void setBossSpawnerBlock(BlockEntity blockEntity);
 
-	public BlockEntity getBossBlock();
+	public void setBossSpawnerEntity(Entity entity);
+
+	public void setNoBossSpawner();
+
+	public Object getBossSpawnerObject();
 
 	public boolean isBoss();
 
@@ -49,21 +54,44 @@ public interface IBossTracker extends ICapabilitySerializable<ByteTag>
 	    private final LazyOptional<IBossTracker> holder = LazyOptional.of(() -> this);
 	    private Level level = null;
 	    private BlockPos pos = null;
+	    private int entityId = -1;
 	    private boolean isBoss = false;
 
-		@Override
-		public void setBossBlock(Level level, BlockPos pos)
+	    @Override
+		public void setBossSpawnerBlock(BlockEntity blockEntity)
 		{
-			this.level = level;
-			this.pos = pos;
-			isBoss = level != null && pos != null;
+			this.level = blockEntity.getLevel();
+			this.pos = blockEntity.getBlockPos();
+			this.entityId = -1;
+			this.isBoss = true;
 		}
 
-		@Override
-		public BlockEntity getBossBlock()
+	    @Override
+		public void setBossSpawnerEntity(Entity entity)
 		{
-			return (level == null || pos == null) ? null : level.getBlockEntity(pos);
+			this.level = entity.getLevel();
+			this.pos = null;
+			this.entityId = entity.getId();
+			this.isBoss = true;
 		}
+
+	    @Override
+		public void setNoBossSpawner()
+		{
+			this.level = null;
+			this.pos = null;
+			this.entityId = -1;
+			this.isBoss = false;
+		}
+
+	    @Override
+	    public Object getBossSpawnerObject()
+	    {
+	    	if (!isBoss || level == null) return null;
+	    	else if (entityId >= 0) return level.getEntity(entityId);
+	    	else if (pos != null) return level.getBlockEntity(pos);
+	    	else return null;
+	    }
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)

@@ -1,0 +1,88 @@
+{
+  "variants": {
+    "detected=false,powered=false,shape=north_south": {
+      "model": "custombgm:block/activator_detector_rail"
+    },
+    "detected=true,powered=false,shape=north_south": {
+      "model": "custombgm:block/activator_detector_rail_detected"
+    },
+    "detected=false,powered=true,shape=north_south": {
+      "model": "custombgm:block/activator_detector_rail_on"
+    },
+    "detected=true,powered=true,shape=north_south": {
+      "model": "custombgm:block/activator_detector_rail_on_detected"
+    },
+    "detected=false,powered=false,shape=east_west": {
+      "model": "custombgm:block/activator_detector_rail",
+      "y": 90
+    },
+    "detected=true,powered=false,shape=east_west": {
+      "model": "custombgm:block/activator_detector_rail_detected",
+      "y": 90
+    },
+    "detected=false,powered=true,shape=east_west": {
+      "model": "custombgm:block/activator_detector_rail_on",
+      "y": 90
+    },
+    "detected=true,powered=true,shape=east_west": {
+      "model": "custombgm:block/activator_detector_rail_on_detected",
+      "y": 90
+    },
+    "detected=false,powered=false,shape=ascending_east": {
+      "model": "custombgm:block/activator_detector_rail_raised_ne",
+      "y": 90
+    },
+    "detected=true,powered=false,shape=ascending_east": {
+      "model": "custombgm:block/activator_detector_rail_detected_raised_ne",
+      "y": 90
+    },
+    "detected=false,powered=true,shape=ascending_east": {
+      "model": "custombgm:block/activator_detector_rail_on_raised_ne",
+      "y": 90
+    },
+    "detected=true,powered=true,shape=ascending_east": {
+      "model": "custombgm:block/activator_detector_rail_on_detected_raised_ne",
+      "y": 90
+    },
+    "detected=false,powered=false,shape=ascending_west": {
+      "model": "custombgm:block/activator_detector_rail_raised_sw",
+      "y": 90
+    },
+    "detected=true,powered=false,shape=ascending_west": {
+      "model": "custombgm:block/activator_detector_rail_detected_raised_sw",
+      "y": 90
+    },
+    "detected=false,powered=true,shape=ascending_west": {
+      "model": "custombgm:block/activator_detector_rail_on_raised_sw",
+      "y": 90
+    },
+    "detected=true,powered=true,shape=ascending_west": {
+      "model": "custombgm:block/activator_detector_rail_on_detected_raised_sw",
+      "y": 90
+    },
+    "detected=false,powered=false,shape=ascending_north": {
+      "model": "custombgm:block/activator_detector_rail_raised_ne"
+    },
+    "detected=true,powered=false,shape=ascending_north": {
+      "model": "custombgm:block/activator_detector_rail_detected_raised_ne"
+    },
+    "detected=false,powered=true,shape=ascending_north": {
+      "model": "custombgm:block/activator_detector_rail_on_raised_ne"
+    },
+    "detected=true,powered=true,shape=ascending_north": {
+      "model": "custombgm:block/activator_detector_rail_on_detected_raised_ne"
+    },
+    "detected=false,powered=false,shape=ascending_south": {
+      "model": "custombgm:block/activator_detector_rail_raised_sw"
+    },
+    "detected=true,powered=false,shape=ascending_south": {
+      "model": "custombgm:block/activator_detector_rail_detected_raised_sw"
+    },
+    "detected=false,powered=true,shape=ascending_south": {
+      "model": "custombgm:block/activator_detector_rail_on_raised_sw"
+    },
+    "detected=true,powered=true,shape=ascending_south": {
+      "model": "custombgm:block/activator_detector_rail_on_detected_raised_sw"
+    }
+  }
+}

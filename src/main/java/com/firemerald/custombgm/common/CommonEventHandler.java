@@ -7,11 +7,13 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.ICustomMusic;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
-import com.firemerald.custombgm.blockentity.BlockEntityBossSpawner;
 import com.firemerald.custombgm.capability.PlayerBase;
 import com.firemerald.custombgm.capability.PlayerServer;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
+import com.firemerald.custombgm.operators.BossSpawnerOperator;
+import com.firemerald.custombgm.operators.IOperatorSource;
+import com.firemerald.custombgm.operators.OperatorBase;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +22,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
@@ -39,7 +40,7 @@ public class CommonEventHandler
 		if (event.loadedFromDisk()) IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
 			if (tracker.isBoss())
 			{
-				tracker.setBossBlock(null, null); //no longer tracking
+				tracker.setNoBossSpawner(); //no longer tracking
 				event.setCanceled(true);
 			}
 		});
@@ -49,28 +50,33 @@ public class CommonEventHandler
 	public static void onLeaveWorld(EntityLeaveWorldEvent event) //boss despawned
 	{
 		IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
-			BlockEntity blockEntity = tracker.getBossBlock();
-			if (blockEntity instanceof BlockEntityBossSpawner)
+			Object blockEntity = tracker.getBossSpawnerObject();
+			if (blockEntity instanceof IOperatorSource)
 			{
-				BlockEntityBossSpawner spawner = (BlockEntityBossSpawner) blockEntity;
-				spawner.setBoss(null);
+				OperatorBase<?, ?, ?> spawner = ((IOperatorSource<?, ?>) blockEntity).getOperator();
+				if (spawner instanceof BossSpawnerOperator) ((BossSpawnerOperator<?, ?>) spawner).setBoss(null);
 			}
-			tracker.setBossBlock(null, null); //no longer tracking
+			tracker.setNoBossSpawner(); //no longer tracking
 		});
+		if (event.getEntity() instanceof IOperatorSource) ((IOperatorSource<?, ?>) event.getEntity()).getOperator().onRemoved();
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingDeath(LivingDeathEvent event) //boss killed
 	{
 		IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
-			BlockEntity blockEntity = tracker.getBossBlock();
-			if (blockEntity instanceof BlockEntityBossSpawner)
+			Object blockEntity = tracker.getBossSpawnerObject();
+			if (blockEntity instanceof IOperatorSource)
 			{
-				BlockEntityBossSpawner spawner = (BlockEntityBossSpawner) blockEntity;
-				spawner.setKilled(true);
-				spawner.setBoss(null);
+				OperatorBase<?, ?, ?> spawner = ((IOperatorSource<?, ?>) blockEntity).getOperator();
+				if (spawner instanceof BossSpawnerOperator)
+				{
+					BossSpawnerOperator<?, ?> operator = (BossSpawnerOperator<?, ?>) spawner;
+					operator.setKilled(true);
+					operator.setBoss(null);
+				}
 			}
-			tracker.setBossBlock(null, null); //no longer tracking
+			tracker.setNoBossSpawner(); //no longer tracking
 		});
 	}
 

@@ -13,9 +13,13 @@ import com.firemerald.custombgm.api.ISoundLoop;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.ConfigClient;
+import com.firemerald.custombgm.client.CustomBGMModelLayers;
 import com.firemerald.custombgm.client.ReloadListener;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
+import com.firemerald.custombgm.datagen.*;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
+import com.firemerald.custombgm.init.CustomBGMBlocks;
+import com.firemerald.custombgm.init.CustomBGMEntities;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
@@ -23,6 +27,11 @@ import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
 import com.firemerald.fecore.networking.SimpleNetwork;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.MinecartModel;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.MinecartRenderer;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
@@ -31,6 +40,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -41,12 +51,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod(CustomBGMAPI.MOD_ID)
 public class CustomBGMMod {
     public static final Logger LOGGER = LoggerFactory.getLogger("Custom BGM");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(CustomBGMAPI.MOD_ID, "main"), "1");
-    
+
     public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(CustomBGMAPI.MOD_ID);
 
     static final ForgeConfigSpec clientSpec;
@@ -61,10 +72,15 @@ public class CustomBGMMod {
     {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
+        eventBus.addListener(this::onGatherData);
+        eventBus.addListener(this::registerCaps);
         if (FMLEnvironment.dist.isClient()) eventBus.addListener(this::clientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
         CustomBGMBlockEntities.init();
-        CustomBGMSounds.registerSounds(eventBus);
+        CustomBGMBlocks.init();
+        CustomBGMEntities.init(eventBus);
+        CustomBGMSounds.init(eventBus);
+        REGISTRY.register(eventBus);
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -115,15 +131,39 @@ public class CustomBGMMod {
 		};
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event)
     {
     	((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new ReloadListener());
+    	CustomBGMBlocks.ACTIVATOR_DETECTOR_RAIL.setRenderLayer(RenderType.cutout());
+        LayerDefinition minecartBody = MinecartModel.createBodyLayer();
+    	ForgeHooksClient.registerLayerDefinition(CustomBGMModelLayers.BGM_MINECART, () -> minecartBody);
+    	ForgeHooksClient.registerLayerDefinition(CustomBGMModelLayers.ENTITY_TESTER_MINECART, () -> minecartBody);
+    	ForgeHooksClient.registerLayerDefinition(CustomBGMModelLayers.BOSS_SPAWNER_MINECART, () -> minecartBody);
+    	EntityRenderers.register(CustomBGMEntities.BGM_MINECART.get(), (context) -> new MinecartRenderer(context, CustomBGMModelLayers.BGM_MINECART));
+    	EntityRenderers.register(CustomBGMEntities.ENTITY_TESTER_MINECART.get(), (context) -> new MinecartRenderer(context, CustomBGMModelLayers.ENTITY_TESTER_MINECART));
+    	EntityRenderers.register(CustomBGMEntities.BOSS_SPAWNER_MINECART.get(), (context) -> new MinecartRenderer(context, CustomBGMModelLayers.BOSS_SPAWNER_MINECART));
     }
 
 	public void registerCaps(RegisterCapabilitiesEvent event)
 	{
 		event.register(IPlayer.class);
 		event.register(IBossTracker.class);
+	}
+
+	public void onGatherData(GatherDataEvent event)
+	{
+		if (event.includeClient())
+		{
+			event.getGenerator().addProvider(new ModelGenerator(event.getGenerator(), CustomBGMAPI.MOD_ID, event.getExistingFileHelper()));
+		}
+		if (event.includeServer())
+		{
+			event.getGenerator().addProvider(new BlockTagsGenerator(event.getGenerator(), CustomBGMAPI.MOD_ID, event.getExistingFileHelper()));
+			event.getGenerator().addProvider(new ItemTagsGenerator(event.getGenerator(), CustomBGMAPI.MOD_ID, event.getExistingFileHelper()));
+			event.getGenerator().addProvider(new LootTableGenerator(event.getGenerator()));
+			event.getGenerator().addProvider(new RecipeGenerator(event.getGenerator()));
+		}
 	}
 }

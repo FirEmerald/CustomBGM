@@ -24,11 +24,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ClientState
 {
-	public static final Music NONE = new Music(CustomBGMSounds.EMPTY, 0, 0, true);
+	private static Music none = null;
 	public static IPlayer clientPlayer = null;
 	public static MusicHandler currentBGM = null;
 	public static ResourceLocation currentBGMName = null;
 	public static int menuMus = -1;
+
+	public static Music musicNone()
+	{
+		if (none == null) none = new Music(CustomBGMSounds.EMPTY.get(), 0, 0, true);
+		return none;
+	}
 
 	public static class MusicHandler implements ISoundLoop
 	{
@@ -219,6 +225,6 @@ public class ClientState
 			currentBGM = new ClientState.MusicHandler(currentBGM, LoopingSounds.grabSound(loopSound, SoundSource.MUSIC, true)); //change
 		}
 		currentBGMName = loopSound;
-		return loopSound == null ? type : NONE;
+		return loopSound == null ? type : musicNone();
 	}
 }

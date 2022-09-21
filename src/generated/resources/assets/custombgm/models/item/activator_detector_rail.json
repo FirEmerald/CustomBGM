@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custombgm:block/activator_detector_rail"
+  }
+}

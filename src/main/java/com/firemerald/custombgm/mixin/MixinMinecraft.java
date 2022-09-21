@@ -17,6 +17,5 @@ public class MixinMinecraft
 	public void getSituationalMusic(CallbackInfoReturnable<Music> ci)
 	{
 		ci.setReturnValue(ClientState.getCustomMusic(ci.getReturnValue(), (Minecraft) (Object) this));
-		//ci.cancel();
 	}
 }
