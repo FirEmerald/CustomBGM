@@ -69,7 +69,7 @@ public interface IPlayer extends ICapabilityProvider
 	 * @return the music
 	 */
 	public ResourceLocation getLastMusicOverride();
-	
+
 	public int getCurrentPriority();
 
 	/**

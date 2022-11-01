@@ -15,7 +15,9 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.common.CommonEventHandler;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -34,7 +36,7 @@ public class Providers implements ResourceManagerReloadListener
 	private static final List<BGMProvider> PROVIDERS_SORTED = new ArrayList<>();
 	private static final Gson GSON = new Gson();
 	public static final ResourceLocation MUSIC_LOCATION = new ResourceLocation(CustomBGMAPI.MOD_ID, "custom_bgm.json");
-	
+
 	private static void load(ResourceManager resourceManager, ICondition.IContext conditionContext, List<BGMProvider> list)
 	{
 		Collection<ResourceLocation> resourceLocations = resourceManager.listResources("custom_bgm", p -> p.endsWith(".json"));
@@ -107,7 +109,7 @@ public class Providers implements ResourceManagerReloadListener
 				}
 				finally
 				{
-					IOUtils.closeQuietly((Closeable)resource);
+					IOUtils.closeQuietly(resource);
 				}
 			}
 			catch (IOException e)
@@ -117,7 +119,7 @@ public class Providers implements ResourceManagerReloadListener
 		});
 		updateProviderList();
 	}
-	
+
 	private static void updateProviderList()
 	{
 		PROVIDERS_SORTED.clear();
@@ -125,7 +127,7 @@ public class Providers implements ResourceManagerReloadListener
 		PROVIDERS_SORTED.addAll(RESOURCE_PACK_PROVIDERS);
 		PROVIDERS_SORTED.sort((v1, v2) -> v2.compareTo(v1)); //descending order
 	}
-	
+
 	public static void setMusic(Player player, IPlayer iPlayer)
 	{
 		int currentPriority = iPlayer.getCurrentPriority();
@@ -142,7 +144,7 @@ public class Providers implements ResourceManagerReloadListener
 			}
 		}
 	}
-	
+
 	private static final Map<String, BGMProviderSerializer> PROVIDERS = new HashMap<>();
 
 	public static void registerProviders()
@@ -199,20 +201,20 @@ public class Providers implements ResourceManagerReloadListener
 		int priority = GsonHelper.getAsInt(json, "priority", 0);
 		return serializer.serialize(json, priority, conditionContext);
 	}
-	
+
 	public static Providers forDataPacks(ICondition.IContext context)
 	{
 		return new Providers(context, DATA_PACK_PROVIDERS);
 	}
-	
+
 	public static Providers forResourcePacks()
 	{
 		return new Providers(ICondition.IContext.EMPTY, RESOURCE_PACK_PROVIDERS);
 	}
-	
+
 	public final ICondition.IContext context;
 	private final List<BGMProvider> list;
-	
+
 	private Providers(ICondition.IContext context, List<BGMProvider> list)
 	{
 		this.context = context;

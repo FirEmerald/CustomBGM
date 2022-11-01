@@ -10,7 +10,8 @@ import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.BGMProviderConditionSerializer;
 import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent;
 import com.firemerald.custombgm.common.CommonEventHandler;
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;

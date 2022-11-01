@@ -17,7 +17,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 public class AndCondition
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "and");
-	
+
 	@SuppressWarnings("unchecked")
 	public static Predicate<Player> serialize(JsonObject json, ICondition.IContext conditionContext)
 	{

@@ -19,7 +19,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 public class BiomeCondition implements Predicate<Player>
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "biome");
-	
+
 	@SuppressWarnings("unchecked")
 	public static BiomeCondition serialize(JsonObject json, ICondition.IContext conditionContext)
 	{
@@ -72,10 +72,10 @@ public class BiomeCondition implements Predicate<Player>
 		else biomes = new ResourceLocation[0];
 		return new BiomeCondition(tags, biomes);
 	}
-	
+
 	public final TagKey<Biome>[] tags;
 	public final ResourceLocation[] biomes;
-	
+
 	public BiomeCondition(TagKey<Biome>[] tags, ResourceLocation[] biomes)
 	{
 		this.tags = tags;
@@ -86,8 +86,10 @@ public class BiomeCondition implements Predicate<Player>
 	public boolean test(Player player)
 	{
 		Holder<Biome> biome = player.getLevel().getBiome(player.blockPosition());
-		for (int i = 0; i < tags.length; ++i) if (biome.containsTag(tags[i])) return true;
-		for (int i = 0; i < biomes.length; ++i) if (biome.is(biomes[i])) return true;
+		for (TagKey<Biome> tag : tags)
+			if (biome.containsTag(tag)) return true;
+		for (ResourceLocation biome2 : biomes)
+			if (biome.is(biome2)) return true;
 		return false;
 	}
 }

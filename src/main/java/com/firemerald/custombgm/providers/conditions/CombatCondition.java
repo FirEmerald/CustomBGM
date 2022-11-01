@@ -22,7 +22,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 public class CombatCondition implements Predicate<Player>
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "combat");
-	
+
 	@SuppressWarnings("unchecked")
 	public static CombatCondition serialize(JsonObject json, ICondition.IContext conditionContext)
 	{
@@ -78,11 +78,11 @@ public class CombatCondition implements Predicate<Player>
 		if (maxEntities < minEntities) throw new JsonSyntaxException("Invalid \"maxEntities\", must be greater than minEntities (" + minEntities + ")");
 		return new CombatCondition(tags, entities, minEntities, maxEntities);
 	}
-	
+
 	public final TagKey<EntityType<?>>[] tags;
 	public final ResourceLocation[] entities;
 	public final int minEntities, maxEntities;
-	
+
 	public CombatCondition(TagKey<EntityType<?>>[] tags, ResourceLocation[] entities, int minEntities, int maxEntities)
 	{
 		this.tags = tags;
@@ -95,12 +95,14 @@ public class CombatCondition implements Predicate<Player>
     {
     	return (int) player.getTargeters().stream().map(Entity::getType).filter(this::matches).count();
     }
-	
+
 	public boolean matches(EntityType<?> type)
 	{
 		if (tags.length == 0 && entities.length == 0) return true;
-		for (int i = 0; i < tags.length; ++i) if (type.is(tags[i])) return true;
-		for (int i = 0; i < entities.length; ++i) if (type.getRegistryName().equals(entities[i])) return true;
+		for (TagKey<EntityType<?>> tag : tags)
+			if (type.is(tag)) return true;
+		for (ResourceLocation element : entities)
+			if (type.getRegistryName().equals(element)) return true;
 		return false;
 	}
 

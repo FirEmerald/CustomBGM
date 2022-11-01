@@ -124,14 +124,14 @@ public class CommonEventHandler
 			});
 		}
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
 	public static void onRegisterBGMProviderSerializers(RegisterBGMProviderSerializersEvent event)
 	{
 		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderSerializers");
 		event.register(BaseMusicProvider.SERIALIZER_ID, BaseMusicProvider::serialize);
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
 	public static void onRegisterBGMProviderConditionSerializers(RegisterBGMProviderConditionSerializersEvent event)
 	{
@@ -146,13 +146,13 @@ public class CommonEventHandler
 		event.register(BiomeCondition.SERIALIZER_ID, BiomeCondition::serialize);
 		event.register(CombatCondition.SERIALIZER_ID, CombatCondition::serialize);
 	}
-	
+
 	@SubscribeEvent
 	public static void onRegisterServerReloadListeners(AddReloadListenerEvent event)
 	{
 		event.addListener(Providers.forDataPacks(event.getConditionContext()));
 	}
-	
+
 	@SubscribeEvent
 	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
 	{
@@ -169,19 +169,19 @@ public class CommonEventHandler
 			targeter.target = target;
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onEntityLeaveWorld(EntityLeaveWorldEvent event)
 	{
 		if (event.getEntity() instanceof LivingEntity) unTarget((LivingEntity) event.getEntity());
 	}
-	
+
 	public static void unTarget(LivingEntity targeter)
 	{
-		Targeter targeter2 = Targeter.getOrNull(targeter); 
+		Targeter targeter2 = Targeter.getOrNull(targeter);
 		if (targeter2 != null) unTarget(targeter, targeter2);
 	}
-	
+
 	public static void unTarget(LivingEntity targeter, Targeter targeterCap)
 	{
 		LivingEntity target = targeterCap.target;

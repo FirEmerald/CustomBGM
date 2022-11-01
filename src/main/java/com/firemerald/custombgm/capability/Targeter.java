@@ -37,7 +37,7 @@ public class Targeter implements ICapabilityProvider
 	{
 		return get(obj, side).resolve().orElse(null);
 	}
-	
+
     private final LazyOptional<Targeter> holder = LazyOptional.of(() -> this);
     public LivingEntity target = null;
 

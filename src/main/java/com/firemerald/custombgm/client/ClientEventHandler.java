@@ -32,7 +32,7 @@ public class ClientEventHandler
 			ClientState.currentBGM.tick(true);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event)
 	{

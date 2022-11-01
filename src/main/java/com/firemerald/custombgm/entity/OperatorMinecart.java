@@ -167,7 +167,7 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 		operator.save(tag);
 		tag.putBoolean("isActive", isActive);
 	}
-	
+
 	@Override
 	public void onRemovedFromWorld()
 	{

@@ -20,7 +20,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 public class BaseMusicProvider extends BGMProvider
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "base");
-	
+
 	public static BaseMusicProvider serialize(JsonObject json, int priority, ICondition.IContext conditionContext)
 	{
 		if (!json.has("music")) throw new JsonSyntaxException("Missing \"music\", expected to find a string or array of strings"); //TODO weighted music list
@@ -49,10 +49,10 @@ public class BaseMusicProvider extends BGMProvider
 		else condition = Conditions.ALWAYS;
 		return new BaseMusicProvider(priority, tracks, condition);
 	}
-	
+
 	public final ResourceLocation[] tracks;
 	public final Predicate<Player> condition;
-	
+
 	public BaseMusicProvider(int priority, ResourceLocation[] tracks, Predicate<Player> condition)
 	{
 		super(priority);
