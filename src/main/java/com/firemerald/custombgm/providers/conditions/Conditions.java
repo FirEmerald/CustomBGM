@@ -6,9 +6,9 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import org.apache.http.util.Asserts;
-
-import com.firemerald.custombgm.api.*;
+import com.firemerald.custombgm.CustomBGMMod;
+import com.firemerald.custombgm.api.BGMProviderConditionSerializer;
+import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent;
 import com.firemerald.custombgm.common.CommonEventHandler;
 import com.google.gson.*;
 
@@ -27,20 +27,29 @@ public class Conditions
 
 	public static void registerProviderConditions()
 	{
-		CustomBGMAPI.LOGGER.info("Now registering BGM provider condition serializers");
+		CustomBGMMod.LOGGER.info("Now registering BGM provider condition serializers");
 		PROVIDERS.clear();
 		RegisterBGMProviderConditionSerializersEvent event = new RegisterBGMProviderConditionSerializersEvent((id, provider) -> {
-			Asserts.notNull(id, "id");
-			Asserts.notNull(provider, "provider");
+			//CustomBGMAPI.LOGGER.debug("Attempting to register BGM provider condition serializer with name " + id);
+			if (id == null)
+			{
+				CustomBGMMod.LOGGER.error("Tried to register BGM provider condition serializer with null name");
+				return false;
+			}
 			String idStr = id.toString();
+			if (provider == null)
+			{
+				CustomBGMMod.LOGGER.error("Tried to register null BGM provider condition serializer with name " + idStr);
+				return false;
+			}
 			if (PROVIDERS.containsKey(idStr))
 			{
-				CustomBGMAPI.LOGGER.error("Tried to register BGM provider serializer with existing name " + idStr);
+				CustomBGMMod.LOGGER.error("Tried to register BGM provider serializer with existing name " + idStr);
 				return false;
 			}
 			else
 			{
-				CustomBGMAPI.LOGGER.debug("Registering BGM provider serializer with name " + idStr);
+				CustomBGMMod.LOGGER.debug("Registering BGM provider serializer with name " + idStr);
 				PROVIDERS.put(idStr, provider);
 				return true;
 			}

@@ -128,12 +128,14 @@ public class CommonEventHandler
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
 	public static void onRegisterBGMProviderSerializers(RegisterBGMProviderSerializersEvent event)
 	{
+		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderSerializers");
 		event.register(BaseMusicProvider.SERIALIZER_ID, BaseMusicProvider::serialize);
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
 	public static void onRegisterBGMProviderConditionSerializers(RegisterBGMProviderConditionSerializersEvent event)
 	{
+		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderConditionSerializers");
 		event.register(new ResourceLocation(CustomBGMAPI.MOD_ID, "always"), (json, context) -> Conditions.ALWAYS);
 		event.register(new ResourceLocation(CustomBGMAPI.MOD_ID, "never"), (json, context) -> Conditions.NEVER);
 		event.register(AndCondition.SERIALIZER_ID, AndCondition::serialize);

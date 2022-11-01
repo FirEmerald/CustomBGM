@@ -7,7 +7,6 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.util.Asserts;
 
 import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.BGMProvider;
@@ -148,20 +147,29 @@ public class Providers implements ResourceManagerReloadListener
 
 	public static void registerProviders()
 	{
-		CustomBGMAPI.LOGGER.info("Now registering BGM provider serializers");
+		CustomBGMMod.LOGGER.info("Now registering BGM provider serializers");
 		PROVIDERS.clear();
 		RegisterBGMProviderSerializersEvent event = new RegisterBGMProviderSerializersEvent((id, provider) -> {
-			Asserts.notNull(id, "id");
-			Asserts.notNull(provider, "provider");
+			//CustomBGMAPI.LOGGER.debug("Attempting to register BGM provider serializer with name " + id);
+			if (id == null)
+			{
+				CustomBGMMod.LOGGER.error("Tried to register BGM provider serializer with null name");
+				return false;
+			}
 			String idStr = id.toString();
+			if (provider == null)
+			{
+				CustomBGMMod.LOGGER.error("Tried to register null BGM provider serializer with name " + idStr);
+				return false;
+			}
 			if (PROVIDERS.containsKey(idStr))
 			{
-				CustomBGMAPI.LOGGER.error("Tried to register BGM provider serializer with existing name " + idStr);
+				CustomBGMMod.LOGGER.error("Tried to register BGM provider serializer with existing name " + idStr);
 				return false;
 			}
 			else
 			{
-				CustomBGMAPI.LOGGER.debug("Registering BGM provider serializer with name " + idStr);
+				CustomBGMMod.LOGGER.debug("Registering BGM provider serializer with name " + idStr);
 				PROVIDERS.put(idStr, provider);
 				return true;
 			}
