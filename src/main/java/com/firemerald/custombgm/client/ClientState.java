@@ -12,7 +12,6 @@ import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -176,7 +175,7 @@ public class ClientState
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "resource" })
+	@SuppressWarnings("resource")
 	public static Music getCustomMusic(Music type, Minecraft mc)
 	{
 		if (!Minecraft.getInstance().getSoundManager().soundEngine.loaded) return type;
@@ -189,7 +188,7 @@ public class ClientState
 		ResourceLocation loopSound;
 		if (mc.screen instanceof ICustomMusic)
 		{
-			loopSound = ((ICustomMusic<Screen>) mc.screen).getMusic(mc.player, currentBGMName, mc.screen);
+			loopSound = ((ICustomMusic) mc.screen).getMusic(mc.player, currentBGMName);
 		}
 		else if (type == Musics.CREDITS)
 		{

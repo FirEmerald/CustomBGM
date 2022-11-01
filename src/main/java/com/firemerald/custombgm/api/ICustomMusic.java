@@ -14,17 +14,16 @@ import net.minecraft.world.entity.player.Player;
  * @author FirEmerald
  *
  */
-public interface ICustomMusic<T>
+public interface ICustomMusic
 {
 	/**
 	 * Get the music to play
 	 *
 	 * @param player the player entity
 	 * @param currentMusic the currently playing BGM. null if none or vanilla.
-	 * @param ths the Screen or Holder of Biome this is referring to
 	 * @return the music to play
 	 */
-	public ResourceLocation getMusic(Player player, @Nullable ResourceLocation currentMusic, T ths);
+	public ResourceLocation getMusic(Player player, @Nullable ResourceLocation currentMusic);
 
 	/**
 	 * Helper method to pick a music from a random list, or return the current music if it is already in the list.

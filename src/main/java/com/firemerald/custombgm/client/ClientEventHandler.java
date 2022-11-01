@@ -2,10 +2,12 @@ package com.firemerald.custombgm.client;
 
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
+import com.firemerald.custombgm.providers.Providers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,5 +31,12 @@ public class ClientEventHandler
 		{
 			ClientState.currentBGM.tick(true);
 		}
+	}
+	
+	@SubscribeEvent
+	public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event)
+	{
+		event.registerReloadListener(new ReloadListener());
+		event.registerReloadListener(Providers.forResourcePacks());
 	}
 }

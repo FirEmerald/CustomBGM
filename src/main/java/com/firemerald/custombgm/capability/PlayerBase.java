@@ -57,4 +57,10 @@ public class PlayerBase implements IPlayer
 	{
         return CAP.orEmpty(cap, holder);
 	}
+
+	@Override
+	public int getCurrentPriority()
+	{
+		return 0;
+	}
 }

@@ -1,0 +1,11 @@
+{
+	"conditions": [
+	{
+		"type": "forge:false"
+	}
+	],
+	"condition": {
+		"type": "custombgm:combat"
+	},
+	"music": "mc4:mp1.boss.incinerator_drone"
+}

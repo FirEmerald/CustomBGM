@@ -1,21 +1,18 @@
 package com.firemerald.custombgm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
-import com.firemerald.custombgm.api.ICustomMusic;
 import com.firemerald.custombgm.api.ISoundLoop;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.capability.Targeter;
 import com.firemerald.custombgm.client.ConfigClient;
 import com.firemerald.custombgm.client.CustomBGMModelLayers;
-import com.firemerald.custombgm.client.ReloadListener;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
+import com.firemerald.custombgm.common.ConfigServer;
 import com.firemerald.custombgm.datagen.*;
 import com.firemerald.custombgm.init.CustomBGMBlockEntities;
 import com.firemerald.custombgm.init.CustomBGMBlocks;
@@ -23,21 +20,18 @@ import com.firemerald.custombgm.init.CustomBGMEntities;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
+import com.firemerald.custombgm.providers.Providers;
+import com.firemerald.custombgm.providers.conditions.Conditions;
 import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
 import com.firemerald.fecore.networking.SimpleNetwork;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.MinecartModel;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.MinecartRenderer;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -60,12 +54,16 @@ public class CustomBGMMod {
 
     public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(CustomBGMAPI.MOD_ID);
 
-    static final ForgeConfigSpec clientSpec;
+    static final ForgeConfigSpec clientSpec, serverSpec;
     public static final ConfigClient CLIENT;
+    public static final ConfigServer SERVER;
     static {
         final Pair<ConfigClient, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ConfigClient::new);
         clientSpec = specPair.getRight();
         CLIENT = specPair.getLeft();
+        final Pair<ConfigServer, ForgeConfigSpec> specPair2 = new ForgeConfigSpec.Builder().configure(ConfigServer::new);
+        serverSpec = specPair2.getRight();
+        SERVER = specPair2.getLeft();
     }
 
     public CustomBGMMod()
@@ -88,9 +86,6 @@ public class CustomBGMMod {
     	NETWORK.registerClientPacket(SelfDataSyncPacket.class, SelfDataSyncPacket::new);
     	NETWORK.registerServerPacket(InitializedPacket.class, InitializedPacket::new);
 		CustomBGMAPI.instance = new CustomBGMAPI() {
-			final Map<ResourceLocation, ICustomMusic<Holder<Biome>>> biomeMapping = new HashMap<>();
-			final Map<TagKey<Biome>, ICustomMusic<Holder<Biome>>> tagMapping = new HashMap<>();
-
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ISoundLoop grabSound(ResourceLocation name, SoundSource category, boolean disablePan)
@@ -104,38 +99,15 @@ public class CustomBGMMod {
 			{
 				return LoopingSounds.playSound(name, category, disablePan);
 			}
-
-			@Override
-			public void registerBiomeMusic(ResourceLocation biomeName, ICustomMusic<Holder<Biome>> music)
-			{
-				biomeMapping.put(biomeName, music);
-			}
-
-			@Override
-			public void registerBiomeMusic(TagKey<Biome> biomeTag, ICustomMusic<Holder<Biome>> music)
-			{
-				tagMapping.put(biomeTag, music);
-			}
-
-			@Override
-			protected ICustomMusic<Holder<Biome>> getBiomeMusic(ResourceLocation biomeName)
-			{
-				return biomeMapping.get(biomeName);
-			}
-
-			@Override
-			protected ICustomMusic<Holder<Biome>> getBiomeMusic(TagKey<Biome> biomeTag)
-			{
-				return tagMapping.get(biomeTag);
-			}
 		};
+		event.enqueueWork(Conditions::registerProviderConditions);
+		event.enqueueWork(Providers::registerProviders);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	@OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event)
     {
-    	((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new ReloadListener());
     	CustomBGMBlocks.ACTIVATOR_DETECTOR_RAIL.setRenderLayer(RenderType.cutout());
         LayerDefinition minecartBody = MinecartModel.createBodyLayer();
     	ForgeHooksClient.registerLayerDefinition(CustomBGMModelLayers.BGM_MINECART, () -> minecartBody);
@@ -150,6 +122,7 @@ public class CustomBGMMod {
 	{
 		event.register(IPlayer.class);
 		event.register(IBossTracker.class);
+		event.register(Targeter.class);
 	}
 
 	public void onGatherData(GatherDataEvent event)
