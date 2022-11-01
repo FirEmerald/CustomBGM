@@ -7,5 +7,8 @@
 	"condition": {
 		"type": "custombgm:combat"
 	},
-	"music": "mc4:mp1.boss.incinerator_drone"
+	"music": {
+		"mc4:mp1.boss.incinerator_drone": 0.7,
+		"mc4:mp1.screen.bootup": 0.3
+	}
 }

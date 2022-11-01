@@ -5,6 +5,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.firemerald.fecore.util.distribution.IDistribution;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -38,5 +40,20 @@ public interface ICustomMusic
 		if (options.length == 0) return null;
 		for (ResourceLocation option : options) if (Objects.equals(option, currentMusic)) return option;
 		return options[rand.nextInt(options.length)];
+	}
+
+	/**
+	 * Helper method to pick a music from a distribution, or return the current music if it is already in the list.
+	 *
+	 * @param rand an instance of Random
+	 * @param currentMusic the currently playing BGM. null if none or vanilla.
+	 * @param options the list of music to pick from
+	 * @return a randomly chosen music, or the currently playing one if it was in the list
+	 */
+	public default ResourceLocation pickOne(Random rand, @Nullable ResourceLocation currentMusic, IDistribution<ResourceLocation> options)
+	{
+		if (options.isEmpty()) return null;
+		else if (currentMusic != null && options.contains(currentMusic)) return currentMusic;
+		return options.getRandom(rand);
 	}
 }
