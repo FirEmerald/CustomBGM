@@ -74,6 +74,7 @@ public class CustomBGMMod {
         eventBus.addListener(this::registerCaps);
         if (FMLEnvironment.dist.isClient()) eventBus.addListener(this::clientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverSpec);
         CustomBGMBlockEntities.init();
         CustomBGMBlocks.init();
         CustomBGMEntities.init(eventBus);
