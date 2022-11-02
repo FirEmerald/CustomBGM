@@ -71,6 +71,11 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     	}
     	else this.selector = null;
     }
+    
+    public boolean isValid(E entity)
+    {
+    	return true;
+    }
 
     public abstract boolean operate(E entity);
 
@@ -94,7 +99,7 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
 				matchingEntities = allEntities(level);
 			}
 			Predicate<E> tester = entity -> shape.isWithin(entity, entity.position().x, entity.position().y, entity.position().z, x + 0.5, y + 0.5, z + 0.5);
-			found = (int) matchingEntities.filter(tester.and(this::operate)).count();
+			found = (int) matchingEntities.filter(((Predicate<E>) this::isValid).and(tester).and(this::operate)).count();
 			if (prevFound != found) source.setIsChanged();
 		}
 	}

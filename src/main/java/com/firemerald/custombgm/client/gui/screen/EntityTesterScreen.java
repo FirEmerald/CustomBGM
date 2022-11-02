@@ -239,8 +239,8 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	{
 		super.read(buf);
 		enabled.clear();
-		min = buf.readShort();
-		max = buf.readShort();
+		min = (short) buf.readVarInt();
+		max = (short) buf.readVarInt();
 		int count = buf.readVarInt();
 		for (int i = 0; i < count; i++)
 		{
@@ -258,8 +258,8 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	public void write(FriendlyByteBuf buf)
 	{
 		super.write(buf);
-		buf.writeShort(min);
-		buf.writeShort(max);
+		buf.writeVarInt(min);
+		buf.writeVarInt(max);
 		buf.writeVarInt(enabled.size());
 		enabled.forEach(name -> buf.writeUtf(name.toString()));
 	}

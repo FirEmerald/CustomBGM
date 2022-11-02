@@ -49,9 +49,15 @@ public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extend
 	}
 
 	@Override
-	public boolean operate(Entity entity)
+	public boolean isValid(Entity entity)
 	{
 		return enabled.contains(getId(entity));
+	}
+
+	@Override
+	public boolean operate(Entity entity)
+	{
+		return true;
 	}
 
 	@Override
