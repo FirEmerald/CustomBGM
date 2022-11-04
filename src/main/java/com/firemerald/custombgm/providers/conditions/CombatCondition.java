@@ -5,8 +5,7 @@ import java.util.function.Predicate;
 import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.capability.PlayerServer;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.firemerald.fecore.util.GsonUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
@@ -27,50 +26,10 @@ public class CombatCondition implements Predicate<Player>
 	public static CombatCondition serialize(JsonObject json, ICondition.IContext conditionContext)
 	{
 		TagKey<EntityType<?>>[] tags;
-		if (json.has("tags"))
-		{
-			JsonElement tagsEl = json.get("tags");
-			if (tagsEl.isJsonArray())
-			{
-				JsonArray tagsAr = tagsEl.getAsJsonArray();
-				if (tagsAr.isEmpty()) throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-				tags = new TagKey[tagsAr.size()];
-				for (int i = 0; i < tags.length; ++i)
-				{
-					JsonElement el = tagsAr.get(i);
-					if (!el.isJsonPrimitive()) throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-					tags[i] = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(el.getAsString()));
-				}
-			}
-			else if (tagsEl.isJsonPrimitive())
-			{
-				tags = new TagKey[] {TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(tagsEl.getAsString()))};
-			}
-			else throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-		}
+		if (json.has("tags")) tags = GsonUtil.arrayFromArrayOrSingle(json.get("tags"), "tags", v -> TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(v)), TagKey[]::new);
 		else tags = new TagKey[0];
 		ResourceLocation[] entities;
-		if (json.has("entities"))
-		{
-			JsonElement entitiesEl = json.get("entities");
-			if (entitiesEl.isJsonArray())
-			{
-				JsonArray entitiesAr = entitiesEl.getAsJsonArray();
-				if (entitiesAr.isEmpty()) throw new JsonSyntaxException("Invalid \"entities\", expected to find a string or array of strings");
-				entities = new ResourceLocation[entitiesAr.size()];
-				for (int i = 0; i < tags.length; ++i)
-				{
-					JsonElement el = entitiesAr.get(i);
-					if (!el.isJsonPrimitive()) throw new JsonSyntaxException("Invalid \"entities\", expected to find a string or array of strings");
-					entities[i] = new ResourceLocation(el.getAsString());
-				}
-			}
-			else if (entitiesEl.isJsonPrimitive())
-			{
-				entities = new ResourceLocation[] {new ResourceLocation(entitiesEl.getAsString())};
-			}
-			else throw new JsonSyntaxException("Invalid \"entities\", expected to find a string or array of strings");
-		}
+		if (json.has("entities")) entities = GsonUtil.arrayFromArrayOrSingle(json.get("entities"), "entities", ResourceLocation::new, ResourceLocation[]::new);
 		else entities = new ResourceLocation[0];
 		int minEntities = GsonHelper.getAsInt(json, "minEntities", 1);
 		if (minEntities < 1) throw new JsonSyntaxException("Invalid \"minEntities\", must be a positive integer");

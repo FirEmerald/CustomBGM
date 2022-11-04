@@ -3,6 +3,7 @@ package com.firemerald.custombgm.providers;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -15,6 +16,7 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.common.CommonEventHandler;
+import com.firemerald.custombgm.providers.conditions.Conditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -199,7 +201,14 @@ public class Providers implements ResourceManagerReloadListener
 		BGMProviderSerializer serializer = getSerializer(type);
 		if (serializer == null) throw new JsonParseException(type + " is not a registered BGMProvider serializer");
 		int priority = GsonHelper.getAsInt(json, "priority", 0);
-		return serializer.serialize(json, priority, conditionContext);
+		Predicate<Player> condition;
+		if (json.has("condition"))
+		{
+			JsonObject obj = GsonHelper.getAsJsonObject(json, "condition");
+			condition = Conditions.serialize(obj, conditionContext);
+		}
+		else condition = Conditions.ALWAYS;
+		return serializer.serialize(json, priority, condition, conditionContext);
 	}
 
 	public static Providers forDataPacks(ICondition.IContext context)

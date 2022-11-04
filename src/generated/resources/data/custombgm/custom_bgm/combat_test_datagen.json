@@ -1,0 +1,16 @@
+{
+  "type": "custombgm:base",
+  "conditions": [
+    {
+      "type": "forge:false"
+    }
+  ],
+  "condition": {
+    "type": "custombgm:combat"
+  },
+  "priority": 0,
+  "music": {
+    "mc4:mp1.screen.bootup": 0.3,
+    "mc4:mp1.boss.incinerator_drone": 0.7
+  }
+}

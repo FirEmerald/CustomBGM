@@ -3,8 +3,7 @@ package com.firemerald.custombgm.providers.conditions;
 import java.util.function.Predicate;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.firemerald.fecore.util.GsonUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
@@ -25,50 +24,10 @@ public class BiomeCondition implements Predicate<Player>
 	{
 		if (!json.has("tags") && !json.has("biomes")) throw new JsonSyntaxException("Missing \"tags\" or \"biomes\", must have one or both, expected to find a string or array of strings");
 		TagKey<Biome>[] tags;
-		if (json.has("tags"))
-		{
-			JsonElement tagsEl = json.get("tags");
-			if (tagsEl.isJsonArray())
-			{
-				JsonArray tagsAr = tagsEl.getAsJsonArray();
-				if (tagsAr.isEmpty()) throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-				tags = new TagKey[tagsAr.size()];
-				for (int i = 0; i < tags.length; ++i)
-				{
-					JsonElement el = tagsAr.get(i);
-					if (!el.isJsonPrimitive()) throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-					tags[i] = TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(el.getAsString()));
-				}
-			}
-			else if (tagsEl.isJsonPrimitive())
-			{
-				tags = new TagKey[] {TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(tagsEl.getAsString()))};
-			}
-			else throw new JsonSyntaxException("Invalid \"tags\", expected to find a string or array of strings");
-		}
+		if (json.has("tags")) tags = GsonUtil.arrayFromArrayOrSingle(json.get("tags"), "tags", v -> TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(v)), TagKey[]::new);
 		else tags = new TagKey[0];
 		ResourceLocation[] biomes;
-		if (json.has("biomes"))
-		{
-			JsonElement biomesEl = json.get("biomes");
-			if (biomesEl.isJsonArray())
-			{
-				JsonArray biomesAr = biomesEl.getAsJsonArray();
-				if (biomesAr.isEmpty()) throw new JsonSyntaxException("Invalid \"biomes\", expected to find a string or array of strings");
-				biomes = new ResourceLocation[biomesAr.size()];
-				for (int i = 0; i < tags.length; ++i)
-				{
-					JsonElement el = biomesAr.get(i);
-					if (!el.isJsonPrimitive()) throw new JsonSyntaxException("Invalid \"biomes\", expected to find a string or array of strings");
-					biomes[i] = new ResourceLocation(el.getAsString());
-				}
-			}
-			else if (biomesEl.isJsonPrimitive())
-			{
-				biomes = new ResourceLocation[] {new ResourceLocation(biomesEl.getAsString())};
-			}
-			else throw new JsonSyntaxException("Invalid \"biomes\", expected to find a string or array of strings");
-		}
+		if (json.has("biomes")) biomes = GsonUtil.arrayFromArrayOrSingle(json.get("biomes"), "biomes", ResourceLocation::new, ResourceLocation[]::new);
 		else biomes = new ResourceLocation[0];
 		return new BiomeCondition(tags, biomes);
 	}

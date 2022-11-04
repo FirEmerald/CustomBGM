@@ -20,7 +20,6 @@ import com.firemerald.custombgm.providers.BaseMusicProvider;
 import com.firemerald.custombgm.providers.Providers;
 import com.firemerald.custombgm.providers.conditions.*;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -136,8 +135,10 @@ public class CommonEventHandler
 	public static void onRegisterBGMProviderConditionSerializers(RegisterBGMProviderConditionSerializersEvent event)
 	{
 		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderConditionSerializers");
-		event.register(new ResourceLocation(CustomBGMAPI.MOD_ID, "always"), (json, context) -> Conditions.ALWAYS);
-		event.register(new ResourceLocation(CustomBGMAPI.MOD_ID, "never"), (json, context) -> Conditions.NEVER);
+		event.register(Conditions.ALWAYS_ID, (json, context) -> Conditions.ALWAYS);
+		event.register(Conditions.TRUE_ID, (json, context) -> Conditions.ALWAYS);
+		event.register(Conditions.NEVER_ID, (json, context) -> Conditions.NEVER);
+		event.register(Conditions.FALSE_ID, (json, context) -> Conditions.NEVER);
 		event.register(AndCondition.SERIALIZER_ID, AndCondition::serialize);
 		event.register(OrCondition.SERIALIZER_ID, OrCondition::serialize);
 		event.register(NandCondition.SERIALIZER_ID, NandCondition::serialize);

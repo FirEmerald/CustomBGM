@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.BGMProviderConditionSerializer;
+import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent;
 import com.firemerald.custombgm.common.CommonEventHandler;
 import com.google.gson.JsonObject;
@@ -24,6 +25,10 @@ public class Conditions
 	public static final Predicate<Player>
 	ALWAYS = player -> true,
 	NEVER = player -> false;
+	public static final ResourceLocation ALWAYS_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "always");
+	public static final ResourceLocation TRUE_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "true");
+	public static final ResourceLocation NEVER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "never");
+	public static final ResourceLocation FALSE_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "false");
 	private static final Map<String, BGMProviderConditionSerializer> PROVIDERS = new HashMap<>();
 
 	public static void registerProviderConditions()

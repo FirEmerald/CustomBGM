@@ -138,6 +138,7 @@ public class CustomBGMMod {
 			event.getGenerator().addProvider(new ItemTagsGenerator(event.getGenerator(), CustomBGMAPI.MOD_ID, event.getExistingFileHelper()));
 			event.getGenerator().addProvider(new LootTableGenerator(event.getGenerator()));
 			event.getGenerator().addProvider(new RecipeGenerator(event.getGenerator()));
+			event.getGenerator().addProvider(new BackgroundMusicProvider(event.getGenerator()));
 		}
 	}
 }
