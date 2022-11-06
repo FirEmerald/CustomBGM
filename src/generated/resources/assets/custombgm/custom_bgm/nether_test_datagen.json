@@ -6,7 +6,7 @@
     }
   ],
   "condition": {
-    "type": "custombgm:biome",
+    "type": "custombgm:dimension_type",
     "dimensionTypes": "minecraft:the_nether"
   },
   "priority": 0,
