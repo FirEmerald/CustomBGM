@@ -11,6 +11,7 @@ import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.capability.Targeter;
 import com.firemerald.custombgm.client.ConfigClient;
 import com.firemerald.custombgm.client.CustomBGMModelLayers;
+import com.firemerald.custombgm.client.ReloadListener;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.common.ConfigServer;
 import com.firemerald.custombgm.datagen.*;
@@ -35,6 +36,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -72,6 +74,7 @@ public class CustomBGMMod {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::onGatherData);
         eventBus.addListener(this::registerCaps);
+        eventBus.addListener(this::onRegisterClientReloadListeners);
         if (FMLEnvironment.dist.isClient()) eventBus.addListener(this::clientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverSpec);
@@ -140,5 +143,10 @@ public class CustomBGMMod {
 			event.getGenerator().addProvider(new RecipeGenerator(event.getGenerator()));
 			event.getGenerator().addProvider(new BackgroundMusicProvider(event.getGenerator()));
 		}
+	}
+
+	public void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event)
+	{
+		event.registerReloadListener(new ReloadListener());
 	}
 }
