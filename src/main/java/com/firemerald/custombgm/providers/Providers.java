@@ -10,10 +10,10 @@ import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
 
 import com.firemerald.custombgm.CustomBGMMod;
-import com.firemerald.custombgm.api.BGMProvider;
-import com.firemerald.custombgm.api.BGMProviderSerializer;
-import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
-import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.api.event.RegisterBGMProviderSerializersEvent;
+import com.firemerald.custombgm.api.providers.BGMProvider;
+import com.firemerald.custombgm.api.providers.BGMProviderSerializer;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.common.CommonEventHandler;
 import com.firemerald.custombgm.providers.conditions.Conditions;
 import com.google.gson.Gson;
@@ -25,7 +25,6 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -117,10 +116,10 @@ public class Providers implements ResourceManagerReloadListener
 		list.sort((v1, v2) -> v2.compareTo(v1)); //descending order
 	}
 
-	public void setMusic(Player player, IPlayer iPlayer)
+	public void setMusic(PlayerConditionData player)
 	{
-		int currentPriority = iPlayer.getCurrentPriority();
-		ResourceLocation currentMusic = iPlayer.getLastMusicOverride();
+		int currentPriority = player.iPlayer.getCurrentPriority();
+		ResourceLocation currentMusic = player.iPlayer.getLastMusicOverride();
 		for (BGMProvider provider : list)
 		{
 			int priority = provider.priority;
@@ -128,7 +127,7 @@ public class Providers implements ResourceManagerReloadListener
 			ResourceLocation music = provider.getMusic(player, currentMusic);
 			if (music != null)
 			{
-				iPlayer.addMusicOverride(music, priority);
+				player.iPlayer.addMusicOverride(music, priority);
 				return;
 			}
 		}
@@ -188,7 +187,7 @@ public class Providers implements ResourceManagerReloadListener
 		BGMProviderSerializer serializer = getSerializer(type);
 		if (serializer == null) throw new JsonParseException(type + " is not a registered BGMProvider serializer");
 		int priority = GsonHelper.getAsInt(json, "priority", 0);
-		Predicate<Player> condition;
+		Predicate<PlayerConditionData> condition;
 		if (json.has("condition"))
 		{
 			JsonObject obj = GsonHelper.getAsJsonObject(json, "condition");

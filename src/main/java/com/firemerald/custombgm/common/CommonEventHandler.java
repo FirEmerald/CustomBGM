@@ -4,10 +4,11 @@ import java.util.Objects;
 
 import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.CustomBGMAPI;
-import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent;
-import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.api.event.RegisterBGMProviderConditionSerializersEvent;
+import com.firemerald.custombgm.api.event.RegisterBGMProviderSerializersEvent;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.capability.PlayerClient;
 import com.firemerald.custombgm.capability.PlayerServer;
 import com.firemerald.custombgm.capability.Targeter;
@@ -118,7 +119,8 @@ public class CommonEventHandler
 				}
 				else if (iPlayer.getInit())
 				{
-					bgmProviders.setMusic(player, iPlayer);
+					PlayerConditionData playerData = new PlayerConditionData(player, iPlayer);
+					bgmProviders.setMusic(playerData);
 					if (entity instanceof ServerPlayer && !Objects.equals(iPlayer.getMusicOverride(), iPlayer.getLastMusicOverride()))
 					{
 						iPlayer.setLastMusicOverride(iPlayer.getMusicOverride());
@@ -153,6 +155,8 @@ public class CommonEventHandler
 		event.register(NotCondition.SERIALIZER_ID, NotCondition::serialize);
 		event.register(BiomeCondition.SERIALIZER_ID, BiomeCondition::serialize);
 		event.register(CombatCondition.SERIALIZER_ID, CombatCondition::serialize);
+		event.register(DimensionTypeCondition.SERIALIZER_ID, DimensionTypeCondition::serialize);
+		event.register(DimensionCondition.SERIALIZER_ID, DimensionCondition::serialize);
 	}
 
 	@SubscribeEvent

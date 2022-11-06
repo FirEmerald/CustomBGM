@@ -8,6 +8,7 @@ import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.ICustomMusic;
 import com.firemerald.custombgm.api.ISoundLoop;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 import com.firemerald.custombgm.init.CustomBGMSounds;
 
@@ -186,9 +187,10 @@ public class ClientState
 			menuMus = -1;
 		}
 		ResourceLocation loopSound;
+		PlayerConditionData playerData = mc.player == null || clientPlayer == null ? null : new PlayerConditionData(mc.player, clientPlayer);
 		if (mc.screen instanceof ICustomMusic)
 		{
-			loopSound = ((ICustomMusic) mc.screen).getMusic(mc.player, currentBGMName);
+			loopSound = ((ICustomMusic) mc.screen).getMusic(playerData, currentBGMName);
 		}
 		else if (type == Musics.CREDITS)
 		{
@@ -199,7 +201,7 @@ public class ClientState
 			if (clientPlayer != null)
 			{
 				clientPlayer.clearMusicOverride();
-				ClientModEventHandler.getBGMProviders().setMusic(mc.player, clientPlayer);
+				ClientModEventHandler.getBGMProviders().setMusic(playerData);
 				loopSound = clientPlayer.getMusicOverride();
 			}
 			else loopSound = null;

@@ -7,22 +7,22 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.firemerald.custombgm.CustomBGMMod;
-import com.firemerald.custombgm.api.BGMProviderConditionSerializer;
 import com.firemerald.custombgm.api.CustomBGMAPI;
-import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent;
+import com.firemerald.custombgm.api.event.RegisterBGMProviderConditionSerializersEvent;
+import com.firemerald.custombgm.api.providers.conditions.BGMProviderConditionSerializer;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.common.CommonEventHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public class Conditions
 {
-	public static final Predicate<Player>
+	public static final Predicate<PlayerConditionData>
 	ALWAYS = player -> true,
 	NEVER = player -> false;
 	public static final ResourceLocation ALWAYS_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "always");
@@ -77,7 +77,7 @@ public class Conditions
 	}
 
 	@Nullable
-	public static Predicate<Player> serialize(JsonObject json, ICondition.IContext conditionContext)
+	public static Predicate<PlayerConditionData> serialize(JsonObject json, ICondition.IContext conditionContext)
 	{
 		String type = GsonHelper.getAsString(json, "type");
 		BGMProviderConditionSerializer serializer = getSerializer(type);

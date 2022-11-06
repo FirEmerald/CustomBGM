@@ -3,6 +3,7 @@ package com.firemerald.custombgm.providers.conditions;
 import java.util.function.Predicate;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.fecore.util.GsonUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -11,11 +12,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
-public class BiomeCondition implements Predicate<Player>
+public class BiomeCondition implements Predicate<PlayerConditionData>
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "biome");
 
@@ -42,9 +42,9 @@ public class BiomeCondition implements Predicate<Player>
 	}
 
 	@Override
-	public boolean test(Player player)
+	public boolean test(PlayerConditionData player)
 	{
-		Holder<Biome> biome = player.getLevel().getBiome(player.blockPosition());
+		Holder<Biome> biome = player.getBiome();
 		for (TagKey<Biome> tag : tags)
 			if (biome.containsTag(tag)) return true;
 		for (ResourceLocation biome2 : biomes)

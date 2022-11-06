@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.capability.PlayerServer;
 import com.firemerald.fecore.util.GsonUtil;
 import com.google.gson.JsonObject;
@@ -15,10 +16,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
-public class CombatCondition implements Predicate<Player>
+public class CombatCondition implements Predicate<PlayerConditionData>
 {
 	public static final ResourceLocation SERIALIZER_ID = new ResourceLocation(CustomBGMAPI.MOD_ID, "combat");
 
@@ -66,9 +66,9 @@ public class CombatCondition implements Predicate<Player>
 	}
 
 	@Override
-	public boolean test(Player player)
+	public boolean test(PlayerConditionData player)
 	{
-		IPlayer iPlayer = IPlayer.getOrNull(player);
+		IPlayer iPlayer = player.iPlayer;
 		if (iPlayer instanceof PlayerServer)
 		{
 			int numEntities = getEntities((PlayerServer) iPlayer);

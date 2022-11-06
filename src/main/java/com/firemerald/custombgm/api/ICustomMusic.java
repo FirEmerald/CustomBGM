@@ -5,10 +5,10 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.fecore.util.distribution.IDistribution;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
 /**
  * Interface to be implemented on GUI screens that changes the background music to a custom loop.
@@ -25,7 +25,7 @@ public interface ICustomMusic
 	 * @param currentMusic the currently playing BGM. null if none or vanilla.
 	 * @return the music to play
 	 */
-	public ResourceLocation getMusic(Player player, @Nullable ResourceLocation currentMusic);
+	public ResourceLocation getMusic(@Nullable PlayerConditionData player, @Nullable ResourceLocation currentMusic);
 
 	/**
 	 * Helper method to pick a music from a random list, or return the current music if it is already in the list.

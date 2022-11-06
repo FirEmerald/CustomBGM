@@ -1,0 +1,14 @@
+{
+  "type": "custombgm:base",
+  "conditions": [
+    {
+      "type": "forge:false"
+    }
+  ],
+  "condition": {
+    "type": "custombgm:biome",
+    "dimensionTypes": "minecraft:the_nether"
+  },
+  "priority": 0,
+  "music": "mc4:mp1.boss.incinerator_drone"
+}
