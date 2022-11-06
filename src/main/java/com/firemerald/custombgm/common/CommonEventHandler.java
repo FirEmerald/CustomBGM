@@ -8,7 +8,7 @@ import com.firemerald.custombgm.api.RegisterBGMProviderConditionSerializersEvent
 import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.capabilities.IBossTracker;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
-import com.firemerald.custombgm.capability.PlayerBase;
+import com.firemerald.custombgm.capability.PlayerClient;
 import com.firemerald.custombgm.capability.PlayerServer;
 import com.firemerald.custombgm.capability.Targeter;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
@@ -38,6 +38,13 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CustomBGMAPI.MOD_ID)
 public class CommonEventHandler
 {
+	private static Providers bgmProviders;
+	
+	public static Providers getBGMProviders()
+	{
+		return bgmProviders;
+	}
+	
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //we want to cancel the event as soon as possible
 	public static void onEntityJoinWorld(EntityJoinWorldEvent event) //do not load boss entities
 	{
@@ -88,7 +95,7 @@ public class CommonEventHandler
 	@SubscribeEvent
 	public static void AttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event)
 	{
-		if (event.getObject() instanceof Player) event.addCapability(IPlayer.NAME, event.getObject().level.isClientSide() ? new PlayerBase() : new PlayerServer());
+		if (event.getObject() instanceof Player) event.addCapability(IPlayer.NAME, event.getObject().level.isClientSide() ? new PlayerClient() : new PlayerServer());
 		if (event.getObject() instanceof LivingEntity) event.addCapability(Targeter.NAME, new Targeter());
 		event.addCapability(IBossTracker.NAME, new IBossTracker.Impl());
 	}
@@ -111,7 +118,7 @@ public class CommonEventHandler
 				}
 				else if (iPlayer.getInit())
 				{
-					Providers.setMusic(player, iPlayer);
+					bgmProviders.setMusic(player, iPlayer);
 					if (entity instanceof ServerPlayer && !Objects.equals(iPlayer.getMusicOverride(), iPlayer.getLastMusicOverride()))
 					{
 						iPlayer.setLastMusicOverride(iPlayer.getMusicOverride());
@@ -151,7 +158,7 @@ public class CommonEventHandler
 	@SubscribeEvent
 	public static void onRegisterServerReloadListeners(AddReloadListenerEvent event)
 	{
-		event.addListener(Providers.forDataPacks(event.getConditionContext()));
+		event.addListener(bgmProviders = Providers.forDataPacks(event.getConditionContext()));
 	}
 
 	@SubscribeEvent

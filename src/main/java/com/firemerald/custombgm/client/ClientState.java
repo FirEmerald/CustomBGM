@@ -196,7 +196,13 @@ public class ClientState
 		}
 		else
 		{
-			loopSound = ClientState.clientPlayer != null ? ClientState.clientPlayer.getMusicOverride() : null;
+			if (clientPlayer != null)
+			{
+				clientPlayer.clearMusicOverride();
+				ClientModEventHandler.getBGMProviders().setMusic(mc.player, clientPlayer);
+				loopSound = clientPlayer.getMusicOverride();
+			}
+			else loopSound = null;
 			if (loopSound == null)
 			{
 				boolean isMenu;

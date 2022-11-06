@@ -82,4 +82,6 @@ public interface IPlayer extends ICapabilityProvider
 	public boolean getInit();
 
 	public void setInit(boolean isInit);
+	
+	public void setServerMusic(ResourceLocation music, int priority);
 }

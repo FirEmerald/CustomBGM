@@ -1,5 +1,6 @@
 package com.firemerald.custombgm.client;
 
+import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.client.audio.LoopingSounds;
 
@@ -11,7 +12,7 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = CustomBGMAPI.MOD_ID)
 public class ClientEventHandler
 {
 	@SubscribeEvent

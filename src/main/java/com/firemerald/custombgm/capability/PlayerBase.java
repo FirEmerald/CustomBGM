@@ -7,23 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class PlayerBase implements IPlayer
+public abstract class PlayerBase implements IPlayer
 {
     private final LazyOptional<IPlayer> holder = LazyOptional.of(() -> this);
 	public ResourceLocation musicOverride = null;
+	protected int musicOverridePriority = Integer.MIN_VALUE;
 	private boolean isInit = false;
-
-	@Override
-	public void addMusicOverride(ResourceLocation music, int priority)
-	{
-		this.musicOverride = music;
-	}
-
-	@Override
-	public void clearMusicOverride()
-	{
-		this.musicOverride = null;
-	}
 
 	@Override
 	public ResourceLocation getMusicOverride()
@@ -32,13 +21,20 @@ public class PlayerBase implements IPlayer
 	}
 
 	@Override
-	public ResourceLocation getLastMusicOverride()
+	public void addMusicOverride(ResourceLocation music, int priority)
 	{
-		return musicOverride;
+		if (priority > this.musicOverridePriority)
+		{
+			this.musicOverride = music;
+			this.musicOverridePriority = priority;
+		}
 	}
 
 	@Override
-	public void setLastMusicOverride(ResourceLocation music) {}
+	public int getCurrentPriority()
+	{
+		return musicOverridePriority;
+	}
 
 	@Override
 	public boolean getInit()
@@ -56,11 +52,5 @@ public class PlayerBase implements IPlayer
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
 	{
         return CAP.orEmpty(cap, holder);
-	}
-
-	@Override
-	public int getCurrentPriority()
-	{
-		return 0;
 	}
 }

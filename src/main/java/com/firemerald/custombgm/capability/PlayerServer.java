@@ -12,7 +12,6 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class PlayerServer extends PlayerBase
 {
-	private int musicOverridePriority = Integer.MIN_VALUE;
 	private ResourceLocation synchronizedMusic = null;
 	private final Map<LivingEntity, Target> targeters = new HashMap<>();
 
@@ -63,19 +62,9 @@ public class PlayerServer extends PlayerBase
 	}
 
 	@Override
-	public void addMusicOverride(ResourceLocation music, int priority)
-	{
-		if (priority > this.musicOverridePriority)
-		{
-			super.addMusicOverride(music, priority);
-			this.musicOverridePriority = priority;
-		}
-	}
-
-	@Override
 	public void clearMusicOverride()
 	{
-		super.clearMusicOverride();
+		this.musicOverride = null;
 		this.musicOverridePriority = Integer.MIN_VALUE;
 	}
 
@@ -91,10 +80,6 @@ public class PlayerServer extends PlayerBase
 		this.synchronizedMusic = music;
 	}
 
-
 	@Override
-	public int getCurrentPriority()
-	{
-		return musicOverridePriority;
-	}
+	public void setServerMusic(ResourceLocation music, int priority) {} //unsupported
 }

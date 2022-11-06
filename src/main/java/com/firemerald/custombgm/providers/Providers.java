@@ -12,7 +12,6 @@ import org.apache.commons.io.IOUtils;
 import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.BGMProvider;
 import com.firemerald.custombgm.api.BGMProviderSerializer;
-import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.capabilities.IPlayer;
 import com.firemerald.custombgm.common.CommonEventHandler;
@@ -33,13 +32,9 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public class Providers implements ResourceManagerReloadListener
 {
-	private static final List<BGMProvider> DATA_PACK_PROVIDERS = new ArrayList<>();
-	private static final List<BGMProvider> RESOURCE_PACK_PROVIDERS = new ArrayList<>();
-	private static final List<BGMProvider> PROVIDERS_SORTED = new ArrayList<>();
 	private static final Gson GSON = new Gson();
-	public static final ResourceLocation MUSIC_LOCATION = new ResourceLocation(CustomBGMAPI.MOD_ID, "custom_bgm.json");
 
-	private static void load(ResourceManager resourceManager, ICondition.IContext conditionContext, List<BGMProvider> list)
+	private void load(ResourceManager resourceManager, ICondition.IContext conditionContext)
 	{
 		Collection<ResourceLocation> resourceLocations = resourceManager.listResources("custom_bgm", p -> p.endsWith(".json"));
 		list.clear();
@@ -119,22 +114,14 @@ public class Providers implements ResourceManagerReloadListener
 				CustomBGMMod.LOGGER.error("Error parsing custom music properties from " + resourceLocation, e);
 			}
 		});
-		updateProviderList();
+		list.sort((v1, v2) -> v2.compareTo(v1)); //descending order
 	}
 
-	private static void updateProviderList()
-	{
-		PROVIDERS_SORTED.clear();
-		PROVIDERS_SORTED.addAll(DATA_PACK_PROVIDERS);
-		PROVIDERS_SORTED.addAll(RESOURCE_PACK_PROVIDERS);
-		PROVIDERS_SORTED.sort((v1, v2) -> v2.compareTo(v1)); //descending order
-	}
-
-	public static void setMusic(Player player, IPlayer iPlayer)
+	public void setMusic(Player player, IPlayer iPlayer)
 	{
 		int currentPriority = iPlayer.getCurrentPriority();
 		ResourceLocation currentMusic = iPlayer.getLastMusicOverride();
-		for (BGMProvider provider : PROVIDERS_SORTED)
+		for (BGMProvider provider : list)
 		{
 			int priority = provider.priority;
 			if (priority <= currentPriority) return;
@@ -213,26 +200,25 @@ public class Providers implements ResourceManagerReloadListener
 
 	public static Providers forDataPacks(ICondition.IContext context)
 	{
-		return new Providers(context, DATA_PACK_PROVIDERS);
+		return new Providers(context);
 	}
 
 	public static Providers forResourcePacks()
 	{
-		return new Providers(ICondition.IContext.EMPTY, RESOURCE_PACK_PROVIDERS);
+		return new Providers(ICondition.IContext.EMPTY);
 	}
 
 	public final ICondition.IContext context;
-	private final List<BGMProvider> list;
+	private final List<BGMProvider> list = new ArrayList<>();
 
-	private Providers(ICondition.IContext context, List<BGMProvider> list)
+	private Providers(ICondition.IContext context)
 	{
 		this.context = context;
-		this.list = list;
 	}
 
 	@Override
 	public void onResourceManagerReload(ResourceManager resourceManager)
 	{
-		load(resourceManager, context, list);
+		load(resourceManager, context);
 	}
 }

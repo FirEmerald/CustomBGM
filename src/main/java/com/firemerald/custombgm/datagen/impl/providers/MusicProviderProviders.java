@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import com.firemerald.custombgm.CustomBGMMod;
 import com.google.common.collect.Sets;
@@ -18,6 +20,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 
 public abstract class MusicProviderProviders implements DataProvider
 {
@@ -33,14 +36,14 @@ public abstract class MusicProviderProviders implements DataProvider
 	public void run(HashCache cache)
 	{
 		Path path = this.generator.getOutputFolder();
-		Set<ResourceLocation> set = Sets.newHashSet();
-		buildProviders((id, generator) -> {
-			if (!set.add(id)) throw new IllegalStateException("Duplicate provider " + id);
-			else saveProvider(cache, generator.compile(), path.resolve("data/" + id.getNamespace() + "/custom_bgm/" + id.getPath() + ".json"));
+		Set<Pair<ResourceLocation, PackType>> set = Sets.newHashSet();
+		buildProviders((id, type, generator) -> {
+			if (!set.add(Pair.of(id, type))) throw new IllegalStateException("Duplicate provider " + id + " for " + type);
+			else saveProvider(cache, generator.compile(), path.resolve(type.getDirectory() + "/" + id.getNamespace() + "/custom_bgm/" + id.getPath() + ".json"));
 		});
 	}
 	
-	public abstract void buildProviders(BiConsumer<ResourceLocation, MusicProviderBuilder<?>> register);
+	public abstract void buildProviders(TriConsumer<ResourceLocation, PackType, MusicProviderBuilder<?>> register);
 	
 	private static void saveProvider(HashCache cache, JsonObject json, Path path)
 	{
