@@ -22,73 +22,73 @@ public class DimensionTypeConditionBuilder extends ProviderConditionBuilder
 {
 	private final List<ResourceLocation> tags = new ArrayList<>();
 	private final List<ResourceLocation> dimensionTypes = new ArrayList<>();
-	
+
 	public DimensionTypeConditionBuilder addTags(ResourceLocation... tags)
 	{
 		Arrays.stream(tags).forEach(this.tags::add);
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public DimensionTypeConditionBuilder addTags(TagKey<DimensionType>... tags)
 	{
 		Arrays.stream(tags).map(TagKey::location).forEach(this.tags::add);
 		return this;
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionTypes(ResourceLocation... dimensionTypes)
 	{
 		Arrays.stream(dimensionTypes).forEach(this.dimensionTypes::add);
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public DimensionTypeConditionBuilder addDimensionTypes(ResourceKey<DimensionType>... dimensionTypes)
 	{
 		Arrays.stream(dimensionTypes).map(ResourceKey::location).forEach(this.dimensionTypes::add);
 		return this;
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionTypes(DimensionType... dimensionTypes)
 	{
 		Arrays.stream(dimensionTypes).map(RegistryAccess.BUILTIN.get().registry(Registry.DIMENSION_TYPE_REGISTRY).get()::getKey).forEach(this.dimensionTypes::add);
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public DimensionTypeConditionBuilder addDimensionTypes(Holder<DimensionType>... dimensionTypes)
 	{
 		Arrays.stream(dimensionTypes).map(Holder::unwrapKey).map(Optional::get).map(ResourceKey::location).forEach(this.dimensionTypes::add);
 		return this;
 	}
-	
+
 	public DimensionTypeConditionBuilder addTag(ResourceLocation tag)
 	{
 		tags.add(tag);
 		return this;
 	}
-	
+
 	public DimensionTypeConditionBuilder addTag(TagKey<DimensionType> tag)
 	{
 		return addTag(tag.location());
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionType(ResourceLocation dimensionType)
 	{
 		dimensionTypes.add(dimensionType);
 		return this;
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionType(DimensionType dimensionType)
 	{
 		return addDimensionType(RegistryAccess.BUILTIN.get().registry(Registry.DIMENSION_TYPE_REGISTRY).get().getKey(dimensionType));
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionType(ResourceKey<DimensionType> dimensionType)
 	{
 		return addDimensionType(dimensionType.location());
 	}
-	
+
 	public DimensionTypeConditionBuilder addDimensionType(Holder<DimensionType> dimensionType)
 	{
 		return addDimensionType(dimensionType.unwrapKey().get());

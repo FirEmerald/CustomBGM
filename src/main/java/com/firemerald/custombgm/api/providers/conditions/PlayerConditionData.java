@@ -19,23 +19,23 @@ public class PlayerConditionData
 			return playerData.player.level.getBiome(playerData.player.blockPosition());
 		}
 	};
-	
+
 	public final Player player;
 	public final IPlayer iPlayer;
 	private final Map<ConditionKey<?>, Object> data = new HashMap<>();
-	
+
 	public PlayerConditionData(Player player, IPlayer iPlayer)
 	{
 		this.player = player;
 		this.iPlayer = iPlayer;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> T getData(ConditionKey<T> key)
 	{
 		return (T) data.computeIfAbsent(key, k -> k.compose(this));
 	}
-	
+
 	public Holder<Biome> getBiome()
 	{
 		return getData(BIOME_KEY);

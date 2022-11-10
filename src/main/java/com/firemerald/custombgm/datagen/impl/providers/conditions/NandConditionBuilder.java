@@ -9,17 +9,17 @@ import net.minecraft.resources.ResourceLocation;
 public class NandConditionBuilder extends CompoundConditionBuilder<NandConditionBuilder>
 {
 	public NandConditionBuilder() {}
-	
+
 	public NandConditionBuilder(ProviderConditionBuilder... conditions)
 	{
 		super(conditions);
 	}
-	
+
 	public NandConditionBuilder(Collection<ProviderConditionBuilder> conditions)
 	{
 		super(conditions);
 	}
-	
+
 	@Override
 	public ResourceLocation getID()
 	{

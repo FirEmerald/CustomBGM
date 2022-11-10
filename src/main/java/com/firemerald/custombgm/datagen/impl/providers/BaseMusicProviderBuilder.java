@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 public class BaseMusicProviderBuilder<T extends BaseMusicProviderBuilder<T>> extends MusicProviderBuilder<T>
 {
 	private IDistribution<ResourceLocation> music = EmptyDistribution.get();
-	
+
 	@SuppressWarnings("unchecked")
 	public T setMusic(IDistribution<ResourceLocation> music)
 	{

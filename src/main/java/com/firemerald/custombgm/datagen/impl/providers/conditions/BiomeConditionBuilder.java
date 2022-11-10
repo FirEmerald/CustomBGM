@@ -18,61 +18,61 @@ public class BiomeConditionBuilder extends ProviderConditionBuilder
 {
 	private final List<ResourceLocation> tags = new ArrayList<>();
 	private final List<ResourceLocation> biomes = new ArrayList<>();
-	
+
 	public BiomeConditionBuilder addTags(ResourceLocation... tags)
 	{
 		Arrays.stream(tags).forEach(this.tags::add);
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public BiomeConditionBuilder addTags(TagKey<Biome>... tags)
 	{
 		Arrays.stream(tags).map(TagKey::location).forEach(this.tags::add);
 		return this;
 	}
-	
+
 	public BiomeConditionBuilder addBiomes(ResourceLocation... biomes)
 	{
 		Arrays.stream(biomes).forEach(this.biomes::add);
 		return this;
 	}
-	
+
 	public BiomeConditionBuilder addBiomes(Biome... biomes)
 	{
 		Arrays.stream(biomes).map(Biome::getRegistryName).forEach(this.biomes::add);
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public BiomeConditionBuilder addBiomes(Holder<Biome>... biomes)
 	{
 		Arrays.stream(biomes).map(Holder::value).map(Biome::getRegistryName).forEach(this.biomes::add);
 		return this;
 	}
-	
+
 	public BiomeConditionBuilder addTag(ResourceLocation tag)
 	{
 		tags.add(tag);
 		return this;
 	}
-	
+
 	public BiomeConditionBuilder addTag(TagKey<Biome> tag)
 	{
 		return addTag(tag.location());
 	}
-	
+
 	public BiomeConditionBuilder addBiome(ResourceLocation biome)
 	{
 		biomes.add(biome);
 		return this;
 	}
-	
+
 	public BiomeConditionBuilder addBiome(Biome biome)
 	{
 		return addBiome(biome.getRegistryName());
 	}
-	
+
 	public BiomeConditionBuilder addBiome(Holder<Biome> biome)
 	{
 		return addBiome(biome.value().getRegistryName());

@@ -26,12 +26,12 @@ public abstract class BGMProvider implements Comparable<BGMProvider>, ICustomMus
 	{
 		return priority - other.priority;
 	}
-	
+
 	@Override
 	public ResourceLocation getMusic(@Nonnull PlayerConditionData player, @Nullable ResourceLocation currentMusic)
 	{
 		return condition.test(player) ? getTheMusic(player, currentMusic) : null;
 	}
-	
+
 	public abstract ResourceLocation getTheMusic(PlayerConditionData player, @Nullable ResourceLocation currentMusic);
 }

@@ -11,33 +11,33 @@ import com.google.gson.JsonObject;
 public abstract class CompoundConditionBuilder<T extends CompoundConditionBuilder<T>> extends ProviderConditionBuilder
 {
 	private final List<ProviderConditionBuilder> conditions = new ArrayList<>();
-	
+
 	public CompoundConditionBuilder() {}
-	
+
 	public CompoundConditionBuilder(ProviderConditionBuilder... conditions)
 	{
 		Arrays.stream(conditions).forEach(this.conditions::add);
 	}
-	
+
 	public CompoundConditionBuilder(Collection<ProviderConditionBuilder> conditions)
 	{
 		this.conditions.addAll(conditions);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T addConditions(ProviderConditionBuilder... conditions)
 	{
 		Arrays.stream(conditions).forEach(this.conditions::add);
 		return (T) this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T addConditions(Collection<ProviderConditionBuilder> conditions)
 	{
 		this.conditions.addAll(conditions);
 		return (T) this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T addCondition(ProviderConditionBuilder condition)
 	{

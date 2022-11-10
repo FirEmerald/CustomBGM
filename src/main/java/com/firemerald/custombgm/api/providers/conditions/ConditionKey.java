@@ -17,6 +17,6 @@ public abstract class ConditionKey<T> extends ResourceLocation
 	{
 		super(nameSpace, path);
 	}
-	
+
 	public abstract T compose(PlayerConditionData playerData);
 }

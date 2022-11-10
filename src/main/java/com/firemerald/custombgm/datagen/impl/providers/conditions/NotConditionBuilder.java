@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 public class NotConditionBuilder extends ProviderConditionBuilder
 {
 	private final BuilderBase condition;
-	
+
 	public NotConditionBuilder(ProviderConditionBuilder condition)
 	{
 		this.condition = condition;

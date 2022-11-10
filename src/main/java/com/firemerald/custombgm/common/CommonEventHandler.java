@@ -40,12 +40,12 @@ import net.minecraftforge.fml.common.Mod;
 public class CommonEventHandler
 {
 	private static Providers bgmProviders;
-	
+
 	public static Providers getBGMProviders()
 	{
 		return bgmProviders;
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //we want to cancel the event as soon as possible
 	public static void onEntityJoinWorld(EntityJoinWorldEvent event) //do not load boss entities
 	{

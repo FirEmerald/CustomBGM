@@ -26,7 +26,7 @@ public abstract class MusicProviderProviders implements DataProvider
 {
 	protected static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
 	protected final DataGenerator generator;
-	
+
 	public MusicProviderProviders(DataGenerator generator)
 	{
 		this.generator = generator;
@@ -42,9 +42,9 @@ public abstract class MusicProviderProviders implements DataProvider
 			else saveProvider(cache, generator.compile(), path.resolve(type.getDirectory() + "/" + id.getNamespace() + "/custom_bgm/" + id.getPath() + ".json"));
 		});
 	}
-	
+
 	public abstract void buildProviders(TriConsumer<ResourceLocation, PackType, MusicProviderBuilder<?>> register);
-	
+
 	private static void saveProvider(HashCache cache, JsonObject json, Path path)
 	{
 		try
@@ -82,7 +82,7 @@ public abstract class MusicProviderProviders implements DataProvider
 		{
 			CustomBGMMod.LOGGER.error("Couldn't save provider " + path, e);
 		}
-		
+
 	}
 
 	@Override

@@ -21,12 +21,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientModEventHandler
 {
 	private static Providers bgmProviders;
-	
+
 	public static Providers getBGMProviders()
 	{
 		return bgmProviders;
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event)

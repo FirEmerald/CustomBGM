@@ -71,7 +71,7 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     	}
     	else this.selector = null;
     }
-    
+
     public boolean isValid(E entity)
     {
     	return true;

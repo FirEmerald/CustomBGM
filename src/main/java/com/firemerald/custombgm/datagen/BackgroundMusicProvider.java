@@ -30,7 +30,7 @@ public class BackgroundMusicProvider extends MusicProviderProviders
 	@Override
 	public void buildProviders(TriConsumer<ResourceLocation, PackType, MusicProviderBuilder<?>> register)
 	{
-		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "combat_test_datagen"), PackType.SERVER_DATA, 
+		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "combat_test_datagen"), PackType.SERVER_DATA,
 				new BaseMusicProviderBuilder<>()
 				.addLoadingCondition(GSON.fromJson("{\"type\":\"forge:false\"}", JsonObject.class))
 				.setCondition(new CombatConditionBuilder())
@@ -41,7 +41,7 @@ public class BackgroundMusicProvider extends MusicProviderProviders
 						.build()
 						)
 				);
-		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "nether_test_datagen"), PackType.SERVER_DATA, 
+		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "nether_test_datagen"), PackType.SERVER_DATA,
 				new BaseMusicProviderBuilder<>()
 				.addLoadingCondition(GSON.fromJson("{\"type\":\"forge:false\"}", JsonObject.class))
 				.setCondition(
@@ -55,7 +55,7 @@ public class BackgroundMusicProvider extends MusicProviderProviders
 						.build()
 						)
 				);
-		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "combat_test_datagen"), PackType.CLIENT_RESOURCES, 
+		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "combat_test_datagen"), PackType.CLIENT_RESOURCES,
 				new BaseMusicProviderBuilder<>()
 				.addLoadingCondition(GSON.fromJson("{\"type\":\"forge:false\"}", JsonObject.class))
 				.setCondition(new CombatConditionBuilder())
@@ -66,7 +66,7 @@ public class BackgroundMusicProvider extends MusicProviderProviders
 						.build()
 						)
 				);
-		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "nether_test_datagen"), PackType.CLIENT_RESOURCES, 
+		register.accept(new ResourceLocation(CustomBGMAPI.MOD_ID, "nether_test_datagen"), PackType.CLIENT_RESOURCES,
 				new BaseMusicProviderBuilder<>()
 				.addLoadingCondition(GSON.fromJson("{\"type\":\"forge:false\"}", JsonObject.class))
 				.setCondition(

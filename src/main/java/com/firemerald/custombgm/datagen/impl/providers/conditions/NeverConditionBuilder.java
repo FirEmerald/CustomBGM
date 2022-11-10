@@ -8,9 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 public class NeverConditionBuilder extends ProviderConditionBuilder
 {
 	public static NeverConditionBuilder INSTANCE = new NeverConditionBuilder();
-	
+
 	private NeverConditionBuilder() {}
-	
+
 	@Override
 	public ResourceLocation getID()
 	{

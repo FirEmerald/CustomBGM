@@ -14,7 +14,7 @@ public abstract class MusicProviderBuilder<T extends MusicProviderBuilder<T>> ex
 	private final List<JsonObject> loadingConditions = new ArrayList<>();
 	private ProviderConditionBuilder condition;
 	private int priority;
-	
+
 	@SuppressWarnings("unchecked")
 	public T setCondition(ProviderConditionBuilder condition)
 	{
@@ -35,7 +35,7 @@ public abstract class MusicProviderBuilder<T extends MusicProviderBuilder<T>> ex
 		loadingConditions.add(condition);
 		return (T) this;
 	}
-	
+
 	@Override
 	public void compile(JsonObject obj)
 	{
@@ -49,6 +49,6 @@ public abstract class MusicProviderBuilder<T extends MusicProviderBuilder<T>> ex
 		obj.addProperty("priority", priority);
 		compileMusic(obj);
 	}
-	
+
 	public abstract void compileMusic(JsonObject obj);
 }

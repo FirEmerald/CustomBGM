@@ -8,9 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 public class AlwaysConditionBuilder extends ProviderConditionBuilder
 {
 	public static AlwaysConditionBuilder INSTANCE = new AlwaysConditionBuilder();
-	
+
 	private AlwaysConditionBuilder() {}
-	
+
 	@Override
 	public ResourceLocation getID()
 	{

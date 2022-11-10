@@ -11,7 +11,7 @@ import com.firemerald.custombgm.datagen.*;
 import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
 import com.firemerald.custombgm.networking.server.InitializedPacket;
 import com.firemerald.custombgm.providers.Providers;
-import com.firemerald.custombgm.providers.conditions.*;
+import com.firemerald.custombgm.providers.conditions.Conditions;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -49,7 +49,7 @@ public class CommonModEventHandler
 		event.enqueueWork(Conditions::registerProviderConditions);
 		event.enqueueWork(Providers::registerProviders);
     }
-    
+
 	@SubscribeEvent
 	public static void registerCaps(RegisterCapabilitiesEvent event)
 	{
