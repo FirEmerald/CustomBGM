@@ -188,17 +188,11 @@ public class ClientState
 		}
 		ResourceLocation loopSound;
 		PlayerConditionData playerData = mc.player == null || clientPlayer == null ? null : new PlayerConditionData(mc.player, clientPlayer);
-		if (mc.screen instanceof ICustomMusic)
-		{
-			loopSound = ((ICustomMusic) mc.screen).getMusic(playerData, currentBGMName);
-		}
-		else if (type == Musics.CREDITS)
-		{
-			loopSound = null;
-		}
+		if (mc.screen instanceof ICustomMusic) loopSound = ((ICustomMusic) mc.screen).getMusic(playerData, currentBGMName);
+		else if (type == Musics.CREDITS) loopSound = null;
 		else
 		{
-			if (clientPlayer != null)
+			if (playerData != null)
 			{
 				clientPlayer.clearMusicOverride();
 				ClientModEventHandler.getBGMProviders().setMusic(playerData);
