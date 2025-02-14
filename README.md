@@ -1,5 +1,6 @@
 [![Discord](https://img.shields.io/discord/176190900945289237?style=flat-square&logo=discord&logoColor=ffffff&label=Discord)](https://discord.gg/ykHRhmC)  
 [![Curseforge](https://cf.way2muchnoise.eu/short_590902_downloads.svg?badge_style=flat)](https://www.curseforge.com/minecraft/mc-mods/custombgm)  
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/8ItSYqmx?style=flat-square&logo=modrinth)]([https://modrinth.com/mod/fe-core](https://modrinth.com/mod/custom-background-music))  
 
 # CustomBGM
 Custom Background Music (and sound loops) for Minecraft  
