@@ -1,10 +1,12 @@
 [![Discord](https://img.shields.io/discord/176190900945289237?style=flat-square&logo=discord&logoColor=ffffff&label=Discord)](https://discord.gg/ykHRhmC)  
 [![Curseforge](https://cf.way2muchnoise.eu/short_590902_downloads.svg?badge_style=flat)](https://www.curseforge.com/minecraft/mc-mods/custombgm)  
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/8ItSYqmx?style=flat-square&logo=modrinth)]([https://modrinth.com/mod/fe-core](https://modrinth.com/mod/custom-background-music))  
 
 # CustomBGM
-Custom Background Music (and sound loops) for Minecraft
+Custom Background Music (and sound loops) for Minecraft  
 
-Provides a framework for custom background music to be used by both mods and map makers. Custom loop points, used in the BGM block, Boss Spawner, optionally configured custom title screen music, and any situatons where mods use the custom loops sound engine the mod provides, can be specified in your sounds.json using "loopStart" and "loopEnd" integers, such as "mp1.boss.flaaghra": {"sounds":[{"loopStart":387124,"loopEnd":3671832,"name":"mc4:mp1/boss/rui_flaaghra","stream":true}]}. the loop points are in samples.
+Provides a framework for [custom background music](https://github.com/FirEmerald/CustomBGM/wiki/Background-Music-Providers) to be used by both mods and map makers.  
+Also adds support for [custom loop points in sounds](https://github.com/FirEmerald/CustomBGM/wiki/Adding-Loop-Points-to-Sounds).  
 
 The BGM block can be used to set the BGM for a specific bounding area  
 The Boss Spawner block is a helper block that can be used to spawn an enemy and play a specific BGM while the entity is alive.  
