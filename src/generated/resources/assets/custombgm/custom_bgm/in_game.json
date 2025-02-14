@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:in_game"
+  },
+  "music": {
+    "loop": "false",
+    "music": "minecraft:music.game"
+  },
+  "priority": 2,
+  "volume": {
+    "type": "custombgm:biome"
+  }
+}

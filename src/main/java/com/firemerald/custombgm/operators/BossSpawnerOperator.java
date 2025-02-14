@@ -1,37 +1,45 @@
 package com.firemerald.custombgm.operators;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.firemerald.custombgm.api.capabilities.IBossTracker;
-import com.firemerald.custombgm.api.capabilities.IPlayer;
+import com.firemerald.custombgm.api.BgmDistribution;
+import com.firemerald.custombgm.attachments.BossTracker;
 import com.firemerald.custombgm.client.gui.screen.BossSpawnerScreen;
 import com.firemerald.custombgm.client.gui.screen.OperatorScreen;
+import com.firemerald.custombgm.codecs.BGMDistributionCodec;
+import com.firemerald.custombgm.init.CustomBGMAttachments;
+import com.firemerald.fecore.util.StackUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapDecoder;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorBase<Player, O, S>
-{
-	public ResourceLocation music;
-	public int priority;
+public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorBase<Player, O, S> {
+	public BgmDistribution music = BgmDistribution.EMPTY;
+	public int priority = 1;
 	public boolean isRelative = true, disableMusic = false;
 	public double spawnX = 0.5, spawnY = 1, spawnZ = 0.5;
 	public ResourceLocation toSpawn;
@@ -40,15 +48,12 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	public boolean killed = false;
 	public int levelOnActive = 7, levelOnKilled = 15;
 
-	public BossSpawnerOperator(S source)
-	{
+	public BossSpawnerOperator(S source) {
 		super(Player.class, source);
 	}
 
-	public void setKilled(boolean killed)
-	{
-		if (this.killed != killed)
-		{
+	public void setKilled(boolean killed) {
+		if (this.killed != killed) {
 			this.killed = killed;
 			source.updateOutputValue();
 			source.setIsChanged();
@@ -56,96 +61,80 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void serverTick(Level level, double x, double y, double z)
-	{
+	public void serverTick(Level level, double x, double y, double z) {
 		//if (!level.isClientSide && !isActive()) setKilled(false);
 		super.serverTick(level, x, y, z);
-		if (!level.isClientSide)
-		{
+		if (!level.isClientSide) {
 			int count = this.getSuccessCount();
-			if (!isActive())
-			{
+			if (!isActive()) {
 				despawn();
 				setKilled(false);
 			}
-			else if (!killed)
-			{
-				if (boss == null) //boss does not exist
-				{
-					if (count > 0) //spawn boss
-					{
-						@SuppressWarnings("deprecation")
-						EntityType<?> type = Registry.ENTITY_TYPE.get(toSpawn);
-						Entity entity = type.create(level);
-						if (isRelative)
-						{
-							x += spawnX;
-							y += spawnY;
-							z += spawnZ;
-						}
-						if (spawnTag != null)
-						{
-			                CompoundTag nbttagcompound = entity.saveWithoutId(new CompoundTag());
-			                UUID uuid = entity.getUUID();
-			                nbttagcompound.merge(spawnTag);
-			                entity.load(nbttagcompound);
-			                entity.setUUID(uuid);
-						}
-						entity.setPos(x, y, z);
-						IBossTracker.get(entity).ifPresent(tracker -> {
+			else if (!killed) {
+				if (boss == null) { //boss does not exist
+					if (count > 0) { //spawn boss
+						Optional<Reference<EntityType<?>>> typeOpt = BuiltInRegistries.ENTITY_TYPE.get(toSpawn);
+						if (typeOpt.isPresent()) {
+							Entity entity = typeOpt.get().value().create(level, EntitySpawnReason.SPAWNER); //TODO
+							if (isRelative) {
+								x += spawnX;
+								y += spawnY;
+								z += spawnZ;
+							}
+							if (spawnTag != null) {
+				                CompoundTag nbttagcompound = entity.saveWithoutId(new CompoundTag());
+				                UUID uuid = entity.getUUID();
+				                nbttagcompound.merge(spawnTag);
+				                entity.load(nbttagcompound);
+				                entity.setUUID(uuid);
+							}
+							entity.setPos(x, y, z);
+							BossTracker tracker = entity.getData(CustomBGMAttachments.BOSS_TRACKER);
 							if (source.isEntity()) tracker.setBossSpawnerEntity((Entity) source);
 							else tracker.setBossSpawnerBlock((BlockEntity) source);
 							BossSpawnerOperator.this.setBoss(entity);
 							((ServerLevel) level).addFreshEntityWithPassengers(entity);
-						});
+						}
 					}
 				}
-				else if (count <= 0) //no players in area, despawn boss
-				{
+				else if (count <= 0) { //no players in area, despawn boss
 					despawn();
 				}
 			}
 		}
 	}
 
-	public void setBoss(Entity boss)
-	{
-		if (boss != this.boss)
-		{
+	public void setBoss(Entity boss) {
+		if (boss != this.boss) {
 			this.boss = boss;
 			source.updateOutputValue();
 			source.setIsChanged();
 		}
 	}
 
-	public void despawn()
-	{
-		if (boss != null)
-		{
+	public void despawn() {
+		if (boss != null) {
 			boss.discard();
 			setBoss(null);
 		}
 	}
 
 	@Override
-	public boolean operate(Player player)
-	{
-		if (boss != null && !disableMusic) IPlayer.get(player).ifPresent(iPlayer -> iPlayer.addMusicOverride(music, priority));
+	public boolean operate(Player player) {
+		if (boss != null && !disableMusic) player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).addMusicOverride(music, priority); //TODO
 		return true;
 	}
 
 	@Override
-	public Stream<? extends Player> allEntities(Level level)
-	{
+	public Stream<? extends Player> allEntities(Level level) {
 		return level.players().stream();
 	}
 
 	@Override
-	public void load(CompoundTag tag)
-	{
+	public void load(CompoundTag tag) {
 		super.load(tag);
-		String music = tag.getString("music");
-		this.music = music.isEmpty() ? null : new ResourceLocation(music);
+		float volume = tag.contains("volume", 99) ? tag.getFloat("volume") : 1f;
+		music = new BgmDistribution(BGMDistributionCodec.fromTag(tag.get("music")), volume);
 		priority = tag.getInt("priority");
 		if (tag.contains("isRelative", 99)) isRelative = tag.getBoolean("isRelative");
 		else isRelative = true;
@@ -155,7 +144,7 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 		spawnY = tag.getDouble("spawnY");
 		spawnZ = tag.getDouble("spawnZ");
 		String toSpawn = tag.getString("toSpawn");
-		this.toSpawn = toSpawn.isEmpty() ? null : new ResourceLocation(toSpawn);
+		this.toSpawn = toSpawn.isEmpty() ? null : ResourceLocation.tryParse(toSpawn);
 		if (tag.contains("spawnTag", 10))
 		{
 			spawnTag = tag.getCompound("spawnTag");
@@ -171,7 +160,8 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	public void save(CompoundTag tag)
 	{
 		super.save(tag);
-		tag.putString("music", music == null ? "" : music.toString());
+		tag.putFloat("volume", music.volume());
+		tag.put("music", BGMDistributionCodec.toTag(music.distribution()));
 		tag.putInt("priority", priority);
 		tag.putBoolean("isRelative", isRelative);
 		tag.putBoolean("disableMusic", disableMusic);
@@ -186,11 +176,10 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void read(FriendlyByteBuf buf)
+	public void read(RegistryFriendlyByteBuf buf)
 	{
 		super.read(buf);
-		String music = buf.readUtf();
-		this.music = music.isEmpty() ? null : new ResourceLocation(music);
+		music = BgmDistribution.STREAM_CODEC.decode(buf);
 		priority = buf.readInt();
 		isRelative = buf.readBoolean();
 		disableMusic = buf.readBoolean();
@@ -198,8 +187,8 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 		spawnY = buf.readDouble();
 		spawnZ = buf.readDouble();
 		String toSpawn = buf.readUtf();
-		this.toSpawn = toSpawn.isEmpty() ? null : new ResourceLocation(toSpawn);
-		spawnTag = buf.readAnySizeNbt();
+		this.toSpawn = toSpawn.isEmpty() ? null : ResourceLocation.tryParse(toSpawn);
+		spawnTag = buf.readNbt();
 		if (spawnTag.isEmpty()) spawnTag = null;
 		byte levels = buf.readByte();
 		levelOnActive = levels & 0xF;
@@ -208,10 +197,10 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf)
+	public void write(RegistryFriendlyByteBuf buf)
 	{
 		super.write(buf);
-		buf.writeUtf(music == null ? "" : music.toString());
+		BgmDistribution.STREAM_CODEC.encode(buf, music);
 		buf.writeInt(priority);
 		buf.writeBoolean(isRelative);
 		buf.writeBoolean(disableMusic);
@@ -251,16 +240,23 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 		return new BossSpawnerScreen<>(source);
 	}
 
-	public static void addTooltip(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag, Supplier<CompoundTag> operatorTag)
-	{
-		int powerOnSpawned = 7;
-		int powerOnKilled = 15;
-		CompoundTag blockTag = operatorTag.get();
-    	if (blockTag != null)
-    	{
-    		if (blockTag.contains("levelOnActive", 99)) powerOnSpawned = blockTag.getByte("levelOnActive");
-    		if (blockTag.contains("levelOnKilled", 99)) powerOnKilled = blockTag.getByte("levelOnKilled");
-    	}
-		tooltip.add(new TranslatableComponent("custombgm.tooltip.boss_spawner", powerOnSpawned, powerOnKilled));
+	public static final MapDecoder<byte[]> TOOLTIP_INFO_DECODER = RecordCodecBuilder.mapCodec(instance ->
+	instance.group(
+			Codec.BYTE.optionalFieldOf("levelOnActive", (byte) 7).forGetter(val -> val[0]),
+			Codec.BYTE.optionalFieldOf("levelOnKilled", (byte) 15).forGetter(val -> val[1])
+			).apply(instance, (v1, v2) -> new byte[] {v1, v2})
+	);
+
+	public static void addTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag, DataComponentType<CustomData> componentType) {
+		int powerOnSpawned, powerOnKilled;
+		byte[] tooltipData = StackUtils.decodeData(stack, TOOLTIP_INFO_DECODER, componentType);
+		if (tooltipData != null) {
+			powerOnSpawned = tooltipData[0];
+			powerOnKilled = tooltipData[1];
+		} else {
+			powerOnSpawned = 7;
+			powerOnKilled = 15;
+		}
+		tooltipComponents.add(Component.translatable("custombgm.tooltip.boss_spawner", powerOnSpawned, powerOnKilled));
 	}
 }

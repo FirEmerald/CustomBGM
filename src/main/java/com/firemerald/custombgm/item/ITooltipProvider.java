@@ -1,18 +1,16 @@
 package com.firemerald.custombgm.item;
 
 import java.util.List;
-import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.item.component.CustomData;
 
 @FunctionalInterface
 public interface ITooltipProvider
 {
-	public abstract void addTooltip(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag, Supplier<CompoundTag> operatorTag);
+	public abstract void addTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag, DataComponentType<CustomData> componentType);
 }

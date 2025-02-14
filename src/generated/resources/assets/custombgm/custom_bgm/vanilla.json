@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "music": [],
+  "priority": 2147483647
+}

@@ -1,37 +1,67 @@
 package com.firemerald.custombgm.api.providers;
 
-import java.util.function.Predicate;
+import java.util.Optional;
+import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.firemerald.custombgm.api.ICustomMusic;
+import com.firemerald.custombgm.api.BgmDistribution;
+import com.firemerald.custombgm.api.CustomBGMRegistries;
+import com.firemerald.custombgm.api.providers.conditions.BGMProviderCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.custombgm.providers.conditions.constant.TrueCondition;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
-import net.minecraft.resources.ResourceLocation;
+public abstract class BGMProvider implements Comparable<BGMProvider> {
+    public static final Codec<BGMProvider> CODEC = CustomBGMRegistries.PROVIDER_CODECS.byNameCodec().dispatch(BGMProvider::codec, Function.identity());
+    public static final Codec<Optional<net.neoforged.neoforge.common.conditions.WithConditions<BGMProvider>>> CONDITIONAL_CODEC = net.neoforged.neoforge.common.conditions.ConditionalOps.createConditionalCodecWithConditions(CODEC);
 
-public abstract class BGMProvider implements Comparable<BGMProvider>, ICustomMusic
-{
 	public final int priority;
-	public final Predicate<PlayerConditionData> condition;
+	public final BGMProviderCondition condition;
 
-	public BGMProvider(int priority, Predicate<PlayerConditionData> condition)
-	{
+	public BGMProvider(int priority, BGMProviderCondition condition) {
 		this.priority = priority;
 		this.condition = condition;
 	}
 
+	public abstract BgmDistribution getMusic(PlayerConditionData player);
+
 	@Override
-	public final int compareTo(BGMProvider other)
-	{
+	public final int compareTo(BGMProvider other) {
 		return priority - other.priority;
 	}
 
-	@Override
-	public ResourceLocation getMusic(@Nonnull PlayerConditionData player, @Nullable ResourceLocation currentMusic)
-	{
-		return condition.test(player) ? getTheMusic(player, currentMusic) : null;
-	}
+	public abstract MapCodec<? extends BGMProvider> codec();
 
-	public abstract ResourceLocation getTheMusic(PlayerConditionData player, @Nullable ResourceLocation currentMusic);
+	public static abstract class BuilderBase<T extends BGMProvider, U extends BuilderBase<T, U>> {
+		protected int priority;
+		protected BGMProviderCondition condition;
+
+		public BuilderBase() {
+			priority = 0;
+			condition = TrueCondition.INSTANCE;
+		}
+
+		public BuilderBase(T derive) {
+			priority = derive.priority;
+			condition = derive.condition;
+		}
+
+		@SuppressWarnings("unchecked")
+		public U me() {
+			return (U) this;
+		}
+
+		public U setPriority(int priority) {
+			this.priority = priority;
+			return me();
+		}
+
+		public U setCondition(BGMProviderCondition condition) {
+			if (condition == null) throw new IllegalStateException("Attempted to set to a null BGMProviderCondition");
+			this.condition = condition;
+			return me();
+		}
+
+		public abstract T build();
+	}
 }

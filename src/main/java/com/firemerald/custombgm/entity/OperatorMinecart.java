@@ -2,14 +2,14 @@ package com.firemerald.custombgm.entity;
 
 import com.firemerald.custombgm.operators.IOperatorSource;
 import com.firemerald.custombgm.operators.OperatorBase;
-import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
-import com.firemerald.fecore.networking.client.EntityGUIPacket;
+import com.firemerald.fecore.network.clientbound.EntityGUIPacket;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,8 +19,8 @@ import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extends OperatorMinecart<O, S> & IOperatorSource<O, S>> extends AbstractMinecart implements IOperatorSource<O, S>
 {
@@ -42,20 +42,12 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	protected abstract O makeOperator();
 
 	@Override
-	public Type getMinecartType()
-	{
-		return Type.COMMAND_BLOCK;
-	}
-
-	@Override
-	public void read(FriendlyByteBuf buf)
-	{
+	public void read(RegistryFriendlyByteBuf buf) {
 		this.operator.readInternal(buf);
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf)
-	{
+	public void write(RegistryFriendlyByteBuf buf) {
 		this.operator.write(buf);
 	}
 
@@ -111,7 +103,17 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	@Override
 	public CommandSourceStack createACommandSourceStack()
 	{
-		return this.createCommandSourceStack();
+		return new CommandSourceStack(
+				this,
+				this.position(),
+				this.getRotationVector(),
+				(ServerLevel) this.level(),
+				2,
+				this.getName().getString(),
+				this.getDisplayName(),
+				this.level().getServer(),
+				this
+				);
 	}
 
 	@Override
@@ -120,33 +122,35 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 		this.isActive = active;
 	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked", "resource" })
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand)
 	{
     	if (!player.isCreative()) return InteractionResult.PASS;
     	else
     	{
-			if (level.isClientSide) return InteractionResult.SUCCESS;
+			if (level().isClientSide) return InteractionResult.SUCCESS;
 	    	else
 	    	{
-	    		if (player instanceof ServerPlayer) FECoreMod.NETWORK.sendTo(new EntityGUIPacket(this), (ServerPlayer) player);
+	    		if (player instanceof ServerPlayer serverPlayer) new EntityGUIPacket<>((S) this).sendToClient(serverPlayer);
 	    		return InteractionResult.CONSUME;
 	    	}
     	}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
     public void tick()
     {
 		super.tick();
-		if (!level.isClientSide) operator.serverTick(level, position().x, position().y, position().z);
+		if (!level().isClientSide) operator.serverTick(level(), position().x, position().y, position().z);
     }
 
 	@Override
-	public abstract ItemStack getPickResult();
+	public ItemStack getPickResult() {
+		return new ItemStack(getDropItem());
+	}
 
-	@Override
 	public int getComparatorLevel()
 	{
 		return operator.getOutputLevel();
@@ -169,9 +173,27 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	}
 
 	@Override
-	public void onRemovedFromWorld()
+	public void onRemovedFromLevel()
 	{
-		super.onRemovedFromWorld();
+		super.onRemovedFromLevel();
 		operator.onRemoved();
+	}
+
+	@Override
+	public void sendSystemMessage(Component component) {}
+
+	@Override
+	public boolean acceptsSuccess() {
+		return false;
+	}
+
+	@Override
+	public boolean acceptsFailure() {
+		return false;
+	}
+
+	@Override
+	public boolean shouldInformAdmins() {
+		return false;
 	}
 }

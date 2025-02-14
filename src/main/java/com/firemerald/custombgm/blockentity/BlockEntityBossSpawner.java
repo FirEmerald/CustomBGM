@@ -1,6 +1,6 @@
 package com.firemerald.custombgm.blockentity;
 
-import com.firemerald.custombgm.init.CustomBGMBlockEntities;
+import com.firemerald.custombgm.init.CustomBGMObjects;
 import com.firemerald.custombgm.operators.BossSpawnerOperator;
 
 import net.minecraft.core.BlockPos;
@@ -12,7 +12,7 @@ public class BlockEntityBossSpawner<O extends BossSpawnerOperator<O, S>, S exten
 	@SuppressWarnings("unchecked")
 	public BlockEntityBossSpawner(BlockPos pos, BlockState state)
     {
-    	this((BlockEntityType<S>) CustomBGMBlockEntities.BOSS_SPAWNER.getBlockEntityType(), pos, state);
+    	this((BlockEntityType<S>) CustomBGMObjects.BOSS_SPAWNER.getBlockEntityType(), pos, state);
     }
 
 	public BlockEntityBossSpawner(BlockEntityType<? extends S> type, BlockPos pos, BlockState state)

@@ -1,0 +1,28 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:and",
+    "conditions": [
+      {
+        "type": "custombgm:underwater"
+      },
+      {
+        "type": "custombgm:biome",
+        "biome": "#minecraft:plays_underwater_music"
+      }
+    ]
+  },
+  "music": {
+    "loop": "false",
+    "music": "minecraft:music.under_water"
+  },
+  "priority": 5,
+  "volume": {
+    "type": "custombgm:biome"
+  }
+}

@@ -1,12 +1,11 @@
 package com.firemerald.custombgm.entity;
 
-import com.firemerald.custombgm.init.CustomBGMBlockEntities;
 import com.firemerald.custombgm.init.CustomBGMEntities;
-import com.firemerald.custombgm.init.CustomBGMItems;
+import com.firemerald.custombgm.init.CustomBGMObjects;
 import com.firemerald.custombgm.operators.BGMOperator;
 
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -42,12 +41,11 @@ public class BGMMinecart<O extends BGMOperator<O, S>, S extends BGMMinecart<O, S
 	@Override
 	public BlockState getDefaultDisplayBlockState()
 	{
-		return CustomBGMBlockEntities.BGM.getBlock().defaultBlockState();
+		return CustomBGMObjects.BGM.getBlock().defaultBlockState();
 	}
 
 	@Override
-	public ItemStack getPickResult()
-	{
-		return new ItemStack(CustomBGMItems.BGM_MINECART_ITEM);
+	protected Item getDropItem() {
+		return CustomBGMObjects.BGM_MINECART.asItem();
 	}
 }

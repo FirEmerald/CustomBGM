@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "minecraft:stone_pressure_plate",
+    "R": "#c:dusts/redstone",
+    "T": "minecraft:redstone_torch",
+    "X": "#c:ingots/iron"
+  },
+  "pattern": [
+    "XTX",
+    "XPX",
+    "XRX"
+  ],
+  "result": {
+    "count": 6,
+    "id": "custombgm:activator_detector_rail"
+  }
+}

@@ -1,0 +1,8 @@
+{
+	"net/minecraft/client/sounds/Weighted": [
+		"com/firemerald/custombgm/client/audio/IWeightedSoundExtensions"
+	],
+	"net/minecraft/client/resources/sounds/Sound": [
+		"com/firemerald/custombgm/client/audio/ISoundExtensions"
+	]
+}

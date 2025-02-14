@@ -1,6 +1,6 @@
 package com.firemerald.custombgm.blockentity;
 
-import com.firemerald.custombgm.init.CustomBGMBlockEntities;
+import com.firemerald.custombgm.init.CustomBGMObjects;
 import com.firemerald.custombgm.operators.EntityTesterOperator;
 
 import net.minecraft.core.BlockPos;
@@ -12,7 +12,7 @@ public class BlockEntityEntityTester<O extends EntityTesterOperator<O, S>, S ext
 	@SuppressWarnings("unchecked")
 	public BlockEntityEntityTester(BlockPos pos, BlockState state)
     {
-    	this((BlockEntityType<S>) CustomBGMBlockEntities.ENTITY_TESTER.getBlockEntityType(), pos, state);
+    	this((BlockEntityType<S>) CustomBGMObjects.ENTITY_TESTER.getBlockEntityType(), pos, state);
     }
 
 	public BlockEntityEntityTester(BlockEntityType<? extends S> type, BlockPos pos, BlockState state)

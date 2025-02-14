@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import com.firemerald.fecore.client.gui.components.text.BetterTextField;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestion;
@@ -17,25 +16,23 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class MusicSuggestions
 {
 	final Minecraft minecraft;
 	final Screen screen;
-	final BetterTextField input;
+	private BetterTextField input;
 	final Font font;
 	final int lineStartOffset;
 	final int suggestionLineLimit;
@@ -58,6 +55,10 @@ public class MusicSuggestions
 		this.fillColor = fillColor;
 	}
 
+	public void setInput(BetterTextField input) {
+		this.input = input;
+	}
+
 	public void setAllowSuggestions(boolean allowSuggestions)
 	{
 		this.allowSuggestions = allowSuggestions;
@@ -67,7 +68,7 @@ public class MusicSuggestions
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
 		if (this.suggestions != null && this.suggestions.keyPressed(key, scancode, mods)) return true;
-		else if (this.screen.getFocused() == this.input && key == 258)
+		else if (input != null && this.screen.getFocused() == this.input && key == 258)
 		{
 			this.showSuggestions(true);
 			return true;
@@ -75,14 +76,17 @@ public class MusicSuggestions
 		else return false;
 	}
 
-	public boolean mouseScrolled(double scrollX)
+	public boolean mouseScrolled(double scrollY)
 	{
-		return this.suggestions != null && this.suggestions.mouseScrolled(Mth.clamp(scrollX, -1.0D, 1.0D));
+		if (this.suggestions != null) {
+			this.suggestions.mouseScrolled(Mth.clamp(scrollY, -1.0D, 1.0D));
+			return true;
+		} else return false;
 	}
 
 	public boolean mouseClicked(double mX, double mY, int button)
 	{
-		if (this.suggestions != null)
+		if (input != null && this.suggestions != null)
 		{
 			if (this.suggestions.mouseClicked((int)mX, (int)mY, button))
 			{
@@ -136,30 +140,39 @@ public class MusicSuggestions
 		return builder.buildFuture();
 	}
 
-	public void updateCommandInfo()
-	{
-		String s = this.input.getValue();
-		if (!this.keepSuggestions)
-		{
-			this.input.setSuggestion((String)null);
+	public void deactivate() {
+		if (suggestions != null) {
+			if (this.input != null) this.input.setSuggestion(null);
 			this.suggestions = null;
 		}
-		StringReader stringreader = new StringReader(s);
-		int i = this.input.getCursorPosition();
-		int j = stringreader.getCursor();
-		if (i >= j && (this.suggestions == null || !this.keepSuggestions))
-		{
-			this.pendingSuggestions = requestCompletions(this.input.getValue().substring(0, i), 0);
-			this.pendingSuggestions.thenRun(() -> {
-				if (this.pendingSuggestions.isDone()) this.updateUsageInfo();
-			});
+	}
+
+	public void updateCommandInfo()
+	{
+		if (this.input != null) {
+			String s = this.input.getValue();
+			if (!this.keepSuggestions)
+			{
+				this.input.setSuggestion((String)null);
+				this.suggestions = null;
+			}
+			StringReader stringreader = new StringReader(s);
+			int i = this.input.getCursorPosition();
+			int j = stringreader.getCursor();
+			if (i >= j && (this.suggestions == null || !this.keepSuggestions))
+			{
+				this.pendingSuggestions = requestCompletions(this.input.getValue().substring(0, i), 0);
+				this.pendingSuggestions.thenRun(() -> {
+					if (this.pendingSuggestions.isDone()) this.updateUsageInfo();
+				});
+			}
 		}
 	}
 
 	private void updateUsageInfo()
 	{
 		this.suggestions = null;
-		if (this.allowSuggestions && this.minecraft.options.autoSuggestions) this.showSuggestions(false);
+		if (this.allowSuggestions && this.minecraft.options.autoSuggestions().get()) this.showSuggestions(false);
 	}
 
 	@Nullable
@@ -168,9 +181,9 @@ public class MusicSuggestions
 		return p_93929_.startsWith(p_93928_) ? p_93929_.substring(p_93928_.length()) : null;
 	}
 
-	public void render(PoseStack pose, int mX, int mY)
+	public void render(GuiGraphics guiGraphics, int mX, int mY)
 	{
-		if (this.suggestions != null) this.suggestions.render(pose, mX, mY);
+		if (this.suggestions != null) this.suggestions.render(guiGraphics, mX, mY);
 	}
 
 	public String getNarrationMessage()
@@ -201,7 +214,7 @@ public class MusicSuggestions
 			this.select(0);
 		}
 
-		public void render(PoseStack pose, int mX, int mY)
+		public void render(GuiGraphics guiGraphics, int mX, int mY)
 		{
 			int i = Math.min(this.suggestionList.size(), MusicSuggestions.this.suggestionLineLimit);
 			int j = -0xFFAAAAAA;
@@ -212,15 +225,15 @@ public class MusicSuggestions
 			if (flag3) this.lastMouse = new Vec2(mX, mY);
 			if (flag2)
 			{
-				GuiComponent.fill(pose, this.rect.getX(), this.rect.getY() - 1, this.rect.getX() + this.rect.getWidth(), this.rect.getY(), MusicSuggestions.this.fillColor);
-				GuiComponent.fill(pose, this.rect.getX(), this.rect.getY() + this.rect.getHeight(), this.rect.getX() + this.rect.getWidth(), this.rect.getY() + this.rect.getHeight() + 1, MusicSuggestions.this.fillColor);
+				guiGraphics.fill(this.rect.getX(), this.rect.getY() - 1, this.rect.getX() + this.rect.getWidth(), this.rect.getY(), MusicSuggestions.this.fillColor);
+				guiGraphics.fill(this.rect.getX(), this.rect.getY() + this.rect.getHeight(), this.rect.getX() + this.rect.getWidth(), this.rect.getY() + this.rect.getHeight() + 1, MusicSuggestions.this.fillColor);
 				if (flag)
 				{
 					for(int k = 0; k < this.rect.getWidth(); ++k)
 					{
 						if (k % 2 == 0)
 						{
-							GuiComponent.fill(pose, this.rect.getX() + k, this.rect.getY() - 1, this.rect.getX() + k + 1, this.rect.getY(), -1);
+							guiGraphics.fill(this.rect.getX() + k, this.rect.getY() - 1, this.rect.getX() + k + 1, this.rect.getY(), -1);
 						}
 					}
 				}
@@ -231,7 +244,7 @@ public class MusicSuggestions
 					{
 						if (i1 % 2 == 0)
 						{
-							GuiComponent.fill(pose, this.rect.getX() + i1, this.rect.getY() + this.rect.getHeight(), this.rect.getX() + i1 + 1, this.rect.getY() + this.rect.getHeight() + 1, -1);
+							guiGraphics.fill(this.rect.getX() + i1, this.rect.getY() + this.rect.getHeight(), this.rect.getX() + i1 + 1, this.rect.getY() + this.rect.getHeight() + 1, -1);
 						}
 					}
 				}
@@ -242,19 +255,19 @@ public class MusicSuggestions
 			for(int l = 0; l < i; ++l)
 			{
 				Suggestion suggestion = this.suggestionList.get(l + this.offset);
-				GuiComponent.fill(pose, this.rect.getX(), this.rect.getY() + 12 * l, this.rect.getX() + this.rect.getWidth(), this.rect.getY() + 12 * l + 12, MusicSuggestions.this.fillColor);
+				guiGraphics.fill(this.rect.getX(), this.rect.getY() + 12 * l, this.rect.getX() + this.rect.getWidth(), this.rect.getY() + 12 * l + 12, MusicSuggestions.this.fillColor);
 				if (mX > this.rect.getX() && mX < this.rect.getX() + this.rect.getWidth() && mY > this.rect.getY() + 12 * l && mY < this.rect.getY() + 12 * l + 12)
 				{
 					if (flag3) this.select(l + this.offset);
 					flag4 = true;
 				}
-				MusicSuggestions.this.font.drawShadow(pose, suggestion.getText(), this.rect.getX() + 1, this.rect.getY() + 2 + 12 * l, l + this.offset == this.current ? -256 : j);
+				guiGraphics.drawString(MusicSuggestions.this.font, suggestion.getText(), this.rect.getX() + 1, this.rect.getY() + 2 + 12 * l, l + this.offset == this.current ? -256 : j);
 			}
 
 			if (flag4)
 			{
 				Message message = this.suggestionList.get(this.current).getTooltip();
-				if (message != null) MusicSuggestions.this.screen.renderTooltip(pose, ComponentUtils.fromMessage(message), mX, mY);
+				if (message != null) guiGraphics.renderTooltip(MusicSuggestions.this.font, ComponentUtils.fromMessage(message), mX, mY);
 			}
 
 		}
@@ -339,7 +352,7 @@ public class MusicSuggestions
 			MusicSuggestions.this.input.setSuggestion(MusicSuggestions.calculateSuggestionSuffix(MusicSuggestions.this.input.getValue(), suggestion.apply(this.originalContents)));
 			if (this.lastNarratedEntry != this.current)
 			{
-				NarratorChatListener.INSTANCE.sayNow(this.getNarrationMessage());
+				MusicSuggestions.this.minecraft.getNarrator().sayNow(this.getNarrationMessage());
 			}
 		}
 
@@ -361,7 +374,7 @@ public class MusicSuggestions
 			this.lastNarratedEntry = this.current;
 			Suggestion suggestion = this.suggestionList.get(this.current);
 			Message message = suggestion.getTooltip();
-			return message != null ? new TranslatableComponent("narration.suggestion.tooltip", this.current + 1, this.suggestionList.size(), suggestion.getText(), message) : new TranslatableComponent("narration.suggestion", this.current + 1, this.suggestionList.size(), suggestion.getText());
+			return message != null ? Component.translatable("narration.suggestion.tooltip", this.current + 1, this.suggestionList.size(), suggestion.getText(), message) : Component.translatable("narration.suggestion", this.current + 1, this.suggestionList.size(), suggestion.getText());
 		}
 
 		public void hide()

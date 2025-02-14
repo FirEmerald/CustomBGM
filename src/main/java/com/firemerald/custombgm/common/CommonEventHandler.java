@@ -1,206 +1,124 @@
 package com.firemerald.custombgm.common;
 
-import java.util.Objects;
-
-import com.firemerald.custombgm.CustomBGMMod;
 import com.firemerald.custombgm.api.CustomBGMAPI;
-import com.firemerald.custombgm.api.capabilities.IBossTracker;
-import com.firemerald.custombgm.api.capabilities.IPlayer;
-import com.firemerald.custombgm.api.event.RegisterBGMProviderConditionSerializersEvent;
-import com.firemerald.custombgm.api.event.RegisterBGMProviderSerializersEvent;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
-import com.firemerald.custombgm.capability.PlayerClient;
-import com.firemerald.custombgm.capability.PlayerServer;
-import com.firemerald.custombgm.capability.Targeter;
-import com.firemerald.custombgm.networking.client.SelfDataSyncPacket;
-import com.firemerald.custombgm.networking.server.InitializedPacket;
+import com.firemerald.custombgm.attachments.BossTracker;
+import com.firemerald.custombgm.attachments.ServerPlayerData;
+import com.firemerald.custombgm.init.CustomBGMAttachments;
+import com.firemerald.custombgm.network.clientbound.MusicSyncPacket;
 import com.firemerald.custombgm.operators.BossSpawnerOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
 import com.firemerald.custombgm.operators.OperatorBase;
-import com.firemerald.custombgm.providers.BaseMusicProvider;
+import com.firemerald.custombgm.providers.OverrideResults;
 import com.firemerald.custombgm.providers.Providers;
-import com.firemerald.custombgm.providers.conditions.*;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-@Mod.EventBusSubscriber(modid = CustomBGMAPI.MOD_ID)
-public class CommonEventHandler
-{
+@EventBusSubscriber(modid = CustomBGMAPI.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+public class CommonEventHandler {
+
 	private static Providers bgmProviders;
 
-	public static Providers getBGMProviders()
-	{
+	public static Providers getBGMProviders() {
 		return bgmProviders;
 	}
 
+	@SubscribeEvent
+	public static void registerServerReloadListeners(AddServerReloadListenersEvent event) {
+		event.addListener(CustomBGMAPI.id("datapack_providers"), bgmProviders = Providers.forDataPacks(event.getConditionContext()));
+	}
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST) //we want to cancel the event as soon as possible
-	public static void onEntityJoinWorld(EntityJoinWorldEvent event) //do not load boss entities
-	{
-		if (event.loadedFromDisk()) IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
-			if (tracker.isBoss())
-			{
+	public static void onEntityJoinWorld(EntityJoinLevelEvent event) { //do not load boss entities
+		if (event.loadedFromDisk()) {
+			BossTracker tracker = event.getEntity().getData(CustomBGMAttachments.BOSS_TRACKER);
+			if (tracker.isBoss()) {
 				tracker.setNoBossSpawner(); //no longer tracking
 				event.setCanceled(true);
 			}
-		});
-	}
-
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onLeaveWorld(EntityLeaveWorldEvent event) //boss despawned
-	{
-		IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
-			Object blockEntity = tracker.getBossSpawnerObject();
-			if (blockEntity instanceof IOperatorSource)
-			{
-				OperatorBase<?, ?, ?> spawner = ((IOperatorSource<?, ?>) blockEntity).getOperator();
-				if (spawner instanceof BossSpawnerOperator) ((BossSpawnerOperator<?, ?>) spawner).setBoss(null);
-			}
-			tracker.setNoBossSpawner(); //no longer tracking
-		});
-		if (event.getEntity() instanceof IOperatorSource) ((IOperatorSource<?, ?>) event.getEntity()).getOperator().onRemoved();
-	}
-
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onLivingDeath(LivingDeathEvent event) //boss killed
-	{
-		IBossTracker.get(event.getEntity()).ifPresent(tracker -> {
-			Object blockEntity = tracker.getBossSpawnerObject();
-			if (blockEntity instanceof IOperatorSource)
-			{
-				OperatorBase<?, ?, ?> spawner = ((IOperatorSource<?, ?>) blockEntity).getOperator();
-				if (spawner instanceof BossSpawnerOperator)
-				{
-					BossSpawnerOperator<?, ?> operator = (BossSpawnerOperator<?, ?>) spawner;
-					operator.setKilled(true);
-					operator.setBoss(null);
-				}
-			}
-			tracker.setNoBossSpawner(); //no longer tracking
-		});
-		unTarget(event.getEntityLiving());
-	}
-
-	@SubscribeEvent
-	public static void AttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event)
-	{
-		if (event.getObject() instanceof Player) event.addCapability(IPlayer.NAME, event.getObject().level.isClientSide() ? new PlayerClient() : new PlayerServer());
-		if (event.getObject() instanceof LivingEntity) event.addCapability(Targeter.NAME, new Targeter());
-		event.addCapability(IBossTracker.NAME, new IBossTracker.Impl());
-	}
-
-	@SubscribeEvent(receiveCanceled = true, priority = EventPriority.LOWEST)
-	public static void onLivingUpdatePostAlways(LivingUpdateEvent event)
-	{
-		LivingEntity entity = event.getEntityLiving();
-		if (entity instanceof Player)
-		{
-			Player player = (Player) entity;
-			IPlayer.get(player).ifPresent(iPlayer -> {
-				if (player.level.isClientSide)
-				{
-					if (!iPlayer.getInit())
-					{
-						CustomBGMMod.NETWORK.sendToServer(new InitializedPacket());
-						iPlayer.setInit(true);
-					}
-				}
-				else if (iPlayer.getInit())
-				{
-					PlayerConditionData playerData = new PlayerConditionData(player, iPlayer);
-					bgmProviders.setMusic(playerData);
-					if (entity instanceof ServerPlayer && !Objects.equals(iPlayer.getMusicOverride(), iPlayer.getLastMusicOverride()))
-					{
-						iPlayer.setLastMusicOverride(iPlayer.getMusicOverride());
-						CustomBGMMod.NETWORK.sendTo(new SelfDataSyncPacket(iPlayer), (ServerPlayer) entity);
-					}
-					iPlayer.clearMusicOverride();
-				}
-				if (iPlayer instanceof PlayerServer) ((PlayerServer) iPlayer).tickTargeters();
-			});
 		}
 	}
 
-	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
-	public static void onRegisterBGMProviderSerializers(RegisterBGMProviderSerializersEvent event)
-	{
-		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderSerializers");
-		event.register(BaseMusicProvider.SERIALIZER_ID, BaseMusicProvider::serialize);
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void leaveWorld(EntityLeaveLevelEvent event) { //boss despawned
+		BossTracker tracker = event.getEntity().getData(CustomBGMAttachments.BOSS_TRACKER);
+		Object blockEntity = tracker.getBossSpawnerObject();
+		if (blockEntity instanceof IOperatorSource<?, ?> source) {
+			OperatorBase<?, ?, ?> spawner = source.getOperator();
+			if (spawner instanceof BossSpawnerOperator<?, ?> operator) operator.setBoss(null);
+		}
+		tracker.setNoBossSpawner(); //no longer tracking
+		if (event.getEntity() instanceof IOperatorSource<?, ?> source) source.getOperator().onRemoved();
+		if (event.getEntity() instanceof LivingEntity livingEntity) unTarget(livingEntity);
 	}
 
-	@SubscribeEvent(priority = EventPriority.HIGHEST) //TODO WHY ISN'T THIS FIRING!!!
-	public static void onRegisterBGMProviderConditionSerializers(RegisterBGMProviderConditionSerializersEvent event)
-	{
-		//CustomBGMMod.LOGGER.debug("TESTING onRegisterBGMProviderConditionSerializers");
-		event.register(Conditions.ALWAYS_ID, (json, context) -> Conditions.ALWAYS);
-		event.register(Conditions.TRUE_ID, (json, context) -> Conditions.ALWAYS);
-		event.register(Conditions.NEVER_ID, (json, context) -> Conditions.NEVER);
-		event.register(Conditions.FALSE_ID, (json, context) -> Conditions.NEVER);
-		event.register(AndCondition.SERIALIZER_ID, AndCondition::serialize);
-		event.register(OrCondition.SERIALIZER_ID, OrCondition::serialize);
-		event.register(NandCondition.SERIALIZER_ID, NandCondition::serialize);
-		event.register(NorCondition.SERIALIZER_ID, NorCondition::serialize);
-		event.register(NotCondition.SERIALIZER_ID, NotCondition::serialize);
-		event.register(BiomeCondition.SERIALIZER_ID, BiomeCondition::serialize);
-		event.register(CombatCondition.SERIALIZER_ID, CombatCondition::serialize);
-		event.register(DimensionTypeCondition.SERIALIZER_ID, DimensionTypeCondition::serialize);
-		event.register(DimensionCondition.SERIALIZER_ID, DimensionCondition::serialize);
-	}
-
-	@SubscribeEvent
-	public static void onRegisterServerReloadListeners(AddReloadListenerEvent event)
-	{
-		event.addListener(bgmProviders = Providers.forDataPacks(event.getConditionContext()));
-	}
-
-	@SubscribeEvent
-	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
-	{
-		Targeter targeter = Targeter.getOrNull(event.getEntityLiving());
-		if (targeter != null)
-		{
-			unTarget(event.getEntityLiving(), targeter);
-			LivingEntity target = event.getTarget();
-			if (target instanceof Player)
-			{
-				IPlayer iPlayer = IPlayer.getOrNull(target);
-				if (iPlayer instanceof PlayerServer) ((PlayerServer) iPlayer).onTargeted(event.getEntityLiving());
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void livingDeath(LivingDeathEvent event) { //boss killed
+		BossTracker tracker = event.getEntity().getData(CustomBGMAttachments.BOSS_TRACKER);
+		Object blockEntity = tracker.getBossSpawnerObject();
+		if (blockEntity instanceof IOperatorSource<?, ?> source) {
+			OperatorBase<?, ?, ?> spawner = source.getOperator();
+			if (spawner instanceof BossSpawnerOperator<?, ?> operator) {
+				operator.setKilled(true);
+				operator.setBoss(null);
 			}
-			targeter.target = target;
+		}
+		tracker.setNoBossSpawner(); //no longer tracking
+		unTarget(event.getEntity());
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void livingChangeTarget(LivingChangeTargetEvent event) {
+		unTarget(event.getEntity());
+		if (event.getNewAboutToBeSetTarget() instanceof ServerPlayer player) {
+			event.getEntity().setData(CustomBGMAttachments.PLAYER_TARGET, player);
+			player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).onTargeted(event.getEntity());
+		}
+	}
+
+	public static void unTarget(LivingEntity targeter) {
+		ServerPlayer target = targeter.getData(CustomBGMAttachments.PLAYER_TARGET);
+		if (target != null) target.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).onUntargeted(targeter);
+	}
+
+	@SubscribeEvent(receiveCanceled = true)
+	public static void tickServerPlayer(EntityTickEvent.Pre event) //we must use this method as any mod could cancel this and prevent all other events from firing
+	{
+		if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+			ServerPlayerData serverData = serverPlayer.getData(CustomBGMAttachments.SERVER_PLAYER_DATA);
+			PlayerConditionData playerData = new PlayerConditionData(serverPlayer);
+			OverrideResults synchronize = serverData.setMusicOverride(bgmProviders.getMusic(playerData, serverData), serverPlayer);
+			if (synchronize != null) new MusicSyncPacket(synchronize).sendToClient(serverPlayer);
+			serverData.resetTickMusic();
+			serverData.tickTargeters();
 		}
 	}
 
 	@SubscribeEvent
-	public static void onEntityLeaveWorld(EntityLeaveWorldEvent event)
-	{
-		if (event.getEntity() instanceof LivingEntity) unTarget((LivingEntity) event.getEntity());
+	public static void livingDamage(LivingIncomingDamageEvent event) {
+		if (event.getSource().getDirectEntity() instanceof ServerPlayer player) {
+			ServerPlayerData playerData = player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA);
+			playerData.onAttack(event.getEntity());
+		}
 	}
-
-	public static void unTarget(LivingEntity targeter)
-	{
-		Targeter targeter2 = Targeter.getOrNull(targeter);
-		if (targeter2 != null) unTarget(targeter, targeter2);
-	}
-
-	public static void unTarget(LivingEntity targeter, Targeter targeterCap)
-	{
-		LivingEntity target = targeterCap.target;
-		if (target instanceof Player)
-		{
-			IPlayer iPlayer = IPlayer.getOrNull(target);
-			if (iPlayer instanceof PlayerServer) ((PlayerServer) iPlayer).onUntargeted(targeter);
+	
+	@SubscribeEvent
+	public static void playerAttack(AttackEntityEvent event) {
+		if (event.getEntity() instanceof ServerPlayer player && event.getTarget() instanceof LivingEntity entity) {
+			ServerPlayerData playerData = player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA);
+			playerData.onAttack(entity);
 		}
 	}
 }

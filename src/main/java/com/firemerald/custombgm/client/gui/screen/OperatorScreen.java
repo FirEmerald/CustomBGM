@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.firemerald.custombgm.blockentity.BlockEntityEntityOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
 import com.firemerald.custombgm.operators.OperatorBase;
 import com.firemerald.fecore.boundingshapes.BoundingShape;
@@ -14,14 +13,15 @@ import com.firemerald.fecore.client.gui.components.text.BetterTextField;
 import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
 import com.firemerald.fecore.client.gui.screen.ShapesScreen;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 
 public abstract class OperatorScreen<O extends OperatorBase<?, O, S>, S extends IOperatorSource<O, S>> extends NetworkedGUIEntityScreen<S>
 {
 	public String selector = "";
 	public BoundingShape shape = new BoundingShapeSphere();
-	public Component customName = BlockEntityEntityOperator.DEFAULT_NAME;
+	public Component customName = Component.empty();//BlockEntityEntityOperator.DEFAULT_NAME;
 	public BetterTextField selectorTxt;
     public ButtonConfigureShape configureShape;
 
@@ -46,24 +46,24 @@ public abstract class OperatorScreen<O extends OperatorBase<?, O, S>, S extends 
 	public void setName(@Nullable Component customName)
 	{
 		if (customName != null) this.customName = customName;
-		else this.customName = BlockEntityEntityOperator.DEFAULT_NAME;
+		else this.customName = Component.empty();//BlockEntityEntityOperator.DEFAULT_NAME;
 	}
 
 	@Override
-	public void read(FriendlyByteBuf buf)
+	public void read(RegistryFriendlyByteBuf buf)
 	{
-		shape = BoundingShape.constructFromBuffer(buf);
+		shape = BoundingShape.STREAM_CODEC.decode(buf);
 		selector = buf.readUtf();
-		this.setName(Component.Serializer.fromJson(buf.readUtf()));
+		this.setName(ComponentSerialization.STREAM_CODEC.decode(buf));
 		selectorTxt.setString(selector);
 		configureShape.onShapeChanged(shape);
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf)
+	public void write(RegistryFriendlyByteBuf buf)
 	{
-		shape.saveToBuffer(buf);
+		BoundingShape.STREAM_CODEC.encode(buf, shape);
 		buf.writeUtf(selector == null ? "" : selector);
-		buf.writeUtf(Component.Serializer.toJson(this.customName));
+		ComponentSerialization.STREAM_CODEC.encode(buf, customName);
 	}
 }

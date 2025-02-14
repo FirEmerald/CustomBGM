@@ -1,0 +1,13 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "music": {
+    "loop": "false",
+    "music": "minecraft:music.menu"
+  },
+  "priority": 1
+}

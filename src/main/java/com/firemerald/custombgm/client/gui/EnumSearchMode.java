@@ -10,21 +10,21 @@ public enum EnumSearchMode
 		@Override
 		public boolean matches(ResourceLocation id, String name, String toMatch)
 		{
-			return id.getNamespace().toLowerCase(Locale.ENGLISH).contains(toMatch);
+			return id.getNamespace().toLowerCase(Locale.ROOT).contains(toMatch);
 		}
 	},
 	ID('#') {
 		@Override
 		public boolean matches(ResourceLocation id, String name, String toMatch)
 		{
-			return id.toString().toLowerCase(Locale.ENGLISH).contains(toMatch);
+			return id.toString().toLowerCase(Locale.ROOT).contains(toMatch);
 		}
 	},
 	NAME('$') {
 		@Override
 		public boolean matches(ResourceLocation id, String name, String toMatch)
 		{
-			return name.toLowerCase(Locale.ENGLISH).contains(toMatch);
+			return name.toLowerCase(Locale.ROOT).contains(toMatch);
 		}
 	};
 
@@ -51,6 +51,6 @@ public enum EnumSearchMode
 				break;
 			}
 		}
-		return mode == null ? id.toString().toLowerCase(Locale.ENGLISH).contains(toMatch) || name.toLowerCase(Locale.ENGLISH).contains(toMatch) : mode.matches(id, name, toMatch);
+		return mode == null ? id.toString().toLowerCase(Locale.ROOT).contains(toMatch) || name.toLowerCase(Locale.ROOT).contains(toMatch) : mode.matches(id, name, toMatch);
 	}
 }

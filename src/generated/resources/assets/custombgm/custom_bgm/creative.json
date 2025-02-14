@@ -1,0 +1,32 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:and",
+    "conditions": [
+      {
+        "type": "custombgm:game_mode",
+        "mode": "creative"
+      },
+      {
+        "type": "custombgm:not",
+        "condition": {
+          "type": "custombgm:dimension",
+          "dimensions": "minecraft:the_nether"
+        }
+      }
+    ]
+  },
+  "music": {
+    "loop": "false",
+    "music": "minecraft:music.creative"
+  },
+  "priority": 4,
+  "volume": {
+    "type": "custombgm:biome"
+  }
+}

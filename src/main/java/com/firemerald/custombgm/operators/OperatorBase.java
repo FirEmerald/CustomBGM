@@ -8,19 +8,23 @@ import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.BoundingShapeSphere;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O, S>, S extends IOperatorSource<O, S>>
-{
+public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O, S>, S extends IOperatorSource<O, S>> {
 	public BoundingShape shape = new BoundingShapeSphere();
 	//public String selector = null;
 	private EntitySelector selector = null;
@@ -30,40 +34,31 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     public final S source;
     public final Class<E> clazz;
 
-    public OperatorBase(Class<E> clazz, S source)
-    {
+    public OperatorBase(Class<E> clazz, S source) {
     	this.clazz = clazz;
     	this.source = source;
     }
 
-	public void readInternal(FriendlyByteBuf buf)
-	{
+	public void readInternal(RegistryFriendlyByteBuf buf) {
 		this.read(buf);
 		source.setIsChanged();
 	}
 
-    public String getSelectorString()
-    {
+    public String getSelectorString() {
     	return selectorString;
     }
 
-    public EntitySelector getSelector()
-    {
+    public EntitySelector getSelector() {
     	return selector;
     }
 
-    public void setSelectorString(String selectorString)
-    {
+    public void setSelectorString(String selectorString) {
     	this.selectorString = selectorString;
-    	if (selectorString != null && !selectorString.isEmpty())
-    	{
-        	EntitySelectorParser parser = new EntitySelectorParser(new StringReader(selectorString));
-        	try
-        	{
+    	if (selectorString != null && !selectorString.isEmpty()) {
+        	EntitySelectorParser parser = new EntitySelectorParser(new StringReader(selectorString), true);
+        	try {
     			this.selector = parser.parse();
-    		}
-        	catch (CommandSyntaxException e)
-        	{
+    		} catch (CommandSyntaxException e) {
     			// TODO Auto-generated catch block
     			//e.printStackTrace();
         		this.selector = null;
@@ -72,8 +67,7 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     	else this.selector = null;
     }
 
-    public boolean isValid(E entity)
-    {
+    public boolean isValid(E entity) {
     	return true;
     }
 
@@ -82,10 +76,8 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     public abstract Stream<? extends E> allEntities(Level level);
 
 	@SuppressWarnings("unchecked")
-	public void serverTick(Level level, double x, double y, double z)
-	{
-		if (isActive())
-		{
+	public void serverTick(Level level, double x, double y, double z) {
+		if (isActive()) {
 			int prevFound = found;
 			Stream<? extends E> matchingEntities;
 			if (selector == null) matchingEntities = allEntities(level);
@@ -98,50 +90,49 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
 				// TODO Auto-generated catch block
 				matchingEntities = allEntities(level);
 			}
-			Predicate<E> tester = entity -> shape.isWithin(entity, entity.position().x, entity.position().y, entity.position().z, x + 0.5, y + 0.5, z + 0.5);
+			Predicate<E> tester = entity -> {
+				if (entity instanceof Player player && player.isSpectator()) return false;
+				else return shape.isWithin(entity, entity.position().x, entity.position().y, entity.position().z, x + 0.5, y + 0.5, z + 0.5);
+			};
 			found = (int) matchingEntities.filter(((Predicate<E>) this::isValid).and(tester).and(this::operate)).count();
 			if (prevFound != found) source.setIsChanged();
 		}
 	}
 
-	public void load(CompoundTag tag)
-	{
-		if (tag.contains("shape", 10)) shape = BoundingShape.constructFromNBT(tag.getCompound("shape"));
+	public void load(CompoundTag tag) {
+		if (tag.contains("shape", 10)) {
+			DataResult<Pair<BoundingShape, Tag>> decoded = BoundingShape.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("shape"));
+			if (decoded.isSuccess()) shape = decoded.result().get().getFirst();
+			else shape = new BoundingShapeSphere();
+		}
 		else shape = new BoundingShapeSphere();
 		this.setSelectorString(tag.getString("selector"));
         this.found = tag.getInt("SuccessCount");
 	}
 
-	public void save(CompoundTag tag)
-	{
-		CompoundTag shapeParams = new CompoundTag();
-		shape.saveToNBT(shapeParams);
-		tag.put("shape", shapeParams);
+	public void save(CompoundTag tag) {
+		BoundingShape.CODEC.encode(shape, NbtOps.INSTANCE, new CompoundTag()).ifSuccess(shapeParams -> tag.put("shape", shapeParams));
 		tag.putString("selector", selectorString == null ? "" : selectorString);
 		tag.putInt("SuccessCount", this.found);
 	}
 
-	public void read(FriendlyByteBuf buf)
-	{
-		shape = BoundingShape.constructFromBuffer(buf);
+	public void read(RegistryFriendlyByteBuf buf) {
+		shape = BoundingShape.STREAM_CODEC.decode(buf);
 		this.setSelectorString(buf.readUtf());
-		this.source.setTheName(Component.Serializer.fromJson(buf.readUtf()));
+		this.source.setTheName(ComponentSerialization.STREAM_CODEC.decode(buf));
 	}
 
-	public void write(FriendlyByteBuf buf)
-	{
-		shape.saveToBuffer(buf);
+	public void write(RegistryFriendlyByteBuf buf) {
+		BoundingShape.STREAM_CODEC.encode(buf, shape);
 		buf.writeUtf(selectorString == null ? "" : selectorString);
-		buf.writeUtf(Component.Serializer.toJson(this.source.getTheName()));
+		ComponentSerialization.STREAM_CODEC.encode(buf, this.source.getTheName());
 	}
 
-	public int getSuccessCount()
-	{
+	public int getSuccessCount() {
 		return this.found;
 	}
 
-    public boolean isActive()
-    {
+    public boolean isActive() {
     	return source.isActive();
     }
 

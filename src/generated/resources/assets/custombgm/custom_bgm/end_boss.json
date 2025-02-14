@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:and",
+    "conditions": [
+      {
+        "type": "custombgm:play_boss_music"
+      },
+      {
+        "type": "custombgm:dimension",
+        "dimensions": "minecraft:the_end"
+      }
+    ]
+  },
+  "music": {
+    "loop": "false",
+    "music": "minecraft:music.dragon"
+  },
+  "priority": 7
+}

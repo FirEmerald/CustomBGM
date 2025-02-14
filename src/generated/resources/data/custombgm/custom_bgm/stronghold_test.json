@@ -1,0 +1,8 @@
+{
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:structure",
+    "structure": "minecraft:stronghold"
+  },
+  "music": "mc4:mp1.phazon_mines.main"
+}

@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:vanilla_bgm",
+    "music": "minecraft:music.menu"
+  },
+  "music": {
+    "mc4:mp1.screen.bootup": "false",
+    "mc4:mp1.screen.menu": "true",
+    "mc4:mp2.screen.bootup": "false",
+    "mc4:mp2.screen.menu": "true",
+    "mc4:mp3.screen.title": "true",
+    "mc4:mpt.screen.title": "true",
+    "minecraft:entity.villager.ambient": "shuffle",
+    "minecraft:music.menu": "shuffle"
+  }
+}

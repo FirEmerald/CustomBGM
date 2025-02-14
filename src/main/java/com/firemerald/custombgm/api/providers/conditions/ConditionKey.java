@@ -2,21 +2,28 @@ package com.firemerald.custombgm.api.providers.conditions;
 
 import net.minecraft.resources.ResourceLocation;
 
-public abstract class ConditionKey<T> extends ResourceLocation
-{
-	/**
-	 * @deprecated use {@link #ConditionKey(String, String)}
-	 */
-	@Deprecated
-	public ConditionKey(String location)
-	{
-		super(location);
+public class ConditionKey<T> {
+	public final ResourceLocation id;
+
+	public ConditionKey(ResourceLocation id) {
+		this.id = id;
 	}
 
-	public ConditionKey(String nameSpace, String path)
-	{
-		super(nameSpace, path);
-	}
+    @Override
+    public String toString() {
+        return "ConditionKey<" + id.toString() + ">";
+    }
 
-	public abstract T compose(PlayerConditionData playerData);
+	@Override
+    public boolean equals(Object other) {
+    	if (other == null) return false;
+    	else if (other == this) return true;
+    	else if (other.getClass() == this.getClass()) return id.equals(((ConditionKey<?>) other).id);
+    	else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

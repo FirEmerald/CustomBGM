@@ -1,7 +1,5 @@
 package com.firemerald.custombgm.blockentity;
 
-import java.util.UUID;
-
 import javax.annotation.Nullable;
 
 import com.firemerald.custombgm.operators.IOperatorSource;
@@ -10,10 +8,10 @@ import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,12 +19,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>, S extends BlockEntityEntityOperator<O, S> & IOperatorSource<O, S>> extends BlockEntity implements IOperatorSource<O, S>
 {
-	public static final Component DEFAULT_NAME = new TextComponent("@");
+	public static final Component DEFAULT_NAME = Component.literal("@");
     private Component customName = DEFAULT_NAME;
     public final O operator;
 
@@ -50,19 +48,20 @@ public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>,
 	}
 
 	@Override
-	public void load(CompoundTag tag)
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
 	{
-		super.load(tag);
+		super.loadAdditional(tag, registries);
 		operator.load(tag);
-        if (tag.contains("CustomName", 8)) this.setName(Component.Serializer.fromJson(tag.getString("CustomName")));
+        if (tag.contains("CustomName", 8)) this.setName(BlockEntity.parseCustomNameSafe(tag.getString("CustomName"), registries));
+        else this.setName(null);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag tag)
+	public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
 	{
-		super.saveAdditional(tag);
+		super.saveAdditional(tag, registries);
 		operator.save(tag);
-		tag.putString("CustomName", Component.Serializer.toJson(this.customName));
+        if (this.customName != null) tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
 	}
 
 	public Component getName()
@@ -107,7 +106,7 @@ public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>,
 	}
 
 	@Override
-	public void sendMessage(Component p_45426_, UUID p_45427_) {}
+	public void sendSystemMessage(Component component) {}
 
 	@Override
 	public void updateOutputValue()
@@ -160,13 +159,13 @@ public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>,
 	}
 
 	@Override
-	public void read(FriendlyByteBuf buf)
+	public void read(RegistryFriendlyByteBuf buf)
 	{
 		this.operator.readInternal(buf);
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf)
+	public void write(RegistryFriendlyByteBuf buf)
 	{
 		this.operator.write(buf);
 	}

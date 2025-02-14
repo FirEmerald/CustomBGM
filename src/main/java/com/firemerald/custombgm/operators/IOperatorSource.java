@@ -7,11 +7,10 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-public interface IOperatorSource<O extends OperatorBase<?, O, S>, S extends IOperatorSource<O, S>> extends CommandSource, INetworkedGUIEntity<S>
-{
+public interface IOperatorSource<O extends OperatorBase<?, O, S>, S extends IOperatorSource<O, S>> extends CommandSource, INetworkedGUIEntity<S> {
 	public abstract O getOperator();
 
 	public abstract void setIsChanged();

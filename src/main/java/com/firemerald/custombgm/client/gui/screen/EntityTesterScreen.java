@@ -3,81 +3,75 @@ package com.firemerald.custombgm.client.gui.screen;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
-import com.firemerald.custombgm.CustomBGMMod;
+import com.firemerald.custombgm.CustomBGM;
 import com.firemerald.custombgm.client.gui.EnumSearchMode;
 import com.firemerald.custombgm.operators.EntityTesterOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
-import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.components.Button;
+import com.firemerald.fecore.client.gui.components.ToggleButton;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollableComponentPane;
 import com.firemerald.fecore.client.gui.components.text.IntegerField;
 import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
-import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.networking.server.EntityGUIClosedPacket;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.firemerald.fecore.network.serverbound.BlockEntityGUIClosedPacket;
+import com.firemerald.fecore.network.serverbound.EntityGUIClosedPacket;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 
-public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorScreen<O, S>
-{
-	public static class EntityButton extends Button
-	{
+public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorScreen<O, S> {
+	public static class EntityButton extends ToggleButton {
 		public final Set<ResourceLocation> set;
 		public final ResourceLocation id;
-		public boolean state;
+		public final String unformattedString;
 
-	    public EntityButton(int x, int y, Component buttonText, Set<ResourceLocation> set, ResourceLocation id)
-	    {
+	    public EntityButton(int x, int y, Component buttonText, Set<ResourceLocation> set, ResourceLocation id) {
 	    	super(x, y, buttonText, null);
 	    	this.set = set;
 	    	this.id = id;
+	    	StringBuilder builder = new StringBuilder();
+	    	buttonText.visit(text -> {
+	    		builder.append(text);
+	    		return Optional.empty();
+	    	});
+	    	unformattedString = builder.toString();
 	    	setAction();
 	    }
 
-		public EntityButton(int x, int y, int widthIn, int heightIn, Component buttonText, Set<ResourceLocation> set, ResourceLocation id)
-		{
+		public EntityButton(int x, int y, int widthIn, int heightIn, Component buttonText, Set<ResourceLocation> set, ResourceLocation id) {
 	    	super(x, y, widthIn, heightIn, buttonText, null);
 	    	this.set = set;
 	    	this.id = id;
+	    	StringBuilder builder = new StringBuilder();
+	    	buttonText.visit(text -> {
+	    		builder.append(text);
+	    		return Optional.empty();
+	    	});
+	    	unformattedString = builder.toString();
 	    	setAction();
 		}
 
-		private void setAction()
-		{
-			this.onClick = () -> {
-				if (state)
-				{
-					set.remove(id);
-					state = false;
-				}
-				else
-				{
-					set.add(id);
-					state = true;
-				}
-			};
+		private void setAction() {
+			this.setToggleAction(state -> {
+				if (state) set.add(id);
+				else set.remove(id);
+			});
 		}
-
-		@Override
-	    protected int getHoverState(boolean mouseOver)
-	    {
-	    	return this.state ? super.getHoverState(mouseOver) : 0;
-	    }
 	}
 
 	public final List<EntityButton> allEntities = new ArrayList<>();
@@ -93,41 +87,42 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
     public final VerticalScrollableComponentPane entityButtons;
     public final VerticalScrollBar entityButtonsScroll;
 
-	@SuppressWarnings({ "deprecation", "resource", "rawtypes", "unchecked" })
+	@SuppressWarnings({ "resource", "rawtypes", "unchecked" })
 	public EntityTesterScreen(S source)
 	{
-		super(new TranslatableComponent("custombgm.gui.entitytester"), source);
+		super(Component.translatable("custombgm.gui.entitytester"), source);
 		this.font = Minecraft.getInstance().font;
 		MutableInt y = new MutableInt(0);
-		Registry.ENTITY_TYPE.keySet().forEach(reg -> {
-			EntityType<?> type = Registry.ENTITY_TYPE.get(reg);
+		BuiltInRegistries.ENTITY_TYPE.entrySet().forEach(entry -> {
+			ResourceLocation reg = entry.getKey().location();
+			EntityType<?> type = entry.getValue();
 			allEntities.add(new EntityButton(0, y.getValue(), 200, y.addAndGet(20), type.getDescription(), enabled, reg));
 		});
 		entities.addAll(allEntities);
 		setupShapeField(0, 0, 200, 20);
-		labelSelector = new FloatingText(0, 20, 200, 40, font, Translator.format("custombgm.gui.operator.selector"));
+		labelSelector = new FloatingText(0, 20, 200, 40, font, I18n.get("custombgm.gui.operator.selector"));
 		this.setupSelectorTextField(0, 0, 40, 200, 20);
-		labelMin = new FloatingText(0, 100, 200, 120, font, Translator.format("custombgm.gui.entitytester.min"));
-		fieldMin = new IntegerField(font, 0, 120, 200, 20, Short.MAX_VALUE, new TranslatableComponent("custombgm.gui.entitytester.min.narrate"), (IntConsumer) (val -> this.min = (short) val));
-		labelMax = new FloatingText(0, 140, 200, 160, font, Translator.format("custombgm.gui.entitytester.max"));
-		fieldMax = new IntegerField(font, 0, 160, 200, 20, Short.MAX_VALUE, new TranslatableComponent("custombgm.gui.entitytester.max.narrate"), (IntConsumer) (val -> this.max = (short) val));
-		selectAll = new Button(200, 0, 110, 20, new TranslatableComponent("custombgm.gui.entitytester.selectall"), () -> {
+		labelMin = new FloatingText(0, 100, 200, 120, font, I18n.get("custombgm.gui.entitytester.min"));
+		fieldMin = new IntegerField(font, 0, 120, 200, 20, Short.MAX_VALUE, Component.translatable("custombgm.gui.entitytester.min.narrate"), (IntConsumer) (val -> this.min = (short) val));
+		labelMax = new FloatingText(0, 140, 200, 160, font, I18n.get("custombgm.gui.entitytester.max"));
+		fieldMax = new IntegerField(font, 0, 160, 200, 20, Short.MAX_VALUE, Component.translatable("custombgm.gui.entitytester.max.narrate"), (IntConsumer) (val -> this.max = (short) val));
+		selectAll = new Button(200, 0, 110, 20, Component.translatable("custombgm.gui.entitytester.selectall"), () -> {
 			entities.forEach(button -> button.state = true); //set all enabled
 			entities.stream().map(button -> button.id).forEach(enabled::add); //add all to enabled list
 		});
-		selectNone = new Button(310, 0, 110, 20, new TranslatableComponent("custombgm.gui.entitytester.selectnone"), () -> {
+		selectNone = new Button(310, 0, 110, 20, Component.translatable("custombgm.gui.entitytester.selectnone"), () -> {
 			entities.forEach(button -> button.state = false); //set all to disabled
 			enabled.clear(); //clear the enabled list
 		});
-		fieldSearch = new LabeledBetterTextField(font, 200, 20, 220, 20, Translator.translate("custombgm.gui.entities.search"), new TranslatableComponent("custombgm.gui.entities.search.narrate"), (Consumer<String>) this::updateSearch);
+		fieldSearch = new LabeledBetterTextField(font, 200, 20, 220, 20, Component.translatable("custombgm.gui.entities.search"), Component.translatable("custombgm.gui.entities.search.narrate"), (Consumer<String>) this::updateSearch);
 		entityButtons = new VerticalScrollableComponentPane(200, 60, 400, 180);
 		entityButtonsScroll = new VerticalScrollBar(400, 60, 420, 180, entityButtons);
 
-		okay = new Button(0, 180, 200, 20, new TranslatableComponent("fecore.gui.confirm"), () -> {
-			FECoreMod.NETWORK.sendToServer(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this));
+		okay = new Button(0, 180, 200, 20, Component.translatable("fecore.gui.confirm"), () -> {
+			(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this)).sendToServer();
 			EntityTesterScreen.this.onClose();
 		});
-		cancel = new Button(200, 180, 200, 20, new TranslatableComponent("fecore.gui.cancel"), () -> {
+		cancel = new Button(200, 180, 200, 20, Component.translatable("fecore.gui.cancel"), () -> {
 			EntityTesterScreen.this.onClose();
 		});
 		entityButtons.setScrollBar(entityButtonsScroll);
@@ -210,13 +205,13 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	public void updateSearch(String s)
 	{
 		MutableInt y = new MutableInt(0);
-		final int w = entityButtons.x2 - entityButtons.x1; //max 392
+		final int w = entityButtons.getWidth(); //max 392
 		allEntities.forEach(entityButtons::removeComponent);
 		entities.clear();
 		for (int i = 0; i < allEntities.size(); i++)
 		{
 			EntityButton button = allEntities.get(i);
-			if (EnumSearchMode.matchString(button.id, button.displayString.getContents(), s))
+			if (EnumSearchMode.matchString(button.id, button.unformattedString, s.toLowerCase(Locale.ROOT)))
 			{
 				button.setSize(0, y.getValue(), w, y.addAndGet(20));
 				entityButtons.addComponent(button);
@@ -228,14 +223,14 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.renderBackground(pose);
-		super.render(pose, mx, my, partialTicks, canHover);
+		this.renderBackground(guiGraphics, mx, my, partialTicks);
+		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 
 	@Override
-	public void read(FriendlyByteBuf buf)
+	public void read(RegistryFriendlyByteBuf buf)
 	{
 		super.read(buf);
 		enabled.clear();
@@ -244,9 +239,9 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 		int count = buf.readVarInt();
 		for (int i = 0; i < count; i++)
 		{
-			ResourceLocation name = new ResourceLocation(buf.readUtf());
+			ResourceLocation name = buf.readResourceLocation();
 			if (allEntities.stream().anyMatch(button -> button.id.equals(name))) enabled.add(name);
-			else CustomBGMMod.LOGGER.warn("[EntityTesterScreen]: Invalid entity ID: " + name + ", ignoring");
+			else CustomBGM.LOGGER.warn("[EntityTesterScreen]: Invalid entity ID: " + name + ", ignoring");
 		}
 		this.fieldMin.setInteger(min);
 		this.fieldMax.setInteger(max);
@@ -255,12 +250,12 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf)
+	public void write(RegistryFriendlyByteBuf buf)
 	{
 		super.write(buf);
 		buf.writeVarInt(min);
 		buf.writeVarInt(max);
 		buf.writeVarInt(enabled.size());
-		enabled.forEach(name -> buf.writeUtf(name.toString()));
+		enabled.forEach(buf::writeResourceLocation);
 	}
 }

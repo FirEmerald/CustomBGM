@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "custombgm:base",
+  "condition": {
+    "type": "custombgm:combat",
+    "count": {}
+  },
+  "music": {
+    "mc4:mp1.boss.incinerator_drone": 0.7,
+    "mc4:mp1.screen.bootup": 0.3
+  }
+}

@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"package": "com.firemerald.custombgm.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"MixinDetectorRailBlock"
+	],
+	"client": [
+		"MixinSound",
+		"MixinSoundEngine",
+		"MixinSoundEventRegistrationSerializer",
+		"MixinSoundManagerPreparations1",
+		"MixinWeighedSoundEvents",
+		"MixinWeighted"
+	],
+	"minVersion": "0.8",
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

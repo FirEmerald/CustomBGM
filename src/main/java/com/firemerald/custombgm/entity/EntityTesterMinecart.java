@@ -1,12 +1,11 @@
 package com.firemerald.custombgm.entity;
 
-import com.firemerald.custombgm.init.CustomBGMBlockEntities;
 import com.firemerald.custombgm.init.CustomBGMEntities;
-import com.firemerald.custombgm.init.CustomBGMItems;
+import com.firemerald.custombgm.init.CustomBGMObjects;
 import com.firemerald.custombgm.operators.EntityTesterOperator;
 
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -42,12 +41,11 @@ public class EntityTesterMinecart<O extends EntityTesterOperator<O, S>, S extend
 	@Override
 	public BlockState getDefaultDisplayBlockState()
 	{
-		return CustomBGMBlockEntities.ENTITY_TESTER.getBlock().defaultBlockState();
+		return CustomBGMObjects.ENTITY_TESTER.getBlock().defaultBlockState();
 	}
 
 	@Override
-	public ItemStack getPickResult()
-	{
-		return new ItemStack(CustomBGMItems.ENTITY_TESTER_MINECART_ITEM);
+	protected Item getDropItem() {
+		return CustomBGMObjects.ENTITY_TESTER_MINECART.asItem();
 	}
 }
