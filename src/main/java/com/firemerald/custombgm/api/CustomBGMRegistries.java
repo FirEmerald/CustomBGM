@@ -7,7 +7,6 @@ import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public class CustomBGMRegistries {
@@ -21,7 +20,7 @@ public class CustomBGMRegistries {
         public static final ResourceKey<Registry<MapCodec<? extends BGMProviderVolume>>> VOLUME_CODECS = key("volume_codecs");
 
         private static <T> ResourceKey<Registry<T>> key(String name) {
-            return ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(CustomBGMAPI.MOD_ID, name));
+            return ResourceKey.createRegistryKey(CustomBGMAPI.id(name));
         }
     }
 }
