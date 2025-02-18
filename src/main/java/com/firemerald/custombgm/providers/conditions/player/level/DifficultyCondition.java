@@ -54,7 +54,7 @@ public class DifficultyCondition implements BGMProviderPlayerCondition {
 	public boolean test(PlayerConditionData playerData, Player player) {
 		return (player.level().getDifficulty() == difficulty) == isDifficulty;
 	}
-	
+
 	@Override
 	public DifficultyCondition simpleNot() {
 		return of(difficulty, !isDifficulty);

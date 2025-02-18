@@ -73,11 +73,11 @@ public class PlayerConditionData {
 	public FluidState insideFluid() { //TODO all fluids and not just block position fluid
 		return getPlayerData(INSIDE_FLUID, player -> player == null || !player.level().isLoaded(player.blockPosition()) ? null : player.level().getFluidState(player.blockPosition()));
 	}
-	
+
 	public DifficultyInstance getDifficultyInstance() {
 		return getPlayerData(DIFFICULTY_INSTANCE, player -> player == null ? null : player.level().getCurrentDifficultyAt(player.blockPosition()));
 	}
-	
+
 	public GlobalPos getRespawnPoint() {
 		return getPlayerData(RESPAWN_POINT, PlayerConditionData::respawnPoint);
 	}
@@ -89,7 +89,7 @@ public class PlayerConditionData {
 		else if (player instanceof ServerPlayer serverPlayer) return GlobalPos.of(serverPlayer.getRespawnDimension(), serverPlayer.getRespawnPosition());
 		else return null;
 	}
-	
+
 	public Raid getRaid() {
 		return getPlayerData(ACTIVE_RAID, player -> player != null && player.level() instanceof ServerLevel level ? level.getRaidAt(player.blockPosition()) : null);
 	}

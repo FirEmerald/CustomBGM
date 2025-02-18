@@ -35,11 +35,11 @@ public class ServerPlayerData implements IOverrideResults {
 		protected boolean targeted = false;
 		protected int untargetedTime = 0;
 		protected int attackTime = ServerConfig.attackTimeout;
-		
+
 		protected void targeted() {
 			targeted = true;
 		}
-		
+
 		protected void onAttack() {
 			attackTime = 0;
 		}
@@ -48,11 +48,11 @@ public class ServerPlayerData implements IOverrideResults {
 			targeted = false;
 			untargetedTime = 0;
 		}
-		
+
 		protected boolean tickInvalid() {
 			return tickUntargeted() && tickAttack();
 		}
-		
+
 		protected boolean tickUntargeted() {
 			if (targeted) return false;
 			else if (untargetedTime >= ServerConfig.trackingTimeout) return true;
@@ -61,7 +61,7 @@ public class ServerPlayerData implements IOverrideResults {
 				return false;
 			}
 		}
-		
+
 		protected boolean tickAttack() {
 			if (attackTime >= ServerConfig.attackTimeout) return true;
 			else {
@@ -74,7 +74,7 @@ public class ServerPlayerData implements IOverrideResults {
 	public void onTargeted(LivingEntity targeter) {
 		targeters.computeIfAbsent(targeter, entity -> new Targeter()).targeted();
 	}
-	
+
 	public void onAttack(LivingEntity targeter) {
 		targeters.computeIfAbsent(targeter, entity -> new Targeter()).onAttack();
 	}

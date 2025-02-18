@@ -114,7 +114,7 @@ public class CommonEventHandler {
 			playerData.onAttack(event.getEntity());
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void playerAttack(AttackEntityEvent event) {
 		if (event.getEntity() instanceof ServerPlayer player && event.getTarget() instanceof LivingEntity entity) {

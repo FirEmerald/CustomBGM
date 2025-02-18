@@ -7,16 +7,16 @@ import net.minecraft.resources.ResourceLocation;
 
 public class VolumedBGM extends BGM {
 	public final float volume;
-	
+
 	public VolumedBGM(ResourceLocation sound, LoopType loop, float volume) {
 		super(sound, loop);
 		this.volume = volume;
 	}
-	
+
 	public VolumedBGM(BGM bgm, float volume) {
 		this(bgm.sound(), bgm.loop(), volume);
 	}
-	
+
 	public VolumedBGM(VolumedBGM other) {
 		this(other.sound, other.loop, other.volume);
 	}
@@ -28,11 +28,11 @@ public class VolumedBGM extends BGM {
         if (i == 0 && other instanceof VolumedBGM volumed) i = Float.compare(volume, volumed.volume);
         return i;
 	}
-	
+
 	public float volume() {
 		return volume;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) return false;
@@ -43,12 +43,12 @@ public class VolumedBGM extends BGM {
 			return other.loop == loop && other.volume == volume && other.sound.equals(sound);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "VolumedBGM<sound=" + sound.toString() + ",loop=" + loop.toString() + ",volume=" + volume + ">";
 	}
-	
+
 	@Override
 	public VolumedBGM clone() {
 		return new VolumedBGM(this);

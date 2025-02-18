@@ -30,9 +30,9 @@ public class WeightedBGM extends BGM {
 			WeightedBGM::new
 			);
 	public static final StreamCodec<ByteBuf, List<WeightedBGM>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
-	
+
 	public final float weight;
-	
+
 	public WeightedBGM(ResourceLocation sound, LoopType loop, float weight) {
 		super(sound, loop);
 		this.weight = weight;
@@ -57,11 +57,11 @@ public class WeightedBGM extends BGM {
 	public WeightedBGM(ResourceLocation sound, SoundProperties properties) {
 		this(sound, properties.getLoop(), properties.getWeight());
 	}
-	
+
 	public WeightedBGM(WeightedBGM other) {
 		this(other.sound, other.loop, other.weight);
 	}
-	
+
 	public float weight() {
 		return weight;
 	}
@@ -77,7 +77,7 @@ public class WeightedBGM extends BGM {
 	public Pair<BGM, Float> pair() {
 		return new Pair<>(this, weight);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) return false;
@@ -88,12 +88,12 @@ public class WeightedBGM extends BGM {
 			return other.loop == loop && other.weight == weight && other.sound.equals(sound);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "WeightedBGM<sound=" + sound.toString() + ",loop=" + loop.toString() + ",weight=" + weight + ">";
 	}
-	
+
 	@Override
 	public WeightedBGM clone() {
 		return new WeightedBGM(this);

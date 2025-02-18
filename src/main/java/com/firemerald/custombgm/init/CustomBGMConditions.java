@@ -33,8 +33,8 @@ import com.firemerald.custombgm.providers.conditions.player.attributes.SwimmingC
 import com.firemerald.custombgm.providers.conditions.player.inventory.EquipmentCondition;
 import com.firemerald.custombgm.providers.conditions.player.inventory.SlotsCondition;
 import com.firemerald.custombgm.providers.conditions.player.level.DifficultyCondition;
-import com.firemerald.custombgm.providers.conditions.player.level.RegionalDifficultyCondition;
 import com.firemerald.custombgm.providers.conditions.player.level.LightLevelCondition;
+import com.firemerald.custombgm.providers.conditions.player.level.RegionalDifficultyCondition;
 import com.firemerald.custombgm.providers.conditions.player.level.TimeCondition;
 import com.firemerald.custombgm.providers.conditions.player.level.WeatherCondition;
 import com.firemerald.custombgm.providers.conditions.player.location.BiomeCondition;
@@ -85,7 +85,7 @@ public class CustomBGMConditions {
 	//player.inventory
 	public static final DeferredHolder<MapCodec<? extends BGMProviderCondition>, MapCodec<EquipmentCondition>> EQUIPMENT = registry.register("equipment", () -> EquipmentCondition.CODEC);
 	public static final DeferredHolder<MapCodec<? extends BGMProviderCondition>, MapCodec<SlotsCondition>> SLOTS = registry.register("slots", () -> SlotsCondition.CODEC);
-	
+
 	//player.level
 	public static final DeferredHolder<MapCodec<? extends BGMProviderCondition>, MapCodec<DifficultyCondition>> DIFFICULTY = registry.register("difficulty", () -> DifficultyCondition.CODEC);
 	public static final DeferredHolder<MapCodec<? extends BGMProviderCondition>, MapCodec<LightLevelCondition>> LIGHT_LEVEL = registry.register("light_level", () -> LightLevelCondition.CODEC);

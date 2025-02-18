@@ -36,10 +36,10 @@ public class BGM implements Comparable<BGM> {
 			BGM::new
 			);
 	public static final StreamCodec<ByteBuf, List<BGM>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
-	
+
 	public final ResourceLocation sound;
 	public final LoopType loop;
-	
+
 	public BGM(ResourceLocation sound, LoopType loop) {
 		this.sound = sound;
 		this.loop = loop;
@@ -112,15 +112,15 @@ public class BGM implements Comparable<BGM> {
 	public BGM(MusicInfo music) {
 		this(music, LoopType.FALSE);
 	}
-	
+
 	public BGM(BGM other) {
 		this(other.sound, other.loop);
 	}
-	
+
 	public ResourceLocation sound() {
 		return sound;
 	}
-	
+
 	public LoopType loop() {
 		return loop;
 	}
@@ -131,12 +131,12 @@ public class BGM implements Comparable<BGM> {
         if (i == 0) i = loop.compareTo(other.loop);
         return i;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return sound.hashCode(); //unlikely to have the same sound but different loop type
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) return false;
@@ -147,7 +147,7 @@ public class BGM implements Comparable<BGM> {
 			return other.loop == loop && other.sound.equals(sound);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BGM<sound=" + sound.toString() + ",loop=" + loop.toString() + ">";
@@ -177,7 +177,7 @@ public class BGM implements Comparable<BGM> {
 	public boolean is(BGM bgm) {
 		return bgm != null && is(bgm.sound, bgm.loop);
 	}
-	
+
 	@Override
 	public BGM clone() {
 		return new BGM(this);

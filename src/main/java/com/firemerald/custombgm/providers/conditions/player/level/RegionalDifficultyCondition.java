@@ -14,7 +14,7 @@ public record RegionalDifficultyCondition(FloatBounds difficulty, boolean clampe
 			FloatBounds.CODEC.fieldOf("difficulty").forGetter(RegionalDifficultyCondition::difficulty),
 			Codec.BOOL.optionalFieldOf("clamped", false).forGetter(RegionalDifficultyCondition::clamped)
 			).apply(instance, RegionalDifficultyCondition::new));
-	
+
 	public RegionalDifficultyCondition(FloatBounds difficulty) {
 		this(difficulty, false);
 	}

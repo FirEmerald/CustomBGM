@@ -14,11 +14,11 @@ public interface BGMProviderCondition extends Predicate<PlayerConditionData> {
     public static final Codec<List<BGMProviderCondition>> LIST_CODEC = CODEC.listOf();
 
 	public MapCodec<? extends BGMProviderCondition> codec();
-	
+
 	public default BGMProviderCondition not() {
 		return new NotCondition(this);
 	}
-	
+
 	// this behaves like not() but will not respect certain uncommon cases such as player-based conditions returning false when not in-game
 	public default BGMProviderCondition simpleNot() {
 		return not();

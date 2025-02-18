@@ -59,7 +59,7 @@ public class GameModeCondition implements BGMProviderPlayerCondition {
 		GameType currentType = gameType(player);
 		return currentType != null && ((currentType == type) == isType);
 	}
-	
+
 	@SuppressWarnings("resource")
 	public GameType gameType(Player player) {
 		return player.level().isClientSide ? gameTypeClient() : player instanceof ServerPlayer serverPlayer ? gameTypeServer(serverPlayer) : null;
@@ -74,7 +74,7 @@ public class GameModeCondition implements BGMProviderPlayerCondition {
 	public GameType gameTypeClient() {
 		return Minecraft.getInstance().gameMode.getPlayerMode();
 	}
-	
+
 	@Override
 	public GameModeCondition simpleNot() {
 		return of(type, !isType);

@@ -17,7 +17,7 @@ public record TimeCondition(LongBounds time, boolean ofDay, boolean ofGame) impl
 			)
 			.apply(instance, TimeCondition::new)
 	);
-	
+
 	public TimeCondition(LongBounds time) {
 		this(time, true, false);
 	}

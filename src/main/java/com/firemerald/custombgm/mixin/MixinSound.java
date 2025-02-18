@@ -39,8 +39,9 @@ public class MixinSound implements ISoundExtensions, IWeightedSoundExtensions {
 		set.add((Sound) (Object) this);
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean containsSound(Sound sound) {
-		return sound.equals((Object) this);
+		return sound.equals(this);
 	}
 }

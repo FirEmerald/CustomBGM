@@ -22,7 +22,7 @@ public record StatisticCondition(Map<Stat<?>, MinMaxBounds.Ints> stats) implemen
 	public static final MapCodec<StatisticCondition> CODEC = Codec.dispatchedMap(
 			BuiltInRegistries.STAT_TYPE.byNameCodec(),
 			statType -> Codec.unboundedMap(
-					((Registry<Object>) statType.getRegistry()).byNameCodec(), 
+					((Registry<Object>) statType.getRegistry()).byNameCodec(),
 					MinMaxBounds.Ints.CODEC
 					)
 			).fieldOf("stats").xmap(expanded -> {
@@ -34,7 +34,7 @@ public record StatisticCondition(Map<Stat<?>, MinMaxBounds.Ints> stats) implemen
 				condition.stats.forEach((stat, bounds) -> expanded.computeIfAbsent(stat.getType(), type -> new HashMap<>()).put(stat.getValue(), bounds));
 				return expanded;
 			});
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> void processStatType(StatType<?> type, Map<?, MinMaxBounds.Ints> objects, Map<Stat<?>, MinMaxBounds.Ints> stats) {
 		StatType<T> type2 = (StatType<T>) type;
@@ -54,20 +54,20 @@ public record StatisticCondition(Map<Stat<?>, MinMaxBounds.Ints> stats) implemen
 			return this.stats.entrySet().stream().allMatch(entry -> entry.getValue().matches(stats.getValue(entry.getKey())));
 		} else return false;
 	}
-	
+
 	public static class Builder {
 		private Map<Stat<?>, MinMaxBounds.Ints> stats;
-		
+
 		public Builder addStat(Stat<?> stat, MinMaxBounds.Ints bounds) {
 			stats.put(stat, bounds);
 			return this;
 		}
-		
+
 		public Builder addStats(Map<Stat<?>, MinMaxBounds.Ints> stats) {
 			this.stats.putAll(stats);
 			return this;
 		}
-		
+
 		public StatisticCondition build() {
 			return new StatisticCondition(new HashMap<>(stats));
 		}

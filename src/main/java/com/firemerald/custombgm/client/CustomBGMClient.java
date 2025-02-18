@@ -24,7 +24,7 @@ public class CustomBGMClient
 	public static final WidgetSprites RANDOM = makeWidgetSprites("random");
 	public static final WidgetSprites NEXT = makeWidgetSprites("next");
 	public static final WidgetSprites TRACKS = makeWidgetSprites("tracks");
-	
+
 	public CustomBGMClient(IEventBus modEventBus, ModContainer modContainer)
     {
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);

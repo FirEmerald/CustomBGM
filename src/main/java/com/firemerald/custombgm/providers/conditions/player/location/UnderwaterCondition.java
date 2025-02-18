@@ -31,7 +31,7 @@ public class UnderwaterCondition implements BGMProviderPlayerCondition {
 	public boolean test(PlayerConditionData playerData, Player player) {
 		return player.isUnderWater() == underwater;
 	}
-	
+
 	@Override
 	public UnderwaterCondition simpleNot() {
 		return of(!underwater);
