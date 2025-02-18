@@ -161,8 +161,7 @@ public class BGMEngine {
 	public static void clientTick() {
 		if (currentBGMInstance != null && !currentBGMInstance.tick(true)) {
 			currentBGMInstance = null;
-			if (currentBGM.loop() != LoopType.SHUFFLE) currentBGM = null;
-			//if (!trackSeeked && (currentBGM == null || currentBGM.loop() != LoopType.SHUFFLE)) trackSkip = 1; //next track
+			if (currentBGM != null && currentBGM.loop() != LoopType.SHUFFLE) currentBGM = null;
 		}
 		if (clientOverride.isEmpty()) { //no tracks
 			if (currentBGM != null && ClientConfig.logMusic) CustomBGM.LOGGER.info("CustomBGM stopping playback");

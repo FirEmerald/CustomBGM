@@ -86,6 +86,7 @@ public class CommonEventHandler {
 			event.getEntity().setData(CustomBGMAttachments.PLAYER_TARGET, player);
 			player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).onTargeted(event.getEntity());
 		}
+		else event.getEntity().setData(CustomBGMAttachments.PLAYER_TARGET, null);
 	}
 
 	public static void unTarget(LivingEntity targeter) {

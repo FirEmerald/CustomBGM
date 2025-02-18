@@ -1,6 +1,5 @@
 package com.firemerald.custombgm;
 
-
 import org.slf4j.Logger;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;

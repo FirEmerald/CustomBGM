@@ -43,11 +43,11 @@ public class ClientEventHandler {
 		final int x1 = ClientConfig.menuButtonsHorizontal.getLeft(event.getScreen().width, width, ClientConfig.menuButtonsHorizontalOffset);
 		final int y1 = ClientConfig.menuButtonsVertical.getTop(event.getScreen().height, height, ClientConfig.menuButtonsVerticalOffset);
 		final int x2 = x1 + sizeX + margin, x3 = x2 + sizeX + margin, x4 = x3 + sizeX + margin;
-		if (event.getScreen() instanceof TitleScreen titleScreen) {
-			titleScreen.addRenderableWidget(new TrackControlButton(x1, y1, sizeX, sizeY, CustomBGMClient.PREVIOUS, iconWidth, iconHeight, BGMEngine::previousTrack));
-			titleScreen.addRenderableWidget(new TrackControlButton(x2, y1, sizeX, sizeY, CustomBGMClient.RANDOM  , iconWidth, iconHeight, BGMEngine::randomTrack));
-			titleScreen.addRenderableWidget(new TrackControlButton(x3, y1, sizeX, sizeY, CustomBGMClient.NEXT    , iconWidth, iconHeight, BGMEngine::nextTrack));
-			titleScreen.addRenderableWidget(new TrackControlButton(x4, y1, sizeX, sizeY, CustomBGMClient.TRACKS  , iconWidth, iconHeight, () -> Minecraft.getInstance().setScreen(new TracksScreen())));
+		if (event.getScreen() instanceof TitleScreen) {
+			event.addListener(new TrackControlButton(x1, y1, sizeX, sizeY, CustomBGMClient.PREVIOUS, iconWidth, iconHeight, BGMEngine::previousTrack));
+			event.addListener(new TrackControlButton(x2, y1, sizeX, sizeY, CustomBGMClient.RANDOM  , iconWidth, iconHeight, BGMEngine::randomTrack));
+			event.addListener(new TrackControlButton(x3, y1, sizeX, sizeY, CustomBGMClient.NEXT    , iconWidth, iconHeight, BGMEngine::nextTrack));
+			event.addListener(new TrackControlButton(x4, y1, sizeX, sizeY, CustomBGMClient.TRACKS  , iconWidth, iconHeight, () -> Minecraft.getInstance().setScreen(new TracksScreen())));
 		}
 	}
 
