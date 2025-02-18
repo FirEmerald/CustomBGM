@@ -8,6 +8,7 @@ public class FalseCondition implements BGMProviderCondition
 {
 	public static final FalseCondition INSTANCE = new FalseCondition();
 	public static final MapCodec<FalseCondition> CODEC = MapCodec.unit(INSTANCE);
+	public static final MapCodec<FalseCondition> CODEC2 = MapCodec.unit(INSTANCE);
 
 	private FalseCondition() {}
 

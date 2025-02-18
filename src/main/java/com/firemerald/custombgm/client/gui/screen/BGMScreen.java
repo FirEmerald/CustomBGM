@@ -5,17 +5,18 @@ import java.util.function.IntConsumer;
 import com.firemerald.custombgm.api.BgmDistribution;
 import com.firemerald.custombgm.operators.BGMOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
+import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.IntegerField;
-import com.firemerald.fecore.network.serverbound.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.network.serverbound.EntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.BlockEntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.EntityGUIClosedPacket;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
 public class BGMScreen<O extends BGMOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorScreen<O, S>
@@ -40,7 +41,7 @@ public class BGMScreen<O extends BGMOperator<O, S>, S extends IOperatorSource<O,
 		piorStr = new FloatingText(200, 20, 400, 60, font, I18n.get("custombgm.gui.bgm.priority"), EnumTextAlignment.CENTER);
 		priorTxt = new IntegerField(font, 201, 81, 198, 18, priority, Component.translatable("custombgm.gui.bgm.priority.narrate"), (IntConsumer) (v -> priority = v));
 		okay = new Button(0, 100, 200, 120, Component.translatable("fecore.gui.confirm"), () -> {
-			(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this)).sendToServer();
+			FECoreMod.NETWORK.sendToServer(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this));
 			this.onClose();
 		});
 		cancel = new Button(200, 100, 400, 120, Component.translatable("fecore.gui.cancel"), () -> {
@@ -89,12 +90,12 @@ public class BGMScreen<O extends BGMOperator<O, S>, S extends IOperatorSource<O,
 	@Override
 	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.renderBackground(guiGraphics, mx, my, partialTicks);
+		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		super.read(buf);
 		music = BgmDistribution.STREAM_CODEC.decode(buf);
@@ -103,7 +104,7 @@ public class BGMScreen<O extends BGMOperator<O, S>, S extends IOperatorSource<O,
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		super.write(buf);
 		BgmDistribution.STREAM_CODEC.encode(buf, music);

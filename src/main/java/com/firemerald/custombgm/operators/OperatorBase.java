@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 import com.firemerald.custombgm.client.gui.screen.OperatorScreen;
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.BoundingShapeSphere;
+import com.firemerald.fecore.codec.Codecs;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -16,13 +18,12 @@ import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O, S>, S extends IOperatorSource<O, S>> {
 	public BoundingShape shape = new BoundingShapeSphere();
@@ -39,7 +40,7 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
     	this.source = source;
     }
 
-	public void readInternal(RegistryFriendlyByteBuf buf) {
+	public void readInternal(FriendlyByteBuf buf) {
 		this.read(buf);
 		source.setIsChanged();
 	}
@@ -102,7 +103,7 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
 	public void load(CompoundTag tag) {
 		if (tag.contains("shape", 10)) {
 			DataResult<Pair<BoundingShape, Tag>> decoded = BoundingShape.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("shape"));
-			if (decoded.isSuccess()) shape = decoded.result().get().getFirst();
+			if (Codecs.isSuccess(decoded)) shape = decoded.result().get().getFirst();
 			else shape = new BoundingShapeSphere();
 		}
 		else shape = new BoundingShapeSphere();
@@ -111,21 +112,21 @@ public abstract class OperatorBase<E extends Entity, O extends OperatorBase<E, O
 	}
 
 	public void save(CompoundTag tag) {
-		BoundingShape.CODEC.encode(shape, NbtOps.INSTANCE, new CompoundTag()).ifSuccess(shapeParams -> tag.put("shape", shapeParams));
+		BoundingShape.CODEC.encode(shape, NbtOps.INSTANCE, new CompoundTag()).result().ifPresent(shapeParams -> tag.put("shape", shapeParams));
 		tag.putString("selector", selectorString == null ? "" : selectorString);
 		tag.putInt("SuccessCount", this.found);
 	}
 
-	public void read(RegistryFriendlyByteBuf buf) {
+	public void read(FriendlyByteBuf buf) {
 		shape = BoundingShape.STREAM_CODEC.decode(buf);
 		this.setSelectorString(buf.readUtf());
-		this.source.setTheName(ComponentSerialization.STREAM_CODEC.decode(buf));
+		this.source.setTheName(StreamCodec.COMPONENT.decode(buf));
 	}
 
-	public void write(RegistryFriendlyByteBuf buf) {
+	public void write(FriendlyByteBuf buf) {
 		BoundingShape.STREAM_CODEC.encode(buf, shape);
 		buf.writeUtf(selectorString == null ? "" : selectorString);
-		ComponentSerialization.STREAM_CODEC.encode(buf, this.source.getTheName());
+		StreamCodec.COMPONENT.encode(buf, this.source.getTheName());
 	}
 
 	public int getSuccessCount() {

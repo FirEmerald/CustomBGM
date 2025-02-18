@@ -10,24 +10,24 @@ import javax.annotation.Nullable;
 import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.google.common.base.Optional;
 
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.Music;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class PlayerConditionData {
 	private static final ConditionKey<Holder<Biome>> BIOME_KEY = new ConditionKey<>(CustomBGMAPI.id("biome"));
 	private static final ConditionKey<Boolean> SEES_SKY_KEY = new ConditionKey<>(CustomBGMAPI.id("sees_sky"));
 	private static final ConditionKey<FluidState> INSIDE_FLUID = new ConditionKey<>(CustomBGMAPI.id("inside_fluid"));
-	private static final ConditionKey<MusicInfo> VANILLA_BGM_KEY = new ConditionKey<>(CustomBGMAPI.id("current_bgm"));
+	private static final ConditionKey<Music> VANILLA_BGM_KEY = new ConditionKey<>(CustomBGMAPI.id("current_bgm"));
 	private static final ConditionKey<DifficultyInstance> DIFFICULTY_INSTANCE = new ConditionKey<>(CustomBGMAPI.id("effective_difficulty"));
 	private static final ConditionKey<GlobalPos> RESPAWN_POINT = new ConditionKey<>(CustomBGMAPI.id("respawn_point"));
 	private static final ConditionKey<Raid> ACTIVE_RAID = new ConditionKey<>(CustomBGMAPI.id("raid"));
@@ -73,11 +73,11 @@ public class PlayerConditionData {
 	public FluidState insideFluid() { //TODO all fluids and not just block position fluid
 		return getPlayerData(INSIDE_FLUID, player -> player == null || !player.level().isLoaded(player.blockPosition()) ? null : player.level().getFluidState(player.blockPosition()));
 	}
-	
+
 	public DifficultyInstance getDifficultyInstance() {
 		return getPlayerData(DIFFICULTY_INSTANCE, player -> player == null ? null : player.level().getCurrentDifficultyAt(player.blockPosition()));
 	}
-	
+
 	public GlobalPos getRespawnPoint() {
 		return getPlayerData(RESPAWN_POINT, PlayerConditionData::respawnPoint);
 	}
@@ -89,17 +89,17 @@ public class PlayerConditionData {
 		else if (player instanceof ServerPlayer serverPlayer) return GlobalPos.of(serverPlayer.getRespawnDimension(), serverPlayer.getRespawnPosition());
 		else return null;
 	}
-	
+
 	public Raid getRaid() {
 		return getPlayerData(ACTIVE_RAID, player -> player != null && player.level() instanceof ServerLevel level ? level.getRaidAt(player.blockPosition()) : null);
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void setVanillaBGM(MusicInfo bgm) {
+	public void setVanillaBGM(Music bgm) {
 		setData(VANILLA_BGM_KEY, bgm);
 	}
 
-	public Optional<MusicInfo> getVanillaBGM() {
+	public Optional<Music> getVanillaBGM() {
 		return getOptionalData(VANILLA_BGM_KEY);
 	}
 }

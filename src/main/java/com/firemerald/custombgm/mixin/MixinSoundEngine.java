@@ -14,12 +14,11 @@ import com.firemerald.custombgm.client.audio.LoopedStreamingAudioStream;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.audio.OggAudioStream;
 
-import net.minecraft.Util;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.AudioStream;
-import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundEngine;
 
@@ -39,21 +38,22 @@ public class MixinSoundEngine {
 			method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/resources/sounds/SoundInstance;getStream(Lnet/minecraft/client/sounds/SoundBufferLibrary;Lnet/minecraft/client/resources/sounds/Sound;Z)Ljava/util/concurrent/CompletableFuture;"),
+					target = "Lnet/minecraft/client/resources/sounds/SoundInstance;getStream(Lnet/minecraft/client/sounds/SoundBufferLibrary;Lnet/minecraft/client/resources/sounds/Sound;Z)Ljava/util/concurrent/CompletableFuture;",
+					remap = false),
 			require = 1)
 	private CompletableFuture<AudioStream> playWrapGetStream(SoundInstance instance, SoundBufferLibrary soundBuffers, Sound sound, boolean looping, Operation<CompletableFuture<AudioStream>> original) {
 		if (looping) {
-			ISoundExtensions extensions = sound;
+			ISoundExtensions extensions = (ISoundExtensions) sound;
 			if (extensions.hasLoop()) {
 				if (sound.shouldStream()) {
 			        return CompletableFuture.supplyAsync(() -> {
 			            try {
 			                InputStream inputstream = soundBuffers.resourceManager.open(sound.getPath());
-			                return new LoopedStreamingAudioStream(JOrbisAudioStream::new, inputstream, extensions.loopStart(), extensions.loopEnd());
+			                return new LoopedStreamingAudioStream(OggAudioStream::new, inputstream, extensions.loopStart(), extensions.loopEnd());
 			            } catch (IOException ioexception) {
 			                throw new CompletionException(ioexception);
 			            }
-			        }, Util.nonCriticalIoPool());
+			        });
 				} else {
 					return soundBuffers
 							.getCompleteBuffer(sound.getPath())

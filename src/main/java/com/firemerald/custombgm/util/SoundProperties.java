@@ -32,11 +32,11 @@ public record SoundProperties(Optional<LoopType> loop, Optional<Float> weight) {
 		@Override
 		public <T> DataResult<Pair<SoundProperties, T>> decode(DynamicOps<T> ops, T input) {
 			DataResult<Pair<Float, T>> decodeWeight = Codec.FLOAT.decode(ops, input);
-			if (decodeWeight.isSuccess()) return Codecs.mapResult(decodeWeight, SoundProperties::new);
+			if (Codecs.isSuccess(decodeWeight)) return Codecs.mapResult(decodeWeight, SoundProperties::new);
 			DataResult<Pair<LoopType, T>> decodeLoop = LoopType.CODEC.decode(ops, input);
-			if (decodeLoop.isSuccess()) return Codecs.mapResult(decodeLoop, SoundProperties::new);
+			if (Codecs.isSuccess(decodeLoop)) return Codecs.mapResult(decodeLoop, SoundProperties::new);
 			DataResult<Pair<SoundProperties, T>> decodeFull = CODEC.decode(ops, input);
-			if (decodeFull.isSuccess()) return decodeFull;
+			if (Codecs.isSuccess(decodeFull)) return decodeFull;
 			return DataResult.error(() -> "Could not parse weighted bgm sound properties: Expected a boolean, float, or map{loop:boolean,weight:float}");
 		}
 	};

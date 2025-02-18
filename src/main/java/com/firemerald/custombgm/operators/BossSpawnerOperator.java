@@ -3,39 +3,41 @@ package com.firemerald.custombgm.operators;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import com.firemerald.custombgm.api.BgmDistribution;
-import com.firemerald.custombgm.attachments.BossTracker;
+import com.firemerald.custombgm.capabilities.BossTracker;
+import com.firemerald.custombgm.capabilities.ServerPlayerData;
 import com.firemerald.custombgm.client.gui.screen.BossSpawnerScreen;
 import com.firemerald.custombgm.client.gui.screen.OperatorScreen;
 import com.firemerald.custombgm.codecs.BGMDistributionCodec;
-import com.firemerald.custombgm.init.CustomBGMAttachments;
-import com.firemerald.fecore.util.StackUtils;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapDecoder;
+import com.mojang.serialization.Decoder;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder.Reference;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorBase<Player, O, S> {
 	public BgmDistribution music = BgmDistribution.EMPTY;
@@ -73,9 +75,9 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 			else if (!killed) {
 				if (boss == null) { //boss does not exist
 					if (count > 0) { //spawn boss
-						Optional<Reference<EntityType<?>>> typeOpt = BuiltInRegistries.ENTITY_TYPE.get(toSpawn);
+						Optional<Reference<EntityType<?>>> typeOpt = ForgeRegistries.ENTITY_TYPES.getDelegate(toSpawn);
 						if (typeOpt.isPresent()) {
-							Entity entity = typeOpt.get().value().create(level, EntitySpawnReason.SPAWNER); //TODO
+							Entity entity = typeOpt.get().value().create(level); //TODO
 							if (isRelative) {
 								x += spawnX;
 								y += spawnY;
@@ -89,9 +91,10 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 				                entity.setUUID(uuid);
 							}
 							entity.setPos(x, y, z);
-							BossTracker tracker = entity.getData(CustomBGMAttachments.BOSS_TRACKER);
-							if (source.isEntity()) tracker.setBossSpawnerEntity((Entity) source);
-							else tracker.setBossSpawnerBlock((BlockEntity) source);
+							BossTracker.get(entity).ifPresent(tracker -> {
+								if (source.isEntity()) tracker.setBossSpawnerEntity((Entity) source);
+								else tracker.setBossSpawnerBlock((BlockEntity) source);
+							});
 							BossSpawnerOperator.this.setBoss(entity);
 							((ServerLevel) level).addFreshEntityWithPassengers(entity);
 						}
@@ -121,7 +124,7 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 
 	@Override
 	public boolean operate(Player player) {
-		if (boss != null && !disableMusic) player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).addMusicOverride(music, priority); //TODO
+		if (boss != null && !disableMusic) ServerPlayerData.get(player).ifPresent(playerData -> playerData.addMusicOverride(music, priority));
 		return true;
 	}
 
@@ -176,7 +179,7 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		super.read(buf);
 		music = BgmDistribution.STREAM_CODEC.decode(buf);
@@ -197,7 +200,7 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		super.write(buf);
 		BgmDistribution.STREAM_CODEC.encode(buf, music);
@@ -240,22 +243,23 @@ public class BossSpawnerOperator<O extends BossSpawnerOperator<O, S>, S extends 
 		return new BossSpawnerScreen<>(source);
 	}
 
-	public static final MapDecoder<byte[]> TOOLTIP_INFO_DECODER = RecordCodecBuilder.mapCodec(instance ->
+	public static final Decoder<byte[]> TOOLTIP_INFO_DECODER = RecordCodecBuilder.create(instance ->
 	instance.group(
 			Codec.BYTE.optionalFieldOf("levelOnActive", (byte) 7).forGetter(val -> val[0]),
 			Codec.BYTE.optionalFieldOf("levelOnKilled", (byte) 15).forGetter(val -> val[1])
 			).apply(instance, (v1, v2) -> new byte[] {v1, v2})
 	);
 
-	public static void addTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag, DataComponentType<CustomData> componentType) {
-		int powerOnSpawned, powerOnKilled;
-		byte[] tooltipData = StackUtils.decodeData(stack, TOOLTIP_INFO_DECODER, componentType);
-		if (tooltipData != null) {
-			powerOnSpawned = tooltipData[0];
-			powerOnKilled = tooltipData[1];
-		} else {
-			powerOnSpawned = 7;
-			powerOnKilled = 15;
+	public static void addTooltip(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag tooltipFlag, Function<ItemStack, CompoundTag> getData) {
+		int powerOnSpawned = 7, powerOnKilled = 15;
+		CompoundTag blockData = getData.apply(stack);
+		if (blockData != null) {
+			Optional<Pair<byte[], Tag>> result = TOOLTIP_INFO_DECODER.decode(NbtOps.INSTANCE, blockData).result();
+			if (result.isPresent()) {
+				byte[] tooltipData = result.get().getFirst();
+				powerOnSpawned = tooltipData[0];
+				powerOnKilled = tooltipData[1];
+			}
 		}
 		tooltipComponents.add(Component.translatable("custombgm.tooltip.boss_spawner", powerOnSpawned, powerOnKilled));
 	}

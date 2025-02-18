@@ -1,19 +1,19 @@
 package com.firemerald.custombgm.client.audio;
 
 import net.minecraft.client.resources.sounds.Sound;
-import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
-public class CustomBGMSoundInstance implements SoundInstance {
-	public static CustomBGMSoundInstance of(ResourceLocation location, boolean loop, Sound sound) {
-		return new CustomBGMSoundInstance(location, loop, sound);
+public class CustomBGMSoundInstance implements TickableSoundInstance {
+	public static CustomBGMSoundInstance of(ResourceLocation location, boolean loop, float volume, Sound sound) {
+		return new CustomBGMSoundInstance(location, loop, volume, sound);
 	}
 
-	public static CustomBGMSoundInstance of(ResourceLocation location, boolean loop, RandomSource random, SoundManager handler) {
+	public static CustomBGMSoundInstance of(ResourceLocation location, boolean loop, float volume, RandomSource random, SoundManager handler) {
 		Sound sound;
         if (location.equals(SoundManager.INTENTIONALLY_EMPTY_SOUND_LOCATION)) sound = SoundManager.INTENTIONALLY_EMPTY_SOUND;
         else {
@@ -21,16 +21,18 @@ public class CustomBGMSoundInstance implements SoundInstance {
         	if (weighedsoundevents == null) sound = SoundManager.EMPTY_SOUND;
         	else sound = weighedsoundevents.getSound(random);
         }
-		return new CustomBGMSoundInstance(location, loop, sound);
+		return new CustomBGMSoundInstance(location, loop, volume, sound);
 	}
 
 	public final ResourceLocation location;
 	public final boolean loop;
 	public final Sound sound;
+	public float volume;
 
-	public CustomBGMSoundInstance(ResourceLocation location, boolean loop, Sound sound) {
+	public CustomBGMSoundInstance(ResourceLocation location, boolean loop, float volume, Sound sound) {
 		this.location = location;
 		this.loop = loop;
+		this.volume = volume;
 		this.sound = sound;
 	}
 
@@ -61,7 +63,7 @@ public class CustomBGMSoundInstance implements SoundInstance {
 
 	@Override
 	public float getVolume() {
-		return 1;
+		return volume;
 	}
 
 	@Override
@@ -103,4 +105,20 @@ public class CustomBGMSoundInstance implements SoundInstance {
 		return sound;
 	}
 
+	public void setVolume(float volume) {
+		this.volume = volume;
+	}
+
+	@Override
+	public boolean canStartSilent() {
+		return true;
+	}
+
+	@Override
+	public boolean isStopped() {
+		return false;
+	}
+
+	@Override
+	public void tick() {}
 }

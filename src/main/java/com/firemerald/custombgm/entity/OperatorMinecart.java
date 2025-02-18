@@ -2,12 +2,13 @@ package com.firemerald.custombgm.entity;
 
 import com.firemerald.custombgm.operators.IOperatorSource;
 import com.firemerald.custombgm.operators.OperatorBase;
+import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
-import com.firemerald.fecore.network.clientbound.EntityGUIPacket;
+import com.firemerald.fecore.network.client.EntityGUIPacket;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,8 +20,8 @@ import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extends OperatorMinecart<O, S> & IOperatorSource<O, S>> extends AbstractMinecart implements IOperatorSource<O, S>
 {
@@ -42,12 +43,12 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	protected abstract O makeOperator();
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf) {
+	public void read(FriendlyByteBuf buf) {
 		this.operator.readInternal(buf);
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf) {
+	public void write(FriendlyByteBuf buf) {
 		this.operator.write(buf);
 	}
 
@@ -132,7 +133,7 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 			if (level().isClientSide) return InteractionResult.SUCCESS;
 	    	else
 	    	{
-	    		if (player instanceof ServerPlayer serverPlayer) new EntityGUIPacket<>((S) this).sendToClient(serverPlayer);
+	    		if (player instanceof ServerPlayer serverPlayer) FECoreMod.NETWORK.sendTo(new EntityGUIPacket<>((S) this), serverPlayer);
 	    		return InteractionResult.CONSUME;
 	    	}
     	}
@@ -151,6 +152,7 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 		return new ItemStack(getDropItem());
 	}
 
+	@Override
 	public int getComparatorLevel()
 	{
 		return operator.getOutputLevel();
@@ -173,9 +175,9 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	}
 
 	@Override
-	public void onRemovedFromLevel()
+	public void onRemovedFromWorld()
 	{
-		super.onRemovedFromLevel();
+		super.onRemovedFromWorld();
 		operator.onRemoved();
 	}
 
@@ -195,5 +197,10 @@ public abstract class OperatorMinecart<O extends OperatorBase<?, O, S>, S extend
 	@Override
 	public boolean shouldInformAdmins() {
 		return false;
+	}
+
+	@Override
+	public Type getMinecartType() {
+		return Type.COMMAND_BLOCK;
 	}
 }

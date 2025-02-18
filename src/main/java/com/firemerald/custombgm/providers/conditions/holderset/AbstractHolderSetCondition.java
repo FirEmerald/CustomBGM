@@ -12,7 +12,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.neoforged.neoforge.registries.holdersets.OrHolderSet;
+import net.minecraftforge.registries.holdersets.OrHolderSet;
 
 public abstract class AbstractHolderSetCondition<T> implements BGMProviderCondition {
     public abstract static class Builder<T, U extends AbstractHolderSetCondition<T>, V extends Builder<T, U, V>> {
@@ -43,12 +43,14 @@ public abstract class AbstractHolderSetCondition<T> implements BGMProviderCondit
             return setHolderSet(HolderSet.direct(holders));
         }
 
-        public V setTag(TagKey<T> tag) {
-            return setHolderSet(lookup.getOrThrow(tag));
+        @SuppressWarnings("deprecation")
+		public V setTag(TagKey<T> tag) {
+            return setHolderSet(HolderSet.emptyNamed(lookup, tag));
         }
 
-        public V setTags(@SuppressWarnings("unchecked") TagKey<T>... tags) {
-            return setHolderSet(Arrays.stream(tags).map(lookup::getOrThrow).toList());
+        @SuppressWarnings("deprecation")
+		public V setTags(@SuppressWarnings("unchecked") TagKey<T>... tags) {
+            return setHolderSet(Arrays.stream(tags).map(tag -> HolderSet.emptyNamed(lookup, tag)).toList());
         }
 
         public V setKey(ResourceKey<T> key) {
@@ -60,7 +62,7 @@ public abstract class AbstractHolderSetCondition<T> implements BGMProviderCondit
         }
 
         public V setHolderSet(@SuppressWarnings("unchecked") HolderSet<T>... holderSets) {
-        	return setHolderSet(new OrHolderSet<>(holderSets));
+        	return setHolderSet(Arrays.asList(holderSets));
         }
 
         @SuppressWarnings("unchecked")

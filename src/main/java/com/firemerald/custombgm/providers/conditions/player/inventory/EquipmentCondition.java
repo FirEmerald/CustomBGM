@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.custombgm.codecs.CustomBGMCodecs;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -20,12 +21,12 @@ public record EquipmentCondition(
 	    Optional<ItemPredicate> offhand) implements BGMProviderPlayerCondition {
     public static final MapCodec<EquipmentCondition> CODEC = RecordCodecBuilder.mapCodec(
     		instance -> instance.group(
-    				ItemPredicate.CODEC.optionalFieldOf("head").forGetter(EquipmentCondition::head),
-    				ItemPredicate.CODEC.optionalFieldOf("chest").forGetter(EquipmentCondition::chest),
-    				ItemPredicate.CODEC.optionalFieldOf("legs").forGetter(EquipmentCondition::legs),
-    				ItemPredicate.CODEC.optionalFieldOf("feet").forGetter(EquipmentCondition::feet),
-    				ItemPredicate.CODEC.optionalFieldOf("mainhand").forGetter(EquipmentCondition::mainhand),
-    				ItemPredicate.CODEC.optionalFieldOf("offhand").forGetter(EquipmentCondition::offhand)
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("head").forGetter(EquipmentCondition::head),
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("chest").forGetter(EquipmentCondition::chest),
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("legs").forGetter(EquipmentCondition::legs),
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("feet").forGetter(EquipmentCondition::feet),
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("mainhand").forGetter(EquipmentCondition::mainhand),
+    				CustomBGMCodecs.ITEM_PREDICATE.optionalFieldOf("offhand").forGetter(EquipmentCondition::offhand)
     				)
     		.apply(instance, EquipmentCondition::new)
     		);
@@ -37,12 +38,12 @@ public record EquipmentCondition(
 
 	@Override
 	public boolean test(PlayerConditionData playerData, Player player) {
-        if (this.head.isPresent() && !this.head.get().test(player.getItemBySlot(EquipmentSlot.HEAD))) return false;
-        else if (this.chest.isPresent() && !this.chest.get().test(player.getItemBySlot(EquipmentSlot.CHEST))) return false;
-        else if (this.legs.isPresent() && !this.legs.get().test(player.getItemBySlot(EquipmentSlot.LEGS))) return false;
-        else if (this.feet.isPresent() && !this.feet.get().test(player.getItemBySlot(EquipmentSlot.FEET))) return false;
-        else if (this.mainhand.isPresent() && !this.mainhand.get().test(player.getItemBySlot(EquipmentSlot.MAINHAND))) return false;
-        else if (this.offhand.isPresent() && !this.offhand.get().test(player.getItemBySlot(EquipmentSlot.OFFHAND))) return false;
+        if (this.head.isPresent() && !this.head.get().matches(player.getItemBySlot(EquipmentSlot.HEAD))) return false;
+        else if (this.chest.isPresent() && !this.chest.get().matches(player.getItemBySlot(EquipmentSlot.CHEST))) return false;
+        else if (this.legs.isPresent() && !this.legs.get().matches(player.getItemBySlot(EquipmentSlot.LEGS))) return false;
+        else if (this.feet.isPresent() && !this.feet.get().matches(player.getItemBySlot(EquipmentSlot.FEET))) return false;
+        else if (this.mainhand.isPresent() && !this.mainhand.get().matches(player.getItemBySlot(EquipmentSlot.MAINHAND))) return false;
+        else if (this.offhand.isPresent() && !this.offhand.get().matches(player.getItemBySlot(EquipmentSlot.OFFHAND))) return false;
         else return true;
 	}
 

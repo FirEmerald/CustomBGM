@@ -5,13 +5,11 @@ import java.util.Map;
 
 import com.firemerald.custombgm.api.BGM;
 import com.firemerald.custombgm.api.LoopType;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 public class WeightedBGM extends BGM {
@@ -23,16 +21,16 @@ public class WeightedBGM extends BGM {
 				).apply(instance, WeightedBGM::new)
 		);
 	public static final Codec<List<WeightedBGM>> LIST_CODEC = CODEC.listOf();
-	public static final StreamCodec<ByteBuf, WeightedBGM> STREAM_CODEC = StreamCodec.composite(
-			ResourceLocation.STREAM_CODEC, WeightedBGM::sound,
+	public static final StreamCodec<WeightedBGM> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.RL, WeightedBGM::sound,
 			LoopType.STREAM_CODEC, WeightedBGM::loop,
-			ByteBufCodecs.FLOAT, WeightedBGM::weight,
+			StreamCodec.FLOAT, WeightedBGM::weight,
 			WeightedBGM::new
 			);
-	public static final StreamCodec<ByteBuf, List<WeightedBGM>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
-	
+	public static final StreamCodec<List<WeightedBGM>> STREAM_LIST_CODEC = STREAM_CODEC.asList();
+
 	public final float weight;
-	
+
 	public WeightedBGM(ResourceLocation sound, LoopType loop, float weight) {
 		super(sound, loop);
 		this.weight = weight;
@@ -57,11 +55,11 @@ public class WeightedBGM extends BGM {
 	public WeightedBGM(ResourceLocation sound, SoundProperties properties) {
 		this(sound, properties.getLoop(), properties.getWeight());
 	}
-	
+
 	public WeightedBGM(WeightedBGM other) {
 		this(other.sound, other.loop, other.weight);
 	}
-	
+
 	public float weight() {
 		return weight;
 	}
@@ -77,7 +75,7 @@ public class WeightedBGM extends BGM {
 	public Pair<BGM, Float> pair() {
 		return new Pair<>(this, weight);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) return false;
@@ -88,12 +86,12 @@ public class WeightedBGM extends BGM {
 			return other.loop == loop && other.weight == weight && other.sound.equals(sound);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "WeightedBGM<sound=" + sound.toString() + ",loop=" + loop.toString() + ",weight=" + weight + ">";
 	}
-	
+
 	@Override
 	public WeightedBGM clone() {
 		return new WeightedBGM(this);

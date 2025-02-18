@@ -15,6 +15,7 @@ import com.firemerald.custombgm.CustomBGM;
 import com.firemerald.custombgm.client.gui.EnumSearchMode;
 import com.firemerald.custombgm.operators.EntityTesterOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
+import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.ToggleButton;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
@@ -22,17 +23,17 @@ import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollableComponentPane;
 import com.firemerald.fecore.client.gui.components.text.IntegerField;
 import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
-import com.firemerald.fecore.network.serverbound.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.network.serverbound.EntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.BlockEntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.EntityGUIClosedPacket;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorScreen<O, S> {
 	public static class EntityButton extends ToggleButton {
@@ -93,7 +94,7 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 		super(Component.translatable("custombgm.gui.entitytester"), source);
 		this.font = Minecraft.getInstance().font;
 		MutableInt y = new MutableInt(0);
-		BuiltInRegistries.ENTITY_TYPE.entrySet().forEach(entry -> {
+		ForgeRegistries.ENTITY_TYPES.getEntries().forEach(entry -> {
 			ResourceLocation reg = entry.getKey().location();
 			EntityType<?> type = entry.getValue();
 			allEntities.add(new EntityButton(0, y.getValue(), 200, y.addAndGet(20), type.getDescription(), enabled, reg));
@@ -119,7 +120,7 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 		entityButtonsScroll = new VerticalScrollBar(400, 60, 420, 180, entityButtons);
 
 		okay = new Button(0, 180, 200, 20, Component.translatable("fecore.gui.confirm"), () -> {
-			(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this)).sendToServer();
+			FECoreMod.NETWORK.sendToServer(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this));
 			EntityTesterScreen.this.onClose();
 		});
 		cancel = new Button(200, 180, 200, 20, Component.translatable("fecore.gui.cancel"), () -> {
@@ -225,12 +226,12 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.renderBackground(guiGraphics, mx, my, partialTicks);
+		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		super.read(buf);
 		enabled.clear();
@@ -250,7 +251,7 @@ public class EntityTesterScreen<O extends EntityTesterOperator<O, S>, S extends 
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		super.write(buf);
 		buf.writeVarInt(min);

@@ -12,10 +12,10 @@ import com.firemerald.fecore.client.gui.components.ButtonConfigureShape;
 import com.firemerald.fecore.client.gui.components.text.BetterTextField;
 import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
 import com.firemerald.fecore.client.gui.screen.ShapesScreen;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 
 public abstract class OperatorScreen<O extends OperatorBase<?, O, S>, S extends IOperatorSource<O, S>> extends NetworkedGUIEntityScreen<S>
 {
@@ -50,20 +50,20 @@ public abstract class OperatorScreen<O extends OperatorBase<?, O, S>, S extends 
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		shape = BoundingShape.STREAM_CODEC.decode(buf);
 		selector = buf.readUtf();
-		this.setName(ComponentSerialization.STREAM_CODEC.decode(buf));
+		this.setName(StreamCodec.COMPONENT.decode(buf));
 		selectorTxt.setString(selector);
 		configureShape.onShapeChanged(shape);
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		BoundingShape.STREAM_CODEC.encode(buf, shape);
 		buf.writeUtf(selector == null ? "" : selector);
-		ComponentSerialization.STREAM_CODEC.encode(buf, customName);
+		StreamCodec.COMPONENT.encode(buf, customName);
 	}
 }

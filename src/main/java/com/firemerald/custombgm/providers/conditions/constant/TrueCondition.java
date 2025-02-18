@@ -8,6 +8,7 @@ public class TrueCondition implements BGMProviderCondition
 {
 	public static final TrueCondition INSTANCE = new TrueCondition();
 	public static final MapCodec<TrueCondition> CODEC = MapCodec.unit(INSTANCE);
+	public static final MapCodec<TrueCondition> CODEC2 = MapCodec.unit(INSTANCE);
 
 	private TrueCondition() {}
 

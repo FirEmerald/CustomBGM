@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.firemerald.custombgm.client.BGMEngine;
+import com.firemerald.custombgm.client.audio.IWeightedSoundExtensions;
 import com.firemerald.custombgm.util.VolumedBGM;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.IComponent;
@@ -175,7 +176,7 @@ public class TracksScreen extends BetterScreen
 				sounds.add(SoundManager.INTENTIONALLY_EMPTY_SOUND);
 			} else {
 				WeighedSoundEvents soundEvent = Minecraft.getInstance().getSoundManager().getSoundEvent(track.sound());
-				if (soundEvent != null) soundEvent.getSounds(sounds);
+				if (soundEvent != null) ((IWeightedSoundExtensions) soundEvent).getSounds(sounds);
 			}
 			for (Sound sound : sounds) {
 				Button button2 = new SoundButton(20, y, width - 20, 20, track, sound);
@@ -190,7 +191,7 @@ public class TracksScreen extends BetterScreen
 	@Override
 	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.renderBackground(guiGraphics, mx, my, partialTicks);
+		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 }

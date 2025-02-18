@@ -8,9 +8,8 @@ import com.firemerald.fecore.client.gui.screen.NetworkedGUIEntityScreen;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,8 +18,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>, S extends BlockEntityEntityOperator<O, S> & IOperatorSource<O, S>> extends BlockEntity implements IOperatorSource<O, S>
 {
@@ -48,20 +47,20 @@ public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>,
 	}
 
 	@Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void load(CompoundTag tag)
 	{
-		super.loadAdditional(tag, registries);
+		super.load(tag);
 		operator.load(tag);
-        if (tag.contains("CustomName", 8)) this.setName(BlockEntity.parseCustomNameSafe(tag.getString("CustomName"), registries));
+        if (tag.contains("CustomName", 8)) this.setName(Component.Serializer.fromJson(tag.getString("CustomName")));
         else this.setName(null);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+	public void saveAdditional(CompoundTag tag)
 	{
-		super.saveAdditional(tag, registries);
+		super.saveAdditional(tag);
 		operator.save(tag);
-        if (this.customName != null) tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
+        if (this.customName != null) tag.putString("CustomName", Component.Serializer.toJson(this.customName));
 	}
 
 	public Component getName()
@@ -159,13 +158,13 @@ public abstract class BlockEntityEntityOperator<O extends OperatorBase<?, O, S>,
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		this.operator.readInternal(buf);
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		this.operator.write(buf);
 	}

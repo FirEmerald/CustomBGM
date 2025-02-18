@@ -3,7 +3,7 @@ package com.firemerald.custombgm.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.commons.lang3.function.TriConsumer;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import com.firemerald.custombgm.api.BGM;
 import com.firemerald.custombgm.api.CustomBGMAPI;
@@ -22,7 +22,6 @@ import com.firemerald.custombgm.providers.conditions.player.attributes.GameModeC
 import com.firemerald.custombgm.providers.conditions.player.location.BiomeCondition;
 import com.firemerald.custombgm.providers.conditions.player.location.DimensionCondition;
 import com.firemerald.custombgm.providers.conditions.player.location.UnderwaterCondition;
-import com.firemerald.custombgm.providers.volume.BiomeVolume;
 import com.firemerald.custombgm.util.BGMDistributionBuilder;
 import com.firemerald.fecore.distribution.EmptyDistribution;
 
@@ -34,7 +33,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public class CustomBGMClientMusicProviderProvider extends MusicProviderProvider {
 	public CustomBGMClientMusicProviderProvider(PackOutput output, CompletableFuture<Provider> completableFuture) {
@@ -92,7 +91,6 @@ public class CustomBGMClientMusicProviderProvider extends MusicProviderProvider 
 								.setTag(BiomeTags.PLAYS_UNDERWATER_MUSIC)
 								.build())
 						.build())
-				.setVolume(BiomeVolume.INSTANCE)
 				.setMusic(new BGM(Musics.UNDER_WATER))
 				.setPriority(5)
 				.build());
@@ -103,7 +101,6 @@ public class CustomBGMClientMusicProviderProvider extends MusicProviderProvider 
 								.addKey(Level.NETHER)
 								.build()))
 						.build())
-				.setVolume(BiomeVolume.INSTANCE)
 				.setMusic(new BGM(Musics.CREATIVE))
 				.setPriority(4)
 				.build());
@@ -112,7 +109,6 @@ public class CustomBGMClientMusicProviderProvider extends MusicProviderProvider 
 				.build());
 		register.accept("in_game", VANILLA_CONDITIONS, new BaseMusicProvider.Builder()
 				.setCondition(InGameCondition.TRUE)
-				.setVolume(BiomeVolume.INSTANCE)
 				.setMusic(new BGM(Musics.GAME))
 				.setPriority(2)
 				.build());

@@ -2,20 +2,20 @@ package com.firemerald.custombgm.config;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
 
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @EventBusSubscriber(modid = CustomBGMAPI.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ServerConfig {
 	private static final IntValue TRACKING_TIMEOUT;
 	private static final IntValue ATTACK_TIMEOUT;
-	public static final ModConfigSpec SPEC;
+	public static final ForgeConfigSpec SPEC;
 
 	static {
-		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.comment("Server settings").push("server");
         TRACKING_TIMEOUT = builder
         		.comment("How many ticks must pass after a player has been targeted by another entity before removing them from the targeting tracker.")
@@ -37,7 +37,7 @@ public class ServerConfig {
     }
 
     public static void loadConfig() {
-    	trackingTimeout = TRACKING_TIMEOUT.getAsInt();
-    	attackTimeout = ATTACK_TIMEOUT.getAsInt();
+    	trackingTimeout = TRACKING_TIMEOUT.get();
+    	attackTimeout = ATTACK_TIMEOUT.get();
     }
 }

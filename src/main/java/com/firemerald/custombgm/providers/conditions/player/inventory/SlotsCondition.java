@@ -4,6 +4,9 @@ import java.util.Map;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.custombgm.codecs.CustomBGMCodecs;
+import com.firemerald.fecore.util.inventory.SlotRange;
+import com.firemerald.fecore.util.inventory.SlotRanges;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,13 +16,11 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.SlotRange;
-import net.minecraft.world.inventory.SlotRanges;
 
 public record SlotsCondition(Map<SlotRange, ItemPredicate> slots) implements BGMProviderPlayerCondition {
 	public static final MapCodec<SlotsCondition> CODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
-				Codec.unboundedMap(SlotRanges.CODEC, ItemPredicate.CODEC).fieldOf("slots").forGetter(SlotsCondition::slots)
+				Codec.unboundedMap(SlotRanges.CODEC, CustomBGMCodecs.ITEM_PREDICATE).fieldOf("slots").forGetter(SlotsCondition::slots)
 				).apply(instance, SlotsCondition::new)
 	);
 
@@ -38,7 +39,7 @@ public record SlotsCondition(Map<SlotRange, ItemPredicate> slots) implements BGM
         for (int listIndex = 0; listIndex < slots.size(); listIndex++) {
             int slotIndex = slots.getInt(listIndex);
             SlotAccess slotaccess = entity.getSlot(slotIndex);
-            if (predicate.test(slotaccess.get())) return true;
+            if (predicate.matches(slotaccess.get())) return true;
         }
         return false;
     }

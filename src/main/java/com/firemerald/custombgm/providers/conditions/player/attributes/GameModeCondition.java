@@ -10,8 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class GameModeCondition implements BGMProviderPlayerCondition {
 	public static final MapCodec<GameModeCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -59,7 +59,7 @@ public class GameModeCondition implements BGMProviderPlayerCondition {
 		GameType currentType = gameType(player);
 		return currentType != null && ((currentType == type) == isType);
 	}
-	
+
 	@SuppressWarnings("resource")
 	public GameType gameType(Player player) {
 		return player.level().isClientSide ? gameTypeClient() : player instanceof ServerPlayer serverPlayer ? gameTypeServer(serverPlayer) : null;
@@ -74,7 +74,7 @@ public class GameModeCondition implements BGMProviderPlayerCondition {
 	public GameType gameTypeClient() {
 		return Minecraft.getInstance().gameMode.getPlayerMode();
 	}
-	
+
 	@Override
 	public GameModeCondition simpleNot() {
 		return of(type, !isType);

@@ -102,7 +102,7 @@ public class MusicScreen extends PopupScreen {
     	}
 
     	public BGMComponents(int y) {
-    		this(y, ResourceLocation.withDefaultNamespace("none"), LoopType.TRUE, 1f);
+    		this(y, new ResourceLocation("minecraft", "none"), LoopType.TRUE, 1f);
     	}
 
     	public void addComponent() {
@@ -207,8 +207,8 @@ public class MusicScreen extends PopupScreen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mX, double mY, double scrollX, double scrollY) {
-		return this.suggestions.mouseScrolled(scrollY) ? true : super.mouseScrolled(mX, mY, scrollX, scrollY);
+	public boolean mouseScrolled(double mX, double mY, double scrollY) {
+		return this.suggestions.mouseScrolled(scrollY) ? true : super.mouseScrolled(mX, mY, scrollY);
 	}
 
 	@Override

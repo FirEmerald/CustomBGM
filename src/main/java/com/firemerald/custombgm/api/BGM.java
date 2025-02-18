@@ -3,24 +3,22 @@ package com.firemerald.custombgm.api;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.firemerald.custombgm.client.audio.IWeightedSoundExtensions;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.Sound;
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BGM implements Comparable<BGM> {
 	public static final Codec<BGM> CODEC = RecordCodecBuilder.create(instance ->
@@ -30,16 +28,16 @@ public class BGM implements Comparable<BGM> {
 			).apply(instance, BGM::new)
 			);
 	public static final Codec<List<BGM>> LIST_CODEC = CODEC.listOf();
-	public static final StreamCodec<ByteBuf, BGM> STREAM_CODEC = StreamCodec.composite(
-			ResourceLocation.STREAM_CODEC, BGM::sound,
+	public static final StreamCodec<BGM> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.RL, BGM::sound,
 			LoopType.STREAM_CODEC, BGM::loop,
 			BGM::new
 			);
-	public static final StreamCodec<ByteBuf, List<BGM>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
-	
+	public static final StreamCodec<List<BGM>> STREAM_LIST_CODEC = STREAM_CODEC.asList();
+
 	public final ResourceLocation sound;
 	public final LoopType loop;
-	
+
 	public BGM(ResourceLocation sound, LoopType loop) {
 		this.sound = sound;
 		this.loop = loop;
@@ -54,7 +52,7 @@ public class BGM implements Comparable<BGM> {
 	}
 
 	public BGM(SoundEvent sound, LoopType loop) {
-		this(sound.location(), loop);
+		this(sound.getLocation(), loop);
 	}
 
 	public BGM(Supplier<SoundEvent> sound, LoopType loop) {
@@ -66,7 +64,7 @@ public class BGM implements Comparable<BGM> {
 	}
 
 	public BGM(Holder<SoundEvent> sound, LoopType loop) {
-		this(sound.getKey(), loop);
+		this(sound.unwrap().<ResourceLocation>map(key -> key.location(), soundEvent -> soundEvent.getLocation()), loop);
 	}
 
 	public BGM(Music music, LoopType loop) {
@@ -105,22 +103,14 @@ public class BGM implements Comparable<BGM> {
 		this(music, LoopType.FALSE);
 	}
 
-	public BGM(MusicInfo music, LoopType loop) {
-		this(music.music().getEvent().getKey().location(), loop);
-	}
-
-	public BGM(MusicInfo music) {
-		this(music, LoopType.FALSE);
-	}
-	
 	public BGM(BGM other) {
 		this(other.sound, other.loop);
 	}
-	
+
 	public ResourceLocation sound() {
 		return sound;
 	}
-	
+
 	public LoopType loop() {
 		return loop;
 	}
@@ -131,12 +121,12 @@ public class BGM implements Comparable<BGM> {
         if (i == 0) i = loop.compareTo(other.loop);
         return i;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return sound.hashCode(); //unlikely to have the same sound but different loop type
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) return false;
@@ -147,7 +137,7 @@ public class BGM implements Comparable<BGM> {
 			return other.loop == loop && other.sound.equals(sound);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BGM<sound=" + sound.toString() + ",loop=" + loop.toString() + ">";
@@ -162,7 +152,7 @@ public class BGM implements Comparable<BGM> {
 
 	public boolean containsSound(Sound sound) {
 		WeighedSoundEvents soundEvent = Minecraft.getInstance().getSoundManager().getSoundEvent(this.sound);
-		if (soundEvent != null) return soundEvent.containsSound(sound);
+		if (soundEvent != null) return ((IWeightedSoundExtensions) soundEvent).containsSound(sound);
 		else return false;
 	}
 
@@ -177,7 +167,7 @@ public class BGM implements Comparable<BGM> {
 	public boolean is(BGM bgm) {
 		return bgm != null && is(bgm.sound, bgm.loop);
 	}
-	
+
 	@Override
 	public BGM clone() {
 		return new BGM(this);

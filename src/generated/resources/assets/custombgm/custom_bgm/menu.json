@@ -1,10 +1,10 @@
 {
-  "neoforge:conditions": [
+  "type": "custombgm:base",
+  "conditions": [
     {
-      "type": "neoforge:never"
+      "type": "forge:false"
     }
   ],
-  "type": "custombgm:base",
   "music": {
     "loop": "false",
     "music": "minecraft:music.menu"

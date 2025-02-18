@@ -3,103 +3,110 @@ package com.firemerald.custombgm.datagen;
 import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.blocks.ActivatorDetectorRailBlock;
 import com.firemerald.custombgm.init.CustomBGMObjects;
+import com.firemerald.fecore.init.registry.BlockObject;
+import com.firemerald.fecore.init.registry.ItemObject;
 
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
-import net.minecraft.client.data.models.ModelProvider;
-import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.blockstates.Variant;
-import net.minecraft.client.data.models.blockstates.VariantProperties;
-import net.minecraft.client.data.models.model.ModelTemplates;
-import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplate;
+import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class CustomBGMModelProvider extends ModelProvider {
-	public CustomBGMModelProvider(PackOutput output) {
-		super(output, CustomBGMAPI.MOD_ID);
+public class CustomBGMModelProvider extends BlockStateProvider
+{
+	public CustomBGMModelProvider(PackOutput output, ExistingFileHelper exFileHelper) {
+		super(output, CustomBGMAPI.MOD_ID, exFileHelper);
 	}
 
-    @Override
-    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-    	itemModels.generateFlatItem(CustomBGMObjects.BGM_MINECART.getItem(), ModelTemplates.FLAT_ITEM);
-    	itemModels.generateFlatItem(CustomBGMObjects.ENTITY_TESTER_MINECART.getItem(), ModelTemplates.FLAT_ITEM);
-    	itemModels.generateFlatItem(CustomBGMObjects.BOSS_SPAWNER_MINECART.getItem(), ModelTemplates.FLAT_ITEM);
-    	blockModels.createTrivialCube(CustomBGMObjects.BGM.getBlock());
-    	blockModels.createTrivialCube(CustomBGMObjects.ENTITY_TESTER.getBlock());
-    	blockModels.createTrivialCube(CustomBGMObjects.BOSS_SPAWNER.getBlock());
-    	createActivatorDetectorRail(blockModels, CustomBGMObjects.ACTIVATOR_DETECTOR_RAIL.getBlock());
-    }
+	@Override
+	protected void registerStatesAndModels() {
+		simpleItem(CustomBGMObjects.BGM_MINECART, "item/bgm_minecart");
+		simpleItem(CustomBGMObjects.ENTITY_TESTER_MINECART, "item/entity_tester_minecart");
+		simpleItem(CustomBGMObjects.BOSS_SPAWNER_MINECART, "item/boss_spawner_minecart");
+		simpleBlock(CustomBGMObjects.BGM, "block/bgm");
+		simpleBlock(CustomBGMObjects.ENTITY_TESTER, "block/entity_tester");
+		simpleBlock(CustomBGMObjects.BOSS_SPAWNER, "block/boss_spawner");
+		ModelFile activatorDetectorRail = models().withExistingParent("activator_detector_rail", mcLoc("block/rail_flat")).texture("rail", "block/activator_detector_rail");
+		ModelFile activatorDetectorRailRaisedNE = models().withExistingParent("activator_detector_rail_raised_ne", mcLoc("block/template_rail_raised_ne")).texture("rail", "block/activator_detector_rail");
+		ModelFile activatorDetectorRailRaisedSW = models().withExistingParent("activator_detector_rail_raised_sw", mcLoc("block/template_rail_raised_sw")).texture("rail", "block/activator_detector_rail");
+		ModelFile activatorDetectorRailOn = models().withExistingParent("activator_detector_rail_on", mcLoc("block/rail_flat")).texture("rail", "block/activator_detector_rail_on");
+		ModelFile activatorDetectorRailOnRaisedNE = models().withExistingParent("activator_detector_rail_on_raised_ne", mcLoc("block/template_rail_raised_ne")).texture("rail", "block/activator_detector_rail_on");
+		ModelFile activatorDetectorRailOnRaisedSW = models().withExistingParent("activator_detector_rail_on_raised_sw", mcLoc("block/template_rail_raised_sw")).texture("rail", "block/activator_detector_rail_on");
+		ModelFile activatorDetectorRailDetected = models().withExistingParent("activator_detector_rail_detected", mcLoc("block/rail_flat")).texture("rail", "block/activator_detector_rail_detected");
+		ModelFile activatorDetectorRailDetectedRaisedNE = models().withExistingParent("activator_detector_rail_detected_raised_ne", mcLoc("block/template_rail_raised_ne")).texture("rail", "block/activator_detector_rail_detected");
+		ModelFile activatorDetectorRailDetectedRaisedSW = models().withExistingParent("activator_detector_rail_detected_raised_sw", mcLoc("block/template_rail_raised_sw")).texture("rail", "block/activator_detector_rail_detected");
+		ModelFile activatorDetectorRailOnDetected = models().withExistingParent("activator_detector_rail_on_detected", mcLoc("block/rail_flat")).texture("rail", "block/activator_detector_rail_on_detected");
+		ModelFile activatorDetectorRailOnDetectedRaisedNE = models().withExistingParent("activator_detector_rail_on_detected_raised_ne", mcLoc("block/template_rail_raised_ne")).texture("rail", "block/activator_detector_rail_on_detected");
+		ModelFile activatorDetectorRailOnDetectedRaisedSW = models().withExistingParent("activator_detector_rail_on_detected_raised_sw", mcLoc("block/template_rail_raised_sw")).texture("rail", "block/activator_detector_rail_on_detected");
+		getVariantBuilder(CustomBGMObjects.ACTIVATOR_DETECTOR_RAIL.getBlock()).forAllStatesExcept(state -> {
+			return new ConfiguredModel[] {
+				switch (state.getValue(PoweredRailBlock.SHAPE))
+				{
+				case NORTH_SOUTH -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetected : activatorDetectorRailOn :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetected : activatorDetectorRail);
+				case EAST_WEST -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetected : activatorDetectorRailOn :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetected : activatorDetectorRail, 0, 90, false);
+				case ASCENDING_NORTH -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetectedRaisedNE : activatorDetectorRailOnRaisedNE :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetectedRaisedNE : activatorDetectorRailRaisedNE);
+				case ASCENDING_EAST -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetectedRaisedNE : activatorDetectorRailOnRaisedNE :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetectedRaisedNE : activatorDetectorRailRaisedNE, 0, 90, false);
+				case ASCENDING_SOUTH -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetectedRaisedSW : activatorDetectorRailOnRaisedSW :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetectedRaisedSW : activatorDetectorRailRaisedSW);
+				case ASCENDING_WEST -> new ConfiguredModel(state.getValue(PoweredRailBlock.POWERED) ?
+						state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailOnDetectedRaisedSW : activatorDetectorRailOnRaisedSW :
+							state.getValue(ActivatorDetectorRailBlock.DETECTED) ? activatorDetectorRailDetectedRaisedSW : activatorDetectorRailRaisedSW, 0, 90, false);
+				default -> throw new IllegalArgumentException("Unexpected value: " + state.getValue(PoweredRailBlock.SHAPE));
+				}
+			};
+		}, BaseRailBlock.WATERLOGGED);
+		simpleItem(CustomBGMObjects.ACTIVATOR_DETECTOR_RAIL, "block/activator_detector_rail");
+	}
 
-    public static final ResourceLocation RENDER_TYPE_CUTOUT = ResourceLocation.withDefaultNamespace("cutout");
-    public static final ExtendedModelTemplate RAIL_FLAT = ModelTemplates.RAIL_FLAT.extend().renderType(RENDER_TYPE_CUTOUT).build();
-    public static final ExtendedModelTemplate RAIL_RAISED_NE = ModelTemplates.RAIL_RAISED_NE.extend().renderType(RENDER_TYPE_CUTOUT).build();
-    public static final ExtendedModelTemplate RAIL_RAISED_SW = ModelTemplates.RAIL_RAISED_SW.extend().renderType(RENDER_TYPE_CUTOUT).build();
+	public void simpleItem(ItemObject<?> item, String texture)
+	{
+		simpleItem(item, CustomBGMAPI.id(texture));
+	}
 
-    public void createActivatorDetectorRail(BlockModelGenerators blockModels, Block railBlock) {
-        ResourceLocation flat_idle = blockModels.createSuffixedVariant(railBlock, "", RAIL_FLAT, TextureMapping::rail);
-        ResourceLocation raised_ne_idle = blockModels.createSuffixedVariant(railBlock, "", RAIL_RAISED_NE, TextureMapping::rail);
-        ResourceLocation raised_sw_idle = blockModels.createSuffixedVariant(railBlock, "", RAIL_RAISED_SW, TextureMapping::rail);
-        ResourceLocation flat_powered = blockModels.createSuffixedVariant(railBlock, "_on", RAIL_FLAT, TextureMapping::rail);
-        ResourceLocation raised_ne_powered = blockModels.createSuffixedVariant(railBlock, "_on", RAIL_RAISED_NE, TextureMapping::rail);
-        ResourceLocation raised_sw_powered = blockModels.createSuffixedVariant(railBlock, "_on", RAIL_RAISED_SW, TextureMapping::rail);
-        ResourceLocation flat_detected = blockModels.createSuffixedVariant(railBlock, "_detected", RAIL_FLAT, TextureMapping::rail);
-        ResourceLocation raised_ne_detected = blockModels.createSuffixedVariant(railBlock, "_detected", RAIL_RAISED_NE, TextureMapping::rail);
-        ResourceLocation raised_sw_detected = blockModels.createSuffixedVariant(railBlock, "_detected", RAIL_RAISED_SW, TextureMapping::rail);
-        ResourceLocation flat_powered_detected = blockModels.createSuffixedVariant(railBlock, "_on_detected", RAIL_FLAT, TextureMapping::rail);
-        ResourceLocation raised_ne_powered_detected = blockModels.createSuffixedVariant(railBlock, "_on_detected", RAIL_RAISED_NE, TextureMapping::rail);
-        ResourceLocation raised_sw_powered_detected = blockModels.createSuffixedVariant(railBlock, "_on_detected", RAIL_RAISED_SW, TextureMapping::rail);
-        PropertyDispatch propertydispatch = PropertyDispatch.properties(BlockStateProperties.POWERED, ActivatorDetectorRailBlock.DETECTED, BlockStateProperties.RAIL_SHAPE_STRAIGHT)
-            .generate(
-                (powered, detected, shape) -> {
-                    switch (shape) {
-                        case NORTH_SOUTH:
-                            return Variant.variant().with(VariantProperties.MODEL,
-                            		powered ?
-                            				detected ? flat_powered_detected : flat_powered :
-                            				detected ? flat_detected : flat_idle);
-                        case EAST_WEST:
-                            return Variant.variant()
-                                .with(VariantProperties.MODEL,
-                                		powered ?
-                                				detected ? flat_powered_detected : flat_powered :
-                                				detected ? flat_detected : flat_idle)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
-                        case ASCENDING_EAST:
-                            return Variant.variant()
-                                .with(VariantProperties.MODEL,
-                                		powered ?
-                                				detected ? raised_ne_powered_detected : raised_ne_powered :
-                                				detected ? raised_ne_detected : raised_ne_idle)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
-                        case ASCENDING_WEST:
-                            return Variant.variant()
-                                .with(VariantProperties.MODEL,
-                                		powered ?
-                                				detected ? raised_sw_powered_detected : raised_sw_powered :
-                                				detected ? raised_sw_detected : raised_sw_idle)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
-                        case ASCENDING_NORTH:
-                            return Variant.variant().with(VariantProperties.MODEL,
-                            		powered ?
-                            				detected ? raised_ne_powered_detected : raised_ne_powered :
-                            				detected ? raised_ne_detected : raised_ne_idle);
-                        case ASCENDING_SOUTH:
-                            return Variant.variant().with(VariantProperties.MODEL,
-                            		powered ?
-                            				detected ? raised_sw_powered_detected : raised_sw_powered :
-                            				detected ? raised_sw_detected : raised_sw_idle);
-                        default:
-                            throw new UnsupportedOperationException("Fix your generator!");
-                    }
-                }
-            );
-        blockModels.registerSimpleFlatItemModel(railBlock);
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(railBlock).with(propertydispatch));
-    }
+	public void simpleItem(ItemObject<?> item, ResourceLocation texture)
+	{
+		itemModels().getBuilder(item.id.toString())
+		.parent(new ModelFile.UncheckedModelFile("item/generated"))
+		.texture("layer0", texture);
+	}
 
+	public void layeredItem(ItemObject<?> item, String... textures)
+	{
+		ResourceLocation[] textureLocs = new ResourceLocation[textures.length];
+		for (int i = 0; i < textures.length; ++i) textureLocs[i] = CustomBGMAPI.id(textures[i]);
+		layeredItem(item, textureLocs);
+	}
+
+	public void layeredItem(ItemObject<?> item, ResourceLocation... textures)
+	{
+		ItemModelBuilder builder = itemModels().getBuilder(item.id.toString())
+		.parent(new ModelFile.UncheckedModelFile("item/generated"));
+		for (int i = 0; i < textures.length; ++i) builder.texture("layer" + i, textures[i]);
+	}
+
+	public ModelFile simpleBlock(BlockObject<?, ?> block, String texture)
+	{
+		return simpleBlock(block, CustomBGMAPI.id(texture));
+	}
+
+	public ModelFile simpleBlock(BlockObject<?, ?> block, ResourceLocation texture)
+	{
+		ModelFile model = models().cubeAll(block.id.getPath(), texture);
+		simpleBlock(block.getBlock(), model);
+		simpleBlockItem(block.getBlock(), model);
+		return model;
+	}
 }

@@ -9,7 +9,6 @@ import com.firemerald.custombgm.api.LoopType;
 import com.firemerald.fecore.distribution.DistributionUtil;
 import com.firemerald.fecore.distribution.IDistribution;
 
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -140,14 +139,6 @@ public class BGMDistributionBuilder {
 		return add(new BGM(music, defaultLoop), weight);
 	}
 
-	public BGMDistributionBuilder add(MusicInfo music, LoopType loop, float weight) {
-		return add(new BGM(music, loop), weight);
-	}
-
-	public BGMDistributionBuilder add(MusicInfo music, float weight) {
-		return add(new BGM(music, defaultLoop), weight);
-	}
-
 	public BGMDistributionBuilder add(BGM bgm) {
 		return add(bgm, defaultWeight);
 	}
@@ -213,14 +204,6 @@ public class BGMDistributionBuilder {
 	}
 
 	public BGMDistributionBuilder add(Music music) {
-		return add(new BGM(music, defaultLoop));
-	}
-
-	public BGMDistributionBuilder add(MusicInfo music, LoopType loop) {
-		return add(new BGM(music, loop));
-	}
-
-	public BGMDistributionBuilder add(MusicInfo music) {
 		return add(new BGM(music, defaultLoop));
 	}
 

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.custombgm.codecs.CustomBGMCodecs;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -18,7 +19,7 @@ public record InFluidCondition(Optional<HolderSet<Fluid>> fluids, Optional<State
 	public static final MapCodec<InFluidCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
 			.group(
 					RegistryCodecs.homogeneousList(Registries.FLUID).optionalFieldOf("fluids").forGetter(InFluidCondition::fluids),
-					StatePropertiesPredicate.CODEC.optionalFieldOf("state").forGetter(InFluidCondition::properties)
+					CustomBGMCodecs.STATE_PROPERTIES_PREDICATE.optionalFieldOf("state").forGetter(InFluidCondition::properties)
 					)
 			.apply(instance, InFluidCondition::new)
 			);

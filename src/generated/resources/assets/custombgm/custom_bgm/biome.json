@@ -1,9 +1,9 @@
 {
-  "neoforge:conditions": [
+  "type": "custombgm:biome",
+  "conditions": [
     {
-      "type": "neoforge:never"
+      "type": "forge:false"
     }
   ],
-  "type": "custombgm:biome",
   "priority": 3
 }

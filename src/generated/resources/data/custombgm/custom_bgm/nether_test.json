@@ -1,13 +1,13 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:never"
-    }
-  ],
   "type": "custombgm:base",
   "condition": {
     "type": "custombgm:biome",
     "biome": "#minecraft:is_nether"
   },
+  "conditions": [
+    {
+      "type": "forge:false"
+    }
+  ],
   "music": "mc4:mp1.screen.bootup"
 }

@@ -4,13 +4,13 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.fecore.util.HorizontalAlignment;
 import com.firemerald.fecore.util.VerticalAlignment;
 
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
-import net.neoforged.neoforge.common.ModConfigSpec.EnumValue;
-import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @EventBusSubscriber(modid = CustomBGMAPI.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientConfig {
@@ -20,10 +20,10 @@ public class ClientConfig {
 	private static final EnumValue<VerticalAlignment> MENU_BUTTONS_VERTICAL;
 	private static final IntValue MENU_BUTTONS_VERTICAL_OFFSET;
 	private static final BooleanValue LOG_MUSIC;
-	public static final ModConfigSpec SPEC;
+	public static final ForgeConfigSpec SPEC;
 
 	static {
-		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.comment("Client settings").push("client");
         MENU_BUTTONS_ENABLED = builder
         		.comment("Whether to add track control buttons to the main menu.")
@@ -65,11 +65,11 @@ public class ClientConfig {
     }
 
     public static void loadConfig() {
-    	menuButtonsEnabled = MENU_BUTTONS_ENABLED.getAsBoolean();
+    	menuButtonsEnabled = MENU_BUTTONS_ENABLED.get();
     	menuButtonsHorizontal = MENU_BUTTONS_HORIZONTAL.get();
-    	menuButtonsHorizontalOffset = MENU_BUTTONS_HORIZONTAL_OFFSET.getAsInt();
+    	menuButtonsHorizontalOffset = MENU_BUTTONS_HORIZONTAL_OFFSET.get();
     	menuButtonsVertical = MENU_BUTTONS_VERTICAL.get();
-    	menuButtonsVerticalOffset = MENU_BUTTONS_VERTICAL_OFFSET.getAsInt();
-    	logMusic = LOG_MUSIC.getAsBoolean();
+    	menuButtonsVerticalOffset = MENU_BUTTONS_VERTICAL_OFFSET.get();
+    	logMusic = LOG_MUSIC.get();
     }
 }

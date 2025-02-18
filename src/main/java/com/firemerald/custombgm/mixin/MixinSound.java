@@ -41,6 +41,6 @@ public class MixinSound implements ISoundExtensions, IWeightedSoundExtensions {
 
 	@Override
 	public boolean containsSound(Sound sound) {
-		return sound.equals((Object) this);
+		return sound.equals(this);
 	}
 }

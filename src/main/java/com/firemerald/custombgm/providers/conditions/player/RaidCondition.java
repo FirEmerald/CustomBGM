@@ -2,6 +2,7 @@ package com.firemerald.custombgm.providers.conditions.player;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,8 +14,8 @@ import net.minecraft.world.entity.raid.Raid;
 public record RaidCondition(Raid.RaidStatus status, MinMaxBounds.Ints wave, MinMaxBounds.Ints level) implements BGMProviderPlayerCondition {
 	public static final MapCodec<RaidCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 			Codec.STRING.xmap(Raid.RaidStatus::getByName, Raid.RaidStatus::getName).optionalFieldOf("status", Raid.RaidStatus.ONGOING).forGetter(RaidCondition::status),
-			MinMaxBounds.Ints.CODEC.optionalFieldOf("wave", MinMaxBounds.Ints.ANY).forGetter(RaidCondition::wave),
-			MinMaxBounds.Ints.CODEC.optionalFieldOf("level", MinMaxBounds.Ints.ANY).forGetter(RaidCondition::level)
+			Codecs.INT_BOUNDS.optionalFieldOf("wave", MinMaxBounds.Ints.ANY).forGetter(RaidCondition::wave),
+			Codecs.INT_BOUNDS.optionalFieldOf("level", MinMaxBounds.Ints.ANY).forGetter(RaidCondition::level)
 			).apply(instance, RaidCondition::new)
 	);
 
@@ -26,6 +27,6 @@ public record RaidCondition(Raid.RaidStatus status, MinMaxBounds.Ints wave, MinM
 	@Override
 	public boolean test(PlayerConditionData playerData, Player player) {
 		Raid raid = playerData.getRaid();
-		return raid != null && raid.status == status && wave.matches(raid.getGroupsSpawned()) && level.matches(raid.getRaidOmenLevel());
+		return raid != null && raid.status == status && wave.matches(raid.getGroupsSpawned()) && level.matches(raid.getBadOmenLevel());
 	}
 }

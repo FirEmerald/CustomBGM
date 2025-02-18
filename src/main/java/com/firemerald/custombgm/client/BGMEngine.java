@@ -17,16 +17,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.sounds.Music;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @OnlyIn(Dist.CLIENT)
 public class BGMEngine {
+	public static final Music EMPTY = new Music(ForgeRegistries.SOUND_EVENTS.getHolder(SoundEvents.EMPTY).get(), 0, 0, true);
 	public static final RandomSource RANDOM = RandomSource.create();
 	private static BGMInstance currentBGMInstance = null;
 	private static VolumedBGM currentBGM = null, targetBGM = null;
@@ -38,7 +41,7 @@ public class BGMEngine {
 	public static class BGMInstance {
 		private final SoundManager soundManager;
 		private BGMInstance previous;
-		public final SoundInstance bgm;
+		public final CustomBGMSoundInstance bgm;
 		private float transition;
 		private static final float TRANSITION_PER_TICK = 1 / 40f;
 		private float volume = 1;
@@ -47,7 +50,7 @@ public class BGMEngine {
 			this(previous, null);
 		}
 
-		public BGMInstance(@Nullable BGMInstance previous, @Nullable SoundInstance bgm) {
+		public BGMInstance(@Nullable BGMInstance previous, @Nullable CustomBGMSoundInstance bgm) {
 			soundManager = Minecraft.getInstance().getSoundManager();
 			this.previous = previous;
 			this.bgm = bgm;
@@ -66,7 +69,7 @@ public class BGMEngine {
 			}
 			if (bgm != null) {
 				if (transition == 0) soundManager.play(bgm);
-				soundManager.setVolume(bgm, volume);
+				bgm.setVolume(volume);
 			}
 			transition = 1;
 		}
@@ -80,7 +83,7 @@ public class BGMEngine {
 				if (transition == 0 && bgm != null) soundManager.play(bgm);
 				if (previous == null && transition == 0) {
 					transition = 1;
-					if (bgm != null) soundManager.setVolume(bgm, volume);
+					if (bgm != null) bgm.setVolume(volume);
 				} else {
 					if ((transition += TRANSITION_PER_TICK) > 1) transition = 1;
 					if (isRoot) updateVolume(1f);
@@ -92,7 +95,7 @@ public class BGMEngine {
 					previous = null;
 				}
 				if (bgm != null) {
-					soundManager.setVolume(bgm, volume);
+					bgm.setVolume(volume);
 					return soundManager.isActive(bgm) || previous != null;
 				} else return false;
 			}
@@ -108,7 +111,7 @@ public class BGMEngine {
 			float prevVol = flattenedHann(transition);
 			float curVol = 1 - prevVol;
 			if (previous != null) previous.updateVolume(Mth.sqrt(prevVol) * volumeFromParent);
-			if (bgm != null) soundManager.setVolume(bgm, Mth.sqrt(curVol) * volumeFromParent * this.volume);
+			if (bgm != null) bgm.setVolume(Mth.sqrt(curVol) * volumeFromParent * this.volume);
 		}
 
 		public static float cubic(float f) {
@@ -161,8 +164,7 @@ public class BGMEngine {
 	public static void clientTick() {
 		if (currentBGMInstance != null && !currentBGMInstance.tick(true)) {
 			currentBGMInstance = null;
-			if (currentBGM.loop() != LoopType.SHUFFLE) currentBGM = null;
-			//if (!trackSeeked && (currentBGM == null || currentBGM.loop() != LoopType.SHUFFLE)) trackSkip = 1; //next track
+			if (currentBGM != null && currentBGM.loop() != LoopType.SHUFFLE) currentBGM = null;
 		}
 		if (clientOverride.isEmpty()) { //no tracks
 			if (currentBGM != null && ClientConfig.logMusic) CustomBGM.LOGGER.info("CustomBGM stopping playback");
@@ -186,23 +188,25 @@ public class BGMEngine {
 				if (targetSound != null) instance = CustomBGMSoundInstance.of(
 							newBGM.sound(),
 							newBGM.loop() == LoopType.TRUE,
+							newBGM.volume(),
 							targetSound);
 				else instance = CustomBGMSoundInstance.of(
 							newBGM.sound(),
 							newBGM.loop() == LoopType.TRUE,
+							newBGM.volume(),
 							SoundInstance.createUnseededRandom(),
 							Minecraft.getInstance().getSoundManager());
 				if (ClientConfig.logMusic) CustomBGM.LOGGER.info("CustomBGM now playing " + newBGM + " with sound " + instance.getSound());
 				currentBGMInstance = new BGMEngine.BGMInstance(currentBGMInstance, instance); //change
 			}
 			currentBGM = newBGM;
-			if (currentBGMInstance != null) currentBGMInstance.setVolume(currentBGM.volume());
+			if (currentBGMInstance != null && currentBGM != null) currentBGMInstance.setVolume(currentBGM.volume());
 		}
 		targetBGM = null;
 		targetSound = null;
 	}
 
-	public static boolean musicTick(MusicInfo musicInfo, Minecraft mc) {
+	public static boolean musicTick(Music music, Minecraft mc) {
 		Player player;
 		OverrideResults currentOverride;
 		if (mc.screen instanceof WinScreen) { //fix for credits screen - act as if we are not on a server
@@ -213,7 +217,7 @@ public class BGMEngine {
 			currentOverride = serverOverride;
 		}
 		PlayerConditionData playerData = new PlayerConditionData(player);
-		playerData.setVanillaBGM(musicInfo);
+		playerData.setVanillaBGM(music);
 		clientOverride = DistributionUtil.sortedMerge(ClientModEventHandler.getBGMProviders().getMusic(playerData, currentOverride).overrides().stream().map(dist ->
 			dist.distribution().map(bgm -> new VolumedBGM(bgm, dist.volume()))
 		));

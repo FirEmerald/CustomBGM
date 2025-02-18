@@ -9,17 +9,22 @@ import com.firemerald.custombgm.providers.ScreenMusicProvider;
 import com.firemerald.custombgm.providers.VanillaMusicProvider;
 import com.mojang.serialization.MapCodec;
 
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class CustomBGMProviders {
 	private static DeferredRegister<MapCodec<? extends BGMProvider>> registry = DeferredRegister.create(CustomBGMRegistries.Keys.PROVIDER_CODECS, CustomBGMAPI.MOD_ID);
 
-	public static final DeferredHolder<MapCodec<? extends BGMProvider>, MapCodec<BaseMusicProvider>> BASE = registry.register("base", () -> BaseMusicProvider.CODEC);
-	public static final DeferredHolder<MapCodec<? extends BGMProvider>, MapCodec<BiomeMusicProvider>> BIOME = registry.register("biome", () -> BiomeMusicProvider.CODEC);
-	public static final DeferredHolder<MapCodec<? extends BGMProvider>, MapCodec<ScreenMusicProvider>> SCREEN = registry.register("screen", () -> ScreenMusicProvider.CODEC);
-	public static final DeferredHolder<MapCodec<? extends BGMProvider>, MapCodec<VanillaMusicProvider>> VANILLA = registry.register("vanilla", () -> VanillaMusicProvider.CODEC);
+	static {
+		CustomBGMRegistries.providerCodecs = registry.makeRegistry(() -> RegistryBuilder.of(CustomBGMRegistries.Keys.PROVIDER_CODECS.location()));
+	}
+
+	public static final RegistryObject<MapCodec<BaseMusicProvider>> BASE = registry.register("base", () -> BaseMusicProvider.CODEC);
+	public static final RegistryObject<MapCodec<BiomeMusicProvider>> BIOME = registry.register("biome", () -> BiomeMusicProvider.CODEC);
+	public static final RegistryObject<MapCodec<ScreenMusicProvider>> SCREEN = registry.register("screen", () -> ScreenMusicProvider.CODEC);
+	public static final RegistryObject<MapCodec<VanillaMusicProvider>> VANILLA = registry.register("vanilla", () -> VanillaMusicProvider.CODEC);
 
 	public static void init(IEventBus bus) {
 		registry.register(bus);

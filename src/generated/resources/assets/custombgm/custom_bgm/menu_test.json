@@ -1,14 +1,14 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:never"
-    }
-  ],
   "type": "custombgm:base",
   "condition": {
     "type": "custombgm:vanilla_bgm",
     "music": "minecraft:music.menu"
   },
+  "conditions": [
+    {
+      "type": "forge:false"
+    }
+  ],
   "music": {
     "mc4:mp1.screen.bootup": "false",
     "mc4:mp1.screen.menu": "true",

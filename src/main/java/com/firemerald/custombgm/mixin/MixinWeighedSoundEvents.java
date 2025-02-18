@@ -21,11 +21,11 @@ public class MixinWeighedSoundEvents implements IWeightedSoundExtensions {
 
 	@Override
 	public void getSounds(Collection<Sound> set) {
-		list.forEach(weighted -> weighted.getSounds(set));
+		list.forEach(weighted -> ((IWeightedSoundExtensions) weighted).getSounds(set));
 	}
 
 	@Override
 	public boolean containsSound(Sound sound) {
-		return list.stream().anyMatch(weighted -> weighted.containsSound(sound));
+		return list.stream().anyMatch(weighted -> ((IWeightedSoundExtensions) weighted).containsSound(sound));
 	}
 }

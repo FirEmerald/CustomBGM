@@ -1,26 +1,27 @@
 package com.firemerald.custombgm.operators;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import com.firemerald.custombgm.api.BgmDistribution;
+import com.firemerald.custombgm.capabilities.ServerPlayerData;
 import com.firemerald.custombgm.client.gui.screen.BGMScreen;
 import com.firemerald.custombgm.client.gui.screen.OperatorScreen;
 import com.firemerald.custombgm.codecs.BGMDistributionCodec;
-import com.firemerald.custombgm.init.CustomBGMAttachments;
 
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BGMOperator<O extends BGMOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorBase<Player, O, S> {
 	public BgmDistribution music = BgmDistribution.EMPTY;
@@ -41,7 +42,7 @@ public class BGMOperator<O extends BGMOperator<O, S>, S extends IOperatorSource<
 
 	@Override
 	public boolean operate(Player player) {
-		player.getData(CustomBGMAttachments.SERVER_PLAYER_DATA).addMusicOverride(music, priority); //TODO
+		ServerPlayerData.get(player).ifPresent(playerData -> playerData.addMusicOverride(music, priority));
 		return true;
 	}
 
@@ -71,14 +72,14 @@ public class BGMOperator<O extends BGMOperator<O, S>, S extends IOperatorSource<
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf) {
+	public void read(FriendlyByteBuf buf) {
 		super.read(buf);
 		music = BgmDistribution.STREAM_CODEC.decode(buf);
 		priority = buf.readInt();
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf) {
+	public void write(FriendlyByteBuf buf) {
 		super.write(buf);
 		BgmDistribution.STREAM_CODEC.encode(buf, music);
 		buf.writeInt(priority);
@@ -96,7 +97,7 @@ public class BGMOperator<O extends BGMOperator<O, S>, S extends IOperatorSource<
 		return new BGMScreen<>(source);
 	}
 
-	public static void addTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag, DataComponentType<CustomData> componentType) {
+	public static void addTooltip(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag tooltipFlag, Function<ItemStack, CompoundTag> getData) {
 		tooltipComponents.add(Component.translatable("custombgm.tooltip.bgm"));
 	}
 }

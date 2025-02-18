@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.firemerald.custombgm.api.BgmDistribution;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.util.CollectionUtils;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-
 public record OverrideResults(List<BgmDistribution> overrides, int priority) implements IOverrideResults {
-	public static final StreamCodec<ByteBuf, OverrideResults> STREAM_CODEC = StreamCodec.composite(
-			BgmDistribution.STREAM_CODEC.apply(ByteBufCodecs.list()), OverrideResults::overrides,
-			ByteBufCodecs.INT, OverrideResults::priority,
+	public static final StreamCodec<OverrideResults> STREAM_CODEC = StreamCodec.composite(
+			BgmDistribution.STREAM_CODEC.asList(), OverrideResults::overrides,
+			StreamCodec.INT, OverrideResults::priority,
 			OverrideResults::new
 			);
 

@@ -2,6 +2,7 @@ package com.firemerald.custombgm.providers.conditions.player.attributes;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 public record HealthCondition(MinMaxBounds.Doubles health, boolean scaled) implements BGMProviderPlayerCondition {
 	public static final MapCodec<HealthCondition> CODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
-				MinMaxBounds.Doubles.CODEC.fieldOf("health").forGetter(HealthCondition::health),
+				Codecs.DOUBLE_BOUNDS.fieldOf("health").forGetter(HealthCondition::health),
 				Codec.BOOL.optionalFieldOf("scaled", true).forGetter(HealthCondition::scaled)
 				)
 		.apply(instance, HealthCondition::new)

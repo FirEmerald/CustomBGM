@@ -2,6 +2,7 @@ package com.firemerald.custombgm.providers.conditions.player.location;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;
@@ -10,7 +11,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.world.entity.player.Player;
 
 public record SpawnpointCondition(MinMaxBounds.Doubles distance) implements BGMProviderPlayerCondition {
-	public static final MapCodec<SpawnpointCondition> CODEC = MinMaxBounds.Doubles.CODEC.fieldOf("distance").xmap(SpawnpointCondition::new, SpawnpointCondition::distance);
+	public static final MapCodec<SpawnpointCondition> CODEC = Codecs.DOUBLE_BOUNDS.fieldOf("distance").xmap(SpawnpointCondition::new, SpawnpointCondition::distance);
 
 	@Override
 	public MapCodec<SpawnpointCondition> codec() {

@@ -10,8 +10,8 @@ import javax.sound.sampled.AudioFormat;
 
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.LoopingAudioStream.AudioStreamProvider;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class LoopedStreamingAudioStream implements AudioStream {
     private final AudioStreamProvider provider;

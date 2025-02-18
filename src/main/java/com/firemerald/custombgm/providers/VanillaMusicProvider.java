@@ -9,12 +9,11 @@ import com.firemerald.fecore.distribution.SingletonWeightedDistribution;
 import com.google.common.base.Optional;
 import com.mojang.serialization.MapCodec;
 
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.sounds.Music;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.util.thread.EffectiveSide;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 public class VanillaMusicProvider extends BuiltInMusicProvider
 {
@@ -43,11 +42,11 @@ public class VanillaMusicProvider extends BuiltInMusicProvider
 
 	@OnlyIn(Dist.CLIENT)
 	public BgmDistribution getMusicClient(PlayerConditionData player) {
-		Optional<MusicInfo> musicInfo = player.getVanillaBGM();
+		Optional<Music> musicInfo = player.getVanillaBGM();
 		if (musicInfo.isPresent() && condition.test(player)) {
-			Music music = musicInfo.get().music();
+			Music music = musicInfo.get();
 			if (music == null) return BgmDistribution.EMPTY;
-			else return new BgmDistribution(new SingletonWeightedDistribution<>(new BGM(music, loop), weight), musicInfo.get().volume());
+			else return new BgmDistribution(new SingletonWeightedDistribution<>(new BGM(music, loop), weight), 1f);
 		} else return null;
 	}
 

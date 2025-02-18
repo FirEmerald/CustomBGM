@@ -4,8 +4,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
-import com.firemerald.custombgm.attachments.ServerPlayerData;
+import com.firemerald.custombgm.capabilities.ServerPlayerData;
 import com.firemerald.custombgm.providers.conditions.holderset.OptionalHolderSetCondition;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -16,12 +17,13 @@ import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class CombatCondition extends OptionalHolderSetCondition<EntityType<?>> {
 	public static final MapCodec<CombatCondition> CODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
 				RegistryCodecs.homogeneousList(Registries.ENTITY_TYPE).optionalFieldOf("entity").forGetter(condition -> condition.holderSet),
-				MinMaxBounds.Ints.CODEC.optionalFieldOf("count", MinMaxBounds.Ints.atLeast(1)).forGetter(condition -> condition.entityCount)
+				Codecs.INT_BOUNDS.optionalFieldOf("count", MinMaxBounds.Ints.atLeast(1)).forGetter(condition -> condition.entityCount)
 				)
 		.apply(instance, CombatCondition::new)
 	);
@@ -36,8 +38,9 @@ public class CombatCondition extends OptionalHolderSetCondition<EntityType<?>> {
     private int getEntities(ServerPlayerData player) {
     	Stream<EntityType<?>> stream = player.getTargeters().stream().map(Entity::getType);
     	if (holderSet.isPresent()) {
+    		final Stream<EntityType<?>> stream2 = stream;
     		HolderSet<EntityType<?>> types = holderSet.get();
-    		stream = stream.filter(type -> type.is(types));
+    		stream = types.unwrap().map(tag -> stream2.filter(type -> type.is(tag)), holders -> stream2.filter(type -> ForgeRegistries.ENTITY_TYPES.getHolder(type).filter(holders::contains).isPresent()));
     	}
     	return (int) stream.count();
     }

@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#minecraft:rails"
+            "tag": "minecraft:rails"
           }
         ]
       },
@@ -20,13 +20,14 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_rail"
+      "has_rail",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "custombgm:activator_detector_rail"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

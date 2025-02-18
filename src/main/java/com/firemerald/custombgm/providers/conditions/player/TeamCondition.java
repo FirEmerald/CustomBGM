@@ -9,18 +9,18 @@ import java.util.Set;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.Team;
 
 public class TeamCondition implements BGMProviderPlayerCondition {
 	public static final MapCodec<TeamCondition> CODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
-				ExtraCodecs.compactListCodec(Codec.STRING).fieldOf("team").forGetter(TeamCondition::teams)
+				Codecs.compactListCodec(Codec.STRING).fieldOf("team").forGetter(TeamCondition::teams)
 				)
 		.apply(instance, TeamCondition::new)
 	);

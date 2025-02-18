@@ -7,7 +7,7 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import net.minecraft.client.model.MinecartModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 
 public class CustomBGMModelLayers {
 	public static final ModelLayerLocation BGM_MINECART = register("bgm_minecart");

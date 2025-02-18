@@ -2,6 +2,7 @@ package com.firemerald.custombgm.providers.conditions.holderset;
 
 import java.util.function.Function;
 
+import com.firemerald.fecore.util.holderset.EmptyHolderSet;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -29,7 +30,7 @@ public abstract class HolderSetCondition<T> extends AbstractHolderSetCondition<T
 	}
 
     public abstract static class Builder<T, U extends HolderSetCondition<T>, V extends Builder<T, U, V>> extends AbstractHolderSetCondition.Builder<T, U, V> {
-        protected HolderSet<T> holderSet = HolderSet.empty();
+        protected HolderSet<T> holderSet = EmptyHolderSet.get();
 
         public Builder(RegistryLookup<T> lookup) {
         	super(lookup);

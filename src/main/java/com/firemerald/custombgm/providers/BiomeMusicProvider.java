@@ -7,13 +7,11 @@ import com.firemerald.custombgm.api.BgmDistribution;
 import com.firemerald.custombgm.api.LoopType;
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
-import com.firemerald.fecore.distribution.DistributionUtil;
-import com.firemerald.fecore.util.SimpleCollector;
+import com.firemerald.fecore.distribution.SingletonUnweightedDistribution;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
-import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.biome.Biome;
 
 public class BiomeMusicProvider extends BuiltInMusicProvider
@@ -40,13 +38,9 @@ public class BiomeMusicProvider extends BuiltInMusicProvider
 	public BgmDistribution getMusic(PlayerConditionData player) {
 		Holder<Biome> biome = player.getBiome();
 		if (biome == null) return null;
-        float volume = biome.value().getBackgroundMusicVolume();
-        Optional<SimpleWeightedRandomList<Music>> optional = biome.value().getBackgroundMusic();
+        Optional<Music> optional = biome.value().getBackgroundMusic();
         if (optional.isPresent() && condition.test(player)) {
-            return new BgmDistribution(DistributionUtil.get(optional.get().unwrap().stream().collect(SimpleCollector.toFloatMap(
-        			wrapper -> new BGM(wrapper.data().getEvent().getKey().location(), loop),
-        			wrapper -> (float) wrapper.getWeight().asInt()
-        			))), volume);
+            return new BgmDistribution(new SingletonUnweightedDistribution<>(new BGM(optional.get())), 1f);
         } else return null;
 	}
 

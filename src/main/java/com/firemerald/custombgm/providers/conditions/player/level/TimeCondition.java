@@ -17,7 +17,7 @@ public record TimeCondition(LongBounds time, boolean ofDay, boolean ofGame) impl
 			)
 			.apply(instance, TimeCondition::new)
 	);
-	
+
 	public TimeCondition(LongBounds time) {
 		this(time, true, false);
 	}
@@ -29,7 +29,6 @@ public record TimeCondition(LongBounds time, boolean ofDay, boolean ofGame) impl
 
 	@Override
 	public boolean test(PlayerConditionData playerData, Player player) {
-		player.level().getDayTimeFraction();
 		long time = ofGame ? player.level().getGameTime() : player.level().getDayTime();
 		if (ofDay) time %= 24000L;
 		return this.time.matches(time);

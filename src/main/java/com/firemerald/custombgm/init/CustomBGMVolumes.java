@@ -4,18 +4,21 @@ import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.api.CustomBGMRegistries;
 import com.firemerald.custombgm.api.providers.volume.BGMProviderVolume;
 import com.firemerald.custombgm.api.providers.volume.ConstantVolume;
-import com.firemerald.custombgm.providers.volume.BiomeVolume;
 import com.mojang.serialization.MapCodec;
 
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class CustomBGMVolumes {
 	private static DeferredRegister<MapCodec<? extends BGMProviderVolume>> registry = DeferredRegister.create(CustomBGMRegistries.Keys.VOLUME_CODECS, CustomBGMAPI.MOD_ID);
 
-	public static final DeferredHolder<MapCodec<? extends BGMProviderVolume>, MapCodec<ConstantVolume>> BASE = registry.register("constant", () -> ConstantVolume.CODEC);
-	public static final DeferredHolder<MapCodec<? extends BGMProviderVolume>, MapCodec<BiomeVolume>> BIOME = registry.register("biome", () -> BiomeVolume.CODEC);
+	static {
+		CustomBGMRegistries.volumeCodecs = registry.makeRegistry(() -> RegistryBuilder.of(CustomBGMRegistries.Keys.VOLUME_CODECS.location()));
+	}
+
+	public static final RegistryObject<MapCodec<ConstantVolume>> BASE = registry.register("constant", () -> ConstantVolume.CODEC);
 
 	public static void init(IEventBus bus) {
 		registry.register(bus);

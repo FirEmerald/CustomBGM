@@ -8,7 +8,6 @@ import com.firemerald.custombgm.providers.conditions.holderset.HolderCondition;
 import com.google.common.base.Optional;
 import com.mojang.serialization.MapCodec;
 
-import net.minecraft.client.sounds.MusicInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.HolderSet;
@@ -25,10 +24,9 @@ public class VanillaBGMCondition extends HolderCondition<SoundEvent> {
 
 	@Override
 	public Holder<SoundEvent> getHolder(PlayerConditionData player) {
-		Optional<MusicInfo> bgmOpt = player.getVanillaBGM();
-		MusicInfo info;
+		Optional<Music> bgmOpt = player.getVanillaBGM();
 		Music music;
-		return bgmOpt.isPresent() && (info = bgmOpt.get()) != null && (music = info.music()) != null ? music.getEvent() : null;
+		return bgmOpt.isPresent() && (music = bgmOpt.get()) != null ? music.getEvent() : null;
 	}
 
 	@Override

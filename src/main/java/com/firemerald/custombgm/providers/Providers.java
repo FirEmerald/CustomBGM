@@ -4,7 +4,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.firemerald.custombgm.CustomBGM;
 import com.firemerald.custombgm.api.BgmDistribution;
@@ -25,17 +24,16 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.conditions.ConditionalOps;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.conditions.WithConditions;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public class Providers implements ResourceManagerReloadListener {
 	private static final Gson GSON = new Gson();
 
-	public static Providers forDataPacks(ICondition.IContext context) {
-		return new Providers(context);
+	public static Providers forDataPacks(ICondition.IContext context, HolderLookup.Provider provider) {
+		return new Providers(context, provider);
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -44,10 +42,17 @@ public class Providers implements ResourceManagerReloadListener {
 	}
 
 	private ICondition.IContext context;
+	private HolderLookup.Provider provider;
 	private final List<BGMProvider> list = new ArrayList<>();
 
-	private Providers(ICondition.IContext context) {
+	private Providers(ICondition.IContext context, HolderLookup.Provider provider) {
 		this.context = context;
+		this.provider = provider;
+	}
+
+	private Providers(LookupContext context) {
+		this.context = context;
+		this.provider = context.provider();
 	}
 
 	@Override
@@ -66,12 +71,13 @@ public class Providers implements ResourceManagerReloadListener {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void setContext(ICondition.IContext context) {
+	public void setContext(LookupContext context) {
+		this.provider = context.provider();
 		load(Minecraft.getInstance().getResourceManager(), this.context = context);
 	}
 
 	private void load(ResourceManager resourceManager, ICondition.IContext conditionContext) {
-        RegistryOps<JsonElement> registryOps = new ConditionalOps<>(RegistryOps.create(JsonOps.INSTANCE, conditionContext.registryAccess()), conditionContext);
+        RegistryOps<JsonElement> registryOps = RegistryOps.create(JsonOps.INSTANCE, provider);
 		Map<ResourceLocation, Resource> resourceLocations = resourceManager.listResources("custom_bgm", p -> p.getPath().endsWith(".json"));
 		list.clear();
 		resourceLocations.forEach((resourceLocation, resource) -> {
@@ -83,16 +89,16 @@ public class Providers implements ResourceManagerReloadListener {
             		CustomBGM.LOGGER.error("Couldn't load custom music properties from " + resourceLocation + " in pack " + resource.sourcePackId() + " as it is empty or null");
             	}
             	else {
-            		DataResult<Optional<WithConditions<BGMProvider>>> parsed = BGMProvider.CONDITIONAL_CODEC.parse(registryOps, json);
-            		parsed.ifSuccess(opt -> {
-            			opt.ifPresentOrElse(provider -> {
-        					list.add(provider.carrier());
-            			}, () -> {
-            				CustomBGM.LOGGER.debug("Skipping loading custom music properties from " + resourceLocation + " in pack " + resource.sourcePackId() + " as it's conditions were not met");
+            		if (CraftingHelper.processConditions(json, "conditions", conditionContext)) {
+            			DataResult<BGMProvider> parsed = BGMProvider.CODEC.parse(registryOps, json);
+            			parsed.get().ifLeft(provider -> {
+        					list.add(provider);
+            			}).ifRight(err -> {
+        					CustomBGM.LOGGER.debug("Could not load custom music properties from " + resourceLocation + " in pack " + resource.sourcePackId() + ": failed to parse provider instance: " + err.message());
             			});
-            		}).ifError(err -> {
-    					CustomBGM.LOGGER.debug("Could not load custom music properties from " + resourceLocation + " in pack " + resource.sourcePackId() + ": failed to parse provider instance: " + err);
-            		});
+            		} else {
+        				CustomBGM.LOGGER.debug("Skipping loading custom music properties from " + resourceLocation + " in pack " + resource.sourcePackId() + " as it's conditions were not met");
+            		}
             	}
             }
             catch (Throwable t) {

@@ -1,19 +1,16 @@
 package com.firemerald.custombgm.api.providers;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.firemerald.custombgm.api.BgmDistribution;
 import com.firemerald.custombgm.api.CustomBGMRegistries;
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
 import com.firemerald.custombgm.providers.conditions.constant.TrueCondition;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 public abstract class BGMProvider implements Comparable<BGMProvider> {
-    public static final Codec<BGMProvider> CODEC = CustomBGMRegistries.PROVIDER_CODECS.byNameCodec().dispatch(BGMProvider::codec, Function.identity());
-    public static final Codec<Optional<net.neoforged.neoforge.common.conditions.WithConditions<BGMProvider>>> CONDITIONAL_CODEC = net.neoforged.neoforge.common.conditions.ConditionalOps.createConditionalCodecWithConditions(CODEC);
+    public static final Codec<BGMProvider> CODEC = Codecs.byNameCodec(CustomBGMRegistries.providerCodecs).dispatch(BGMProvider::codec, MapCodec::codec);
 
 	public final int priority;
 	public final BGMProviderCondition condition;

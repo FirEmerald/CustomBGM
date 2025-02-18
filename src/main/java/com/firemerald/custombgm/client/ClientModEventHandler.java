@@ -2,7 +2,6 @@ package com.firemerald.custombgm.client;
 
 import com.firemerald.custombgm.api.CustomBGMAPI;
 import com.firemerald.custombgm.client.model.CustomBGMModelLayers;
-import com.firemerald.custombgm.common.CommonModEventHandler;
 import com.firemerald.custombgm.datagen.CustomBGMClientMusicProviderProvider;
 import com.firemerald.custombgm.datagen.CustomBGMModelProvider;
 import com.firemerald.custombgm.init.CustomBGMEntities;
@@ -11,13 +10,13 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.data.DataProvider;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = CustomBGMAPI.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientModEventHandler
@@ -30,8 +29,8 @@ public class ClientModEventHandler
 	}
 
 	@SubscribeEvent
-	public static void onRegisterClientReloadListeners(AddClientReloadListenersEvent event) {
-		event.addListener(CustomBGMAPI.id("resource_pack_providers"), bgmProviders = Providers.forResourcePacks());
+	public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+		event.registerReloadListener(bgmProviders = Providers.forResourcePacks());
 	}
 
 	@SubscribeEvent
@@ -45,11 +44,12 @@ public class ClientModEventHandler
 	}
 
 	@SubscribeEvent
-	public static void gatherClientData(GatherDataEvent.Client event)
+	public static void gatherClientData(GatherDataEvent event)
 	{
-		event.getGenerator().addProvider(true, (DataProvider.Factory<CustomBGMModelProvider>) CustomBGMModelProvider::new);
-		event.getGenerator().addProvider(true, (DataProvider.Factory<CustomBGMClientMusicProviderProvider>) (output -> new CustomBGMClientMusicProviderProvider(output, event.getLookupProvider())));
-		CommonModEventHandler.gatherData(event);
+		event.getGenerator().addProvider(event.includeClient(),
+				(DataProvider.Factory<CustomBGMModelProvider>) output -> new CustomBGMModelProvider(output, event.getExistingFileHelper()));
+		event.getGenerator().addProvider(event.includeClient(),
+				(DataProvider.Factory<CustomBGMClientMusicProviderProvider>) (output -> new CustomBGMClientMusicProviderProvider(output, event.getLookupProvider())));
 	}
 
     @SubscribeEvent

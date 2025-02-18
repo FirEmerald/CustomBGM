@@ -2,29 +2,30 @@ package com.firemerald.custombgm.operators;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import javax.annotation.Nullable;
 
 import com.firemerald.custombgm.client.gui.screen.EntityTesterScreen;
 import com.firemerald.custombgm.client.gui.screen.OperatorScreen;
 
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorBase<Entity, O, S> {
 	public List<ResourceLocation> enabled = new ArrayList<>();
@@ -61,7 +62,7 @@ public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extend
 	}
 
 	public static ResourceLocation getId(Entity entity) {
-		return BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+		return ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
 	}
 
 	@Override
@@ -92,7 +93,7 @@ public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extend
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf) {
+	public void read(FriendlyByteBuf buf) {
 		int prevCount = count;
 		super.read(buf);
 		min = (short) buf.readVarInt();
@@ -107,7 +108,7 @@ public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extend
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf) {
+	public void write(FriendlyByteBuf buf) {
 		super.write(buf);
 		buf.writeVarInt(min);
 		buf.writeVarInt(max);
@@ -127,7 +128,7 @@ public class EntityTesterOperator<O extends EntityTesterOperator<O, S>, S extend
 		return new EntityTesterScreen<>(source);
 	}
 
-	public static void addTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag, DataComponentType<CustomData> componentType)
+	public static void addTooltip(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag tooltipFlag, Function<ItemStack, CompoundTag> getData)
 	{
 		tooltipComponents.add(Component.translatable("custombgm.tooltip.entity_tester"));
 	}

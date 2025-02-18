@@ -2,23 +2,23 @@ package com.firemerald.custombgm.blocks;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.firemerald.custombgm.blockentity.BlockEntityEntityOperator;
 import com.firemerald.custombgm.item.ITooltipProvider;
 import com.firemerald.custombgm.operators.IOperatorSource;
 import com.firemerald.custombgm.operators.OperatorBase;
 import com.firemerald.fecore.block.BlockEntityGUIBlock;
+import com.firemerald.fecore.util.StackUtils;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -30,9 +30,9 @@ public abstract class BlockOperator<O extends OperatorBase<?, O, S>, S extends B
 {
 	protected final ITooltipProvider tooltip;
 
-    public BlockOperator(ITooltipProvider tooltip, ResourceKey<Block> id)
+    public BlockOperator(ITooltipProvider tooltip)
     {
-    	this(tooltip, BlockBehaviour.Properties.of().setId(id).mapColor(MapColor.COLOR_BROWN).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).noLootTable());
+    	this(tooltip, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).noLootTable());
     }
 
     public BlockOperator(ITooltipProvider tooltip, BlockBehaviour.Properties properties)
@@ -72,10 +72,10 @@ public abstract class BlockOperator<O extends OperatorBase<?, O, S>, S extends B
 	public abstract S newBlockEntity(BlockPos blockPos, BlockState blockState);
 
 	@Override
-	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
-		super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-		this.tooltip.addTooltip(stack, context, tooltipComponents, tooltipFlag, DataComponents.BLOCK_ENTITY_DATA);
+		super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+		this.tooltip.addTooltip(stack, level, tooltipComponents, tooltipFlag, StackUtils::decodeBlockData);
 		tooltipComponents.add(Component.translatable("custombgm.tooltip.redstone_activated"));
 	}
 

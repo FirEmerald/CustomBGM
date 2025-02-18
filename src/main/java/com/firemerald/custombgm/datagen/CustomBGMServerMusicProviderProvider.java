@@ -3,7 +3,7 @@ package com.firemerald.custombgm.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.commons.lang3.function.TriConsumer;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import com.firemerald.custombgm.api.BGM;
 import com.firemerald.custombgm.api.CustomBGMAPI;
@@ -20,7 +20,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.Target;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
-import net.neoforged.neoforge.common.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public class CustomBGMServerMusicProviderProvider extends MusicProviderProvider {
 	public CustomBGMServerMusicProviderProvider(PackOutput output, CompletableFuture<Provider> completableFuture) {

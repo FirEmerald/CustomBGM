@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[46,)"
+license="MIT License"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #TODO
+[[mods]]
+modId="custombgm"
+version="${file.jarVersion}"
+displayName="Custom BGM"
+# A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+logoFile="logo.png"
+credits="FirEmerald"
+authors="FirEmerald"
+description='''
+Library that allows modders, resource pack makers, and map makers to add and customize background music. 
+Also acts as a utility to enable arbitrary loop points for sounds.
+'''
+[[dependencies.custombgm]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20,1.21)"
+    ordering="NONE"
+    side="BOTH"
+	

@@ -2,9 +2,9 @@ package com.firemerald.custombgm.blocks;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import com.firemerald.custombgm.entity.OperatorMinecart;
-import com.mojang.serialization.MapCodec;
+import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,33 +16,24 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.RailState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ActivatorDetectorRailBlock extends PoweredRailBlock
 {
-    public static final MapCodec<PoweredRailBlock> CODEC = simpleCodec(ActivatorDetectorRailBlock::new);
 	public static final BooleanProperty DETECTED = BooleanProperty.create("detected");
-
-    @Override
-    public MapCodec<PoweredRailBlock> codec() {
-        return CODEC;
-    }
 
 	public ActivatorDetectorRailBlock(Properties properties)
 	{
@@ -57,17 +48,17 @@ public class ActivatorDetectorRailBlock extends PoweredRailBlock
 	}
 
     @Override
-    protected boolean isSignalSource(BlockState state) {
+	public boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!level.isClientSide && !state.getValue(DETECTED)) this.checkPressed(level, pos, state);
     }
 
     @Override
-    protected void tick(BlockState p_221060_, ServerLevel p_221061_, BlockPos p_221062_, RandomSource p_221063_) {
+    public void tick(BlockState p_221060_, ServerLevel p_221061_, BlockPos p_221062_, RandomSource p_221063_) {
         if (p_221060_.getValue(DETECTED)) this.checkPressed(p_221061_, p_221062_, p_221060_);
     }
 
@@ -97,7 +88,7 @@ public class ActivatorDetectorRailBlock extends PoweredRailBlock
     }
 
     @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (!oldState.is(state.getBlock())) {
             BlockState blockstate = this.updateState(state, level, pos, isMoving);
             this.checkPressed(level, pos, blockstate);
@@ -105,38 +96,25 @@ public class ActivatorDetectorRailBlock extends PoweredRailBlock
     }
 
     @Override
-    protected boolean hasAnalogOutputSignal(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
-        if (blockState.getValue(DETECTED)) {
-        	try { //we attempt to directly use the detector rail analog output signal code so that any other mod-added comparator outputs are supported
-            	BlockState testState = Blocks.DETECTOR_RAIL.defaultBlockState().setValue(DetectorRailBlock.POWERED, true);
-            	//copy all other properties
-            	for (Property<?> prop : blockState.getProperties()) if (prop != DetectorRailBlock.POWERED) testState = copyProperty(prop, blockState, testState);
-            	return testState.getAnalogOutputSignal(level, pos);
-        	} catch (Exception e) { //fallback in case the hack above fails
-        		//TODO log exception once
-                List<MinecartCommandBlock> list = this.getInteractingMinecartOfType(level, pos, MinecartCommandBlock.class, entity -> true);
-                if (!list.isEmpty()) return list.get(0).getCommandBlock().getSuccessCount();
-                List<AbstractMinecart> list1 = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, EntitySelector.CONTAINER_ENTITY_SELECTOR);
-                if (!list1.isEmpty()) return AbstractContainerMenu.getRedstoneSignalFromContainer((Container)list1.get(0));
-    			@SuppressWarnings("rawtypes")
-    			List<OperatorMinecart> list2 = this.getInteractingMinecartOfType(level, pos, OperatorMinecart.class, entity -> true);
-                if (!list2.isEmpty()) return list2.get(0).getComparatorLevel();
-        	}
-        }
-        return 0;
-    }
-
-    private <T extends Comparable<T>> BlockState copyProperty(Property<T> property, BlockState from, BlockState to) {
-    	return to.setValue(property, from.getValue(property));
+    public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+    	if (blockState.getValue(DETECTED)) {
+    		List<MinecartCommandBlock> list = this.getInteractingMinecartOfType(level, pos, MinecartCommandBlock.class, (p_153123_) -> true);
+    		if (!list.isEmpty()) return list.get(0).getCommandBlock().getSuccessCount();
+    		List<AbstractMinecart> carts = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, Entity::isAlive);
+    		if (!carts.isEmpty() && carts.get(0).getComparatorLevel() > -1) return carts.get(0).getComparatorLevel();
+    		List<AbstractMinecart> list1 = carts.stream().filter(EntitySelector.CONTAINER_ENTITY_SELECTOR).collect(Collectors.toList());
+    		if (!list1.isEmpty()) return AbstractContainerMenu.getRedstoneSignalFromContainer((Container)list1.get(0));
+    	}
+    	return 0;
     }
 
     private <T extends AbstractMinecart> List<T> getInteractingMinecartOfType(Level level, BlockPos pos, Class<T> cartType, Predicate<Entity> filter) {
-        return level.getEntitiesOfClass(cartType, this.getSearchBB(pos), filter);
+    	return level.getEntitiesOfClass(cartType, this.getSearchBB(pos), filter);
     }
 
     private AABB getSearchBB(BlockPos pos) {
@@ -153,9 +131,9 @@ public class ActivatorDetectorRailBlock extends PoweredRailBlock
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
-		super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+		super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
 		tooltipComponents.add(Component.translatable("custombgm.tooltip.activator_detector_rail"));
 	}
 }

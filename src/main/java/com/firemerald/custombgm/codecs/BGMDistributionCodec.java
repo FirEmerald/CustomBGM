@@ -95,13 +95,13 @@ public class BGMDistributionCodec implements Codec<IDistribution<BGM>> {
 				final LoopType constantLoopFinal = constantLoop;
 				final Float constantWeightFinal = constantWeight;
 				if (entries != null) entries.forEach((bgm, weight) -> {
-					T key = ResourceLocation.CODEC.encode(bgm.sound(), ops, prefix).getOrThrow();
+					T key = ResourceLocation.CODEC.encode(bgm.sound(), ops, prefix).getOrThrow(false, str -> {});
 					SoundProperties props = new SoundProperties(bgm, weight, constantLoopFinal, constantWeightFinal);
 					if (props.isEmpty()) defaults.add(key);
 					else map.add(key, SoundProperties.ADAPTABLE_CODEC.encode(props, ops, prefix));
 				});
 				if (entries2 != null) entries2.forEach(bgm -> {
-					T key = ResourceLocation.CODEC.encode(bgm.sound(), ops, prefix).getOrThrow();
+					T key = ResourceLocation.CODEC.encode(bgm.sound(), ops, prefix).getOrThrow(false, str -> {});
 					SoundProperties props = new SoundProperties(bgm, constantLoopFinal);
 					if (props.isEmpty()) defaults.add(key);
 					else map.add(key, SoundProperties.ADAPTABLE_CODEC.encode(props, ops, prefix));
@@ -128,12 +128,12 @@ public class BGMDistributionCodec implements Codec<IDistribution<BGM>> {
 
 	public <T> DataResult<T> decodeInto(DynamicOps<T> ops, T input, LoopType loop, float weight, Consumer<WeightedBGM> add) {
 		DataResult<Pair<ResourceLocation,T>> singleSound = ResourceLocation.CODEC.decode(ops, input);
-		if (singleSound.isSuccess()) return singleSound.map(pair -> {
+		if (Codecs.isSuccess(singleSound)) return singleSound.map(pair -> {
 			add.accept(new WeightedBGM(pair.getFirst(), loop, weight));
 			return pair.getSecond();
 		});
 		DataResult<MapLike<T>> mapResult = ops.getMap(input);
-		if (mapResult.isSuccess()) return mapResult.flatMap(map -> {
+		if (Codecs.isSuccess(mapResult)) return mapResult.flatMap(map -> {
 			List<String> errors = new ArrayList<>();
 			LoopType newLoop = Codecs.getOrDefault(ops, map, "loop", loop, LoopType.CODEC, errors::add);
 			float newWeight = Codecs.getOrDefault(ops, map, "weight", 1f, Codec.FLOAT, errors::add) * weight;
@@ -143,25 +143,25 @@ public class BGMDistributionCodec implements Codec<IDistribution<BGM>> {
 			T music = map.get("music");
 			if (music != null) {
 				DataResult<T> additional = decodeInto(ops, music, newLoop, newWeight, noPropErrors ? add : a -> {}).mapError(err -> "Invalid \"music\": " + err);
-				if (additional.isError()) errors.add("Invalid \"music\": " + additional.error().get().message());
+				if (Codecs.isError(additional)) errors.add("Invalid \"music\": " + additional.error().get().message());
 			}
 
 			map.entries().forEach(pair -> {
 				DataResult<Pair<String,T>> keyStrRes = Codec.STRING.decode(ops, pair.getFirst());
-				if (keyStrRes.isError()) errors.add("Invalid key: " + keyStrRes.error().get().message());
+				if (Codecs.isError(keyStrRes)) errors.add("Invalid key: " + keyStrRes.error().get().message());
 				else {
-					String keyStr = keyStrRes.getOrThrow().getFirst();
+					String keyStr = keyStrRes.getOrThrow(false, errors::add).getFirst();
 					switch (keyStr) {
 					case "loop", "weight", "music": break; //reserved
 					default:
 						DataResult<ResourceLocation> soundRes = ResourceLocation.read(keyStr);
-						if (soundRes.isError()) errors.add("Invalid key: " + keyStrRes.error().get().message());
+						if (Codecs.isError(soundRes)) errors.add("Invalid key: " + keyStrRes.error().get().message());
 						else {
-							ResourceLocation sound = soundRes.getOrThrow();
+							ResourceLocation sound = soundRes.getOrThrow(false, errors::add);
 							DataResult<Pair<SoundProperties, T>> propsRes = SoundProperties.ADAPTABLE_CODEC.decode(ops, pair.getSecond());
-							if (propsRes.isError()) errors.add("Invalid sound properties: " + propsRes.error().get().message());
+							if (Codecs.isError(propsRes)) errors.add("Invalid sound properties: " + propsRes.error().get().message());
 							else if (noPropErrors) {
-								SoundProperties props = propsRes.getOrThrow().getFirst();
+								SoundProperties props = propsRes.getOrThrow(false, errors::add).getFirst();
 								add.accept(new WeightedBGM(sound, props, newLoop, newWeight));
 							}
 						}
@@ -177,11 +177,11 @@ public class BGMDistributionCodec implements Codec<IDistribution<BGM>> {
 			});
 		});
 		DataResult<Consumer<Consumer<T>>> listResult = ops.getList(input);
-		if (listResult.isSuccess()) return listResult.flatMap(decoder -> {
+		if (Codecs.isSuccess(listResult)) return listResult.flatMap(decoder -> {
 			List<String> errors = new ArrayList<>();
 			decoder.accept(obj -> {
 				DataResult<T> result = decodeInto(ops, obj, loop, weight, add);
-				if (result.isError()) errors.add(result.error().get().message());
+				if (Codecs.isError(result)) errors.add(result.error().get().message());
 			});
 			if (errors.isEmpty()) return DataResult.success(ops.empty());
 			else return DataResult.error(() -> {
@@ -198,14 +198,14 @@ public class BGMDistributionCodec implements Codec<IDistribution<BGM>> {
 	}
 
 	public static Tag toTag(IDistribution<BGM> distribution) {
-		return INSTANCE.encode(distribution, NbtOps.INSTANCE, EndTag.INSTANCE).getOrThrow();
+		return INSTANCE.encode(distribution, NbtOps.INSTANCE, EndTag.INSTANCE).getOrThrow(false, str -> {});
 	}
 
 	public static IDistribution<BGM> fromTag(Tag tag) {
 		if (tag == null) return EmptyDistribution.get();
 		else {
 			DataResult<Pair<IDistribution<BGM>, Tag>> result = INSTANCE.decode(NbtOps.INSTANCE, tag);
-			if (result.isSuccess()) return result.getOrThrow().getFirst();
+			if (Codecs.isSuccess(result)) return result.getOrThrow(false, str -> {}).getFirst();
 			else return EmptyDistribution.get();
 		}
 	}

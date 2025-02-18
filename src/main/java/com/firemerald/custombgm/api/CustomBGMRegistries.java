@@ -1,5 +1,7 @@
 package com.firemerald.custombgm.api;
 
+import java.util.function.Supplier;
+
 import com.firemerald.custombgm.api.providers.BGMProvider;
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderCondition;
 import com.firemerald.custombgm.api.providers.volume.BGMProviderVolume;
@@ -8,12 +10,12 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class CustomBGMRegistries {
-    public static final Registry<MapCodec<? extends BGMProvider>> PROVIDER_CODECS = new RegistryBuilder<>(Keys.PROVIDER_CODECS).create();
-    public static final Registry<MapCodec<? extends BGMProviderCondition>> CONDITION_CODECS = new RegistryBuilder<>(Keys.CONDITION_CODECS).create();
-    public static final Registry<MapCodec<? extends BGMProviderVolume>> VOLUME_CODECS = new RegistryBuilder<>(Keys.VOLUME_CODECS).create();
+    public static Supplier<IForgeRegistry<MapCodec<? extends BGMProvider>>> providerCodecs;
+    public static Supplier<IForgeRegistry<MapCodec<? extends BGMProviderCondition>>> conditionCodecs;
+    public static Supplier<IForgeRegistry<MapCodec<? extends BGMProviderVolume>>> volumeCodecs;
 
     public static class Keys {
         public static final ResourceKey<Registry<MapCodec<? extends BGMProvider>>> PROVIDER_CODECS = key("provider_codecs");

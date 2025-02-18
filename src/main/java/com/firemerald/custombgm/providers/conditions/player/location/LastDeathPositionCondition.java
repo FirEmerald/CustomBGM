@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.firemerald.custombgm.api.providers.conditions.BGMProviderPlayerCondition;
 import com.firemerald.custombgm.api.providers.conditions.PlayerConditionData;
+import com.firemerald.fecore.codec.Codecs;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;
@@ -12,7 +13,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.world.entity.player.Player;
 
 public record LastDeathPositionCondition(MinMaxBounds.Doubles distance) implements BGMProviderPlayerCondition {
-	public static final MapCodec<LastDeathPositionCondition> CODEC = MinMaxBounds.Doubles.CODEC.fieldOf("distance").xmap(LastDeathPositionCondition::new, LastDeathPositionCondition::distance);
+	public static final MapCodec<LastDeathPositionCondition> CODEC = Codecs.DOUBLE_BOUNDS.fieldOf("distance").xmap(LastDeathPositionCondition::new, LastDeathPositionCondition::distance);
 
 	@Override
 	public MapCodec<LastDeathPositionCondition> codec() {

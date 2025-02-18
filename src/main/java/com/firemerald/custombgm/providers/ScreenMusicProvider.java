@@ -11,10 +11,10 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.sounds.Music;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.util.thread.EffectiveSide;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 public class ScreenMusicProvider extends BuiltInMusicProvider
 {
@@ -47,7 +47,7 @@ public class ScreenMusicProvider extends BuiltInMusicProvider
 		Screen screen = Minecraft.getInstance().screen;
 		if (screen == null) return null;
 		Music music = screen.getBackgroundMusic();
-		return music == null || !condition.test(player) ? null : new BgmDistribution(new SingletonWeightedDistribution<>(new BGM(music.getEvent().getKey().location(), loop), weight), 1f);
+		return music == null || !condition.test(player) ? null : new BgmDistribution(new SingletonWeightedDistribution<>(new BGM(music, loop), weight), 1f);
 	}
 
 	@Override

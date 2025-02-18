@@ -14,6 +14,7 @@ import com.firemerald.custombgm.api.BgmDistribution;
 import com.firemerald.custombgm.client.gui.EnumSearchMode;
 import com.firemerald.custombgm.operators.BossSpawnerOperator;
 import com.firemerald.custombgm.operators.IOperatorSource;
+import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.ToggleButton;
@@ -24,18 +25,18 @@ import com.firemerald.fecore.client.gui.components.text.CompoundTagField;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
 import com.firemerald.fecore.client.gui.components.text.IntegerField;
 import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
-import com.firemerald.fecore.network.serverbound.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.network.serverbound.EntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.BlockEntityGUIClosedPacket;
+import com.firemerald.fecore.network.server.EntityGUIClosedPacket;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class BossSpawnerScreen<O extends BossSpawnerOperator<O, S>, S extends IOperatorSource<O, S>> extends OperatorScreen<O, S> {
 	public class EntityButton extends Button {
@@ -110,7 +111,7 @@ public class BossSpawnerScreen<O extends BossSpawnerOperator<O, S>, S extends IO
 		super(Component.translatable("custombgm.gui.bossspawner"), source);
 		this.font = Minecraft.getInstance().font;
 		MutableInt y = new MutableInt(0);
-		BuiltInRegistries.ENTITY_TYPE.entrySet().forEach(entry -> {
+		ForgeRegistries.ENTITY_TYPES.getEntries().forEach(entry -> {
 			ResourceLocation reg = entry.getKey().location();
 			EntityType<?> type = entry.getValue();
 			if (type.canSummon()) allEntities.add(new EntityButton(0, y.getValue(), 200, y.addAndGet(20), type.getDescription(), reg));
@@ -160,7 +161,7 @@ public class BossSpawnerScreen<O extends BossSpawnerOperator<O, S>, S extends IO
 		entityButtonsScroll = new VerticalScrollBar(400, 40, 420, 220, entityButtons);
 
 		okay = new Button(0, 220, 200, 20, Component.translatable("fecore.gui.confirm"), () -> {
-			(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this)).sendToServer();
+			FECoreMod.NETWORK.sendToServer(source.isEntity() ? new EntityGUIClosedPacket(this) : new BlockEntityGUIClosedPacket(this));
 			this.onClose();
 		});
 		cancel = new Button(200, 220, 400, 20, Component.translatable("fecore.gui.cancel"), () -> {
@@ -277,12 +278,12 @@ public class BossSpawnerScreen<O extends BossSpawnerOperator<O, S>, S extends IO
 	@Override
 	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.renderBackground(guiGraphics, mx, my, partialTicks);
+		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 
 	@Override
-	public void read(RegistryFriendlyByteBuf buf)
+	public void read(FriendlyByteBuf buf)
 	{
 		super.read(buf);
 		music = BgmDistribution.STREAM_CODEC.decode(buf);
@@ -324,7 +325,7 @@ public class BossSpawnerScreen<O extends BossSpawnerOperator<O, S>, S extends IO
 	}
 
 	@Override
-	public void write(RegistryFriendlyByteBuf buf)
+	public void write(FriendlyByteBuf buf)
 	{
 		super.write(buf);
 		BgmDistribution.STREAM_CODEC.encode(buf, music);

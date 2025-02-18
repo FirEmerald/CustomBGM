@@ -6,10 +6,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.client.Minecraft;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.util.thread.EffectiveSide;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 public class PlayBossMusicCondition implements BGMProviderCondition {
 	public static final MapCodec<PlayBossMusicCondition> CODEC = Codec.BOOL.optionalFieldOf("play_music", true).xmap(PlayBossMusicCondition::of, condition -> condition.playBossMusic);

@@ -2,8 +2,8 @@ package com.firemerald.custombgm.client.gui.components;
 
 import com.firemerald.custombgm.client.BGMEngine;
 import com.firemerald.fecore.client.gui.components.SpriteButton;
+import com.firemerald.fecore.client.gui.components.WidgetSprites;
 
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceLocation;
 
 public class TrackControlButton extends SpriteButton {
