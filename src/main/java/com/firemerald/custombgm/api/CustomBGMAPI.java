@@ -12,6 +12,6 @@ public abstract class CustomBGMAPI
     public static final Logger LOGGER = LoggerFactory.getLogger("Custom BGM API");
 
     public static ResourceLocation id(String name) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+		return new ResourceLocation(MOD_ID, name);
 	}
 }

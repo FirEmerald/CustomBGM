@@ -51,7 +51,7 @@ public abstract class MusicProviderProvider implements DataProvider {
             Set<ResourceLocation> set = new HashSet<>();
             List<CompletableFuture<?>> list = new ArrayList<>();
 			generate(registries, (name, loadConditions, provider) -> {
-				ResourceLocation key = ResourceLocation.fromNamespaceAndPath(modId, name);
+				ResourceLocation key = new ResourceLocation(modId, name);
 				if (set.contains(key)) throw new IllegalStateException("Duplicate provider " + key.toString() + " for " + target);
 				DataResult<JsonElement> encoded = BGMProvider.CODEC.encode(provider, RegistryOps.create(JsonOps.INSTANCE, registries), JsonNull.INSTANCE);
 				encoded.get().ifLeft(json -> {

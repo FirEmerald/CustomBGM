@@ -80,7 +80,7 @@ public class BGMDistributionBuilder {
 	}
 
 	public BGMDistributionBuilder add(String namespace, String path, LoopType loop, float weight) {
-		return add(ResourceLocation.fromNamespaceAndPath(namespace, path), loop, weight);
+		return add(new ResourceLocation(namespace, path), loop, weight);
 	}
 
 	public BGMDistributionBuilder add(String sound, LoopType loop, float weight) {
@@ -112,7 +112,7 @@ public class BGMDistributionBuilder {
 	}
 
 	public BGMDistributionBuilder add(String namespace, String path, float weight) {
-		return add(ResourceLocation.fromNamespaceAndPath(namespace, path), weight);
+		return add(new ResourceLocation(namespace, path), weight);
 	}
 
 	public BGMDistributionBuilder add(String sound, float weight) {
@@ -148,7 +148,7 @@ public class BGMDistributionBuilder {
 	}
 
 	public BGMDistributionBuilder add(String namespace, String path, LoopType loop) {
-		return add(ResourceLocation.fromNamespaceAndPath(namespace, path), loop);
+		return add(new ResourceLocation(namespace, path), loop);
 	}
 
 	public BGMDistributionBuilder add(String sound, LoopType loop) {
@@ -180,7 +180,7 @@ public class BGMDistributionBuilder {
 	}
 
 	public BGMDistributionBuilder add(String namespace, String path) {
-		return add(ResourceLocation.fromNamespaceAndPath(namespace, path));
+		return add(new ResourceLocation(namespace, path));
 	}
 
 	public BGMDistributionBuilder add(String sound) {

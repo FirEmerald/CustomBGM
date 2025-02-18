@@ -48,7 +48,7 @@ public class BGM implements Comparable<BGM> {
 	}
 
 	public BGM(String namespace, String path, LoopType loop) {
-		this(ResourceLocation.fromNamespaceAndPath(namespace, path), loop);
+		this(new ResourceLocation(namespace, path), loop);
 	}
 
 	public BGM(SoundEvent sound, LoopType loop) {
@@ -80,7 +80,7 @@ public class BGM implements Comparable<BGM> {
 	}
 
 	public BGM(String namespace, String path) {
-		this(ResourceLocation.fromNamespaceAndPath(namespace, path));
+		this(new ResourceLocation(namespace, path));
 	}
 
 	public BGM(SoundEvent sound) {
