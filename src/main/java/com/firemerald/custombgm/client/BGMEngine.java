@@ -46,10 +46,6 @@ public class BGMEngine {
 		private static final float TRANSITION_PER_TICK = 1 / 40f;
 		private float volume = 1;
 
-		public BGMInstance(@Nullable BGMInstance previous) {
-			this(previous, null);
-		}
-
 		public BGMInstance(@Nullable BGMInstance previous, @Nullable CustomBGMSoundInstance bgm) {
 			soundManager = Minecraft.getInstance().getSoundManager();
 			this.previous = previous;
